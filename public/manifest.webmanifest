@@ -1,0 +1,15 @@
+{
+  "name": "UBIT Technologiez",
+  "short_name": "UBIT",
+  "description": "Enterprise IT infrastructure solutions provider",
+  "theme_color": "#141c2e",
+  "background_color": "#141c2e",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
+}

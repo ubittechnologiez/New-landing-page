@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#141c2e"/>
+      <stop offset="100%" stop-color="#0c1220"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#4a9eff"/>
+      <stop offset="40%" stop-color="#2670c4"/>
+      <stop offset="100%" stop-color="#0f3d7a"/>
+    </linearGradient>
+    <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c4986a"/>
+      <stop offset="50%" stop-color="#AA8159"/>
+      <stop offset="100%" stop-color="#8a6540"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0.5" y1="0" x2="0.5" y2="0.5">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  
+  <g transform="translate(64, 70)">
+    <!-- Outer U ribbon -->
+    <path d="M-30,-34 L-30,4 Q-30,18 -16,18 L-2,18 L-2,-14 L2,-14 L2,18 L16,18 Q30,18 30,4 L30,-34" fill="url(#blue)" stroke="url(#bronze)" stroke-width="2"/>
+    <!-- Middle U ribbon -->
+    <path d="M-20,-34 L-20,0 Q-20,10 -9,10 L-2,10 L-2,-14 L2,-14 L2,10 L9,10 Q20,10 20,0 L20,-34" fill="url(#blue)" stroke="url(#bronze)" stroke-width="2"/>
+    <!-- Inner U ribbon -->
+    <path d="M-10,-34 L-10,-4 Q-10,4 -2,4 L2,4 Q10,4 10,-4 L10,-34" fill="url(#blue)" stroke="url(#bronze)" stroke-width="2"/>
+    
+    <!-- Gloss highlights -->
+    <path d="M-28,-34 L-28,0 Q-28,8 -22,8" fill="none" stroke="url(#gloss)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-18,-34 L-18,-4 Q-18,2 -13,2" fill="none" stroke="url(#gloss)" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>
