@@ -39,7 +39,7 @@ import { Link } from "react-router";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BrandLockup } from "@/components/BrandImage";
-
+import Spline from '@splinetool/react-spline';
 
 
 import { Badge } from "@/components/ui/badge";
@@ -891,9 +891,8 @@ function Hero() {
         style={{ y: contentY, opacity: contentOpacity }}
         className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-32 md:px-8"
       >
-
-
-
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+          <div className="flex flex-col relative z-20">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -960,6 +959,20 @@ function Hero() {
                 </Magnetic>
               </div>
             </motion.div>
+          </div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.6 }}
+            className="relative h-[350px] w-full md:h-[450px] lg:h-[600px] z-10 flex items-center justify-center -mx-4 lg:mx-0"
+          >
+            <Spline 
+              scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" 
+              className="w-full h-full object-contain pointer-events-none md:pointer-events-auto"
+            />
+          </motion.div>
+        </div>
 
 
         <motion.dl
