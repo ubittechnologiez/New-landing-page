@@ -13,6 +13,7 @@ import {
   ArrowRight,
   BadgeCheck,
   BarChart3,
+  Bot,
   FileText,
   HardDrive,
   Headphones,
@@ -891,100 +892,96 @@ function Hero() {
         style={{ y: contentY, opacity: contentOpacity }}
         className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-32 md:px-8"
       >
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-          <div className="flex flex-col relative z-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-              className="mb-8 flex items-center gap-3"
-            >
-              <Badge
-                variant="outline"
-                className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
-              >
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-                  <span className="relative inline-flex size-2 rounded-full bg-primary" />
-                </span>
-                Enterprise IT Solutions Provider — Salem, India
-              </Badge>
-            </motion.div>
-
-            <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
-              <RevealLine text="Powering your" delay={0.15} />
-              <RevealLine text="business with" delay={0.27} />
-              <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
-              <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
-                <motion.span
-                  className="block"
-                  initial={{ y: "112%" }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 0.85, ease: EASE, delay: 0.51 }}
-                >
-                  <RotatingWord words={ROTATING_WORDS} />
-                </motion.span>
-              </span>
-            </h1>
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
-              className="mt-10 flex max-w-xl flex-col gap-8"
-            >
-              <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-                From high-performance servers and firewalls to complete networking
-                solutions — UBIT Technologiez delivers cutting-edge technology
-                infrastructure that scales with your business.
-              </p>
-              <div className="flex flex-wrap items-center gap-4">
-                <Magnetic>
-                  <Button asChild size="lg" className="rounded-full">
-                    <Link to="/quote">
-                      Get a quote
-                      <ArrowRight className="size-4" />
-                    </Link>
-                  </Button>
-                </Magnetic>
-                <Magnetic strength={0.18}>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="lg"
-                    className="rounded-full border-white/15 bg-white/5 backdrop-blur"
-                  >
-                    <a href="#solutions">Explore solutions</a>
-                  </Button>
-                </Magnetic>
-              </div>
-            </motion.div>
-          </div>
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.6 }}
-            className="relative h-[350px] w-full md:h-[450px] lg:h-[600px] z-10 flex items-center justify-center -mx-4 lg:mx-0 perspective-[1000px]"
+        {/* Absolute Robot Container for Desktop / Relative for Mobile */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: EASE, delay: 0.4 }}
+          className="relative mt-8 h-[300px] w-full z-10 flex items-center justify-center lg:absolute lg:right-8 lg:top-1/2 lg:-translate-y-1/2 lg:mt-0 lg:h-[500px] lg:w-[450px] xl:w-[500px]"
+        >
+          <div className="absolute inset-0 bg-primary/20 blur-[120px] rounded-full -z-10" />
+          <motion.div
+            animate={{ 
+              y: [0, -20, 0],
+              rotate: [-2, 2, -2]
+            }}
+            transition={{ 
+              duration: 6, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="w-full h-full flex items-center justify-center"
           >
-            <motion.img
-              src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1000&auto=format&fit=crop"
-              alt="Greeting Robot"
-              className="w-full h-full max-h-[500px] object-cover rounded-3xl border border-white/10 shadow-2xl"
-              animate={{ 
-                y: [0, -20, 0],
-                rotateY: [-5, 5, -5],
-                rotateX: [2, -2, 2]
-              }}
-              transition={{ 
-                duration: 6, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-            />
-            
-            {/* Glowing backdrop for the robot */}
-            <div className="absolute inset-0 bg-primary/20 blur-[100px] -z-10 rounded-full" />
+            <Bot className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 text-primary drop-shadow-[0_0_40px_rgba(var(--primary),0.6)]" strokeWidth={1} />
+          </motion.div>
+        </motion.div>
+
+        <div className="relative z-20 w-full lg:w-[65%] xl:w-[70%]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+            className="mb-8 flex items-center gap-3"
+          >
+            <Badge
+              variant="outline"
+              className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
+            >
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-primary" />
+              </span>
+              Enterprise IT Solutions Provider — Salem, India
+            </Badge>
+          </motion.div>
+
+          <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
+            <RevealLine text="Powering your" delay={0.15} />
+            <RevealLine text="business with" delay={0.27} />
+            <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
+            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+              <motion.span
+                className="block"
+                initial={{ y: "112%" }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.85, ease: EASE, delay: 0.51 }}
+              >
+                <RotatingWord words={ROTATING_WORDS} />
+              </motion.span>
+            </span>
+          </h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
+            className="mt-10 flex max-w-xl flex-col gap-8"
+          >
+            <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
+              From high-performance servers and firewalls to complete networking
+              solutions — UBIT Technologiez delivers cutting-edge technology
+              infrastructure that scales with your business.
+            </p>
+            <div className="flex flex-wrap items-center gap-4">
+              <Magnetic>
+                <Button asChild size="lg" className="rounded-full">
+                  <Link to="/quote">
+                    Get a quote
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </Magnetic>
+              <Magnetic strength={0.18}>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="rounded-full border-white/15 bg-white/5 backdrop-blur"
+                >
+                  <a href="#solutions">Explore solutions</a>
+                </Button>
+              </Magnetic>
+            </div>
           </motion.div>
         </div>
 
