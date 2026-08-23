@@ -965,12 +965,26 @@ function Hero() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: EASE, delay: 0.6 }}
-            className="relative h-[350px] w-full md:h-[450px] lg:h-[600px] z-10 flex items-center justify-center -mx-4 lg:mx-0"
+            className="relative h-[350px] w-full md:h-[450px] lg:h-[600px] z-10 flex items-center justify-center -mx-4 lg:mx-0 perspective-[1000px]"
           >
-            <Spline 
-              scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" 
-              className="w-full h-full object-contain pointer-events-none md:pointer-events-auto"
+            <motion.img
+              src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1000&auto=format&fit=crop"
+              alt="Greeting Robot"
+              className="w-full h-full max-h-[500px] object-cover rounded-3xl border border-white/10 shadow-2xl"
+              animate={{ 
+                y: [0, -20, 0],
+                rotateY: [-5, 5, -5],
+                rotateX: [2, -2, 2]
+              }}
+              transition={{ 
+                duration: 6, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
             />
+            
+            {/* Glowing backdrop for the robot */}
+            <div className="absolute inset-0 bg-primary/20 blur-[100px] -z-10 rounded-full" />
           </motion.div>
         </div>
 
