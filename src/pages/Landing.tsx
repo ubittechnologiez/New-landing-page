@@ -13,7 +13,6 @@ import {
   ArrowRight,
   BadgeCheck,
   BarChart3,
-  Bot,
   FileText,
   HardDrive,
   Headphones,
@@ -40,7 +39,7 @@ import { Link } from "react-router";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BrandLockup } from "@/components/BrandImage";
-import Spline from '@splinetool/react-spline';
+
 
 
 import { Badge } from "@/components/ui/badge";
@@ -705,211 +704,8 @@ function HorizontalScrollSection({
 
 /* ------------------------------- 3D Robot --------------------------------- */
 
-function RobotModel() {
-  return (
-    <div className="relative w-[300px] h-[400px] md:w-[360px] md:h-[480px] lg:w-[400px] lg:h-[530px] select-none flex items-center justify-center">
-
-      {/* Ambient glow behind robot */}
-      <motion.div
-        animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.08, 1] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-56 h-56 rounded-full bg-blue-500/20 blur-3xl"
-      />
-
-      {/* Ground shadow */}
-      <motion.div
-        animate={{ scaleX: [1, 0.8, 1], opacity: [0.35, 0.15, 0.35] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-2 left-1/2 -translate-x-1/2 w-44 h-5 bg-black/50 blur-xl rounded-full"
-      />
-
-      {/* Robot — float animation */}
-      <motion.div
-        animate={{ y: [0, -16, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="relative w-full h-full"
-      >
-        <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <defs>
-            {/* === Pearl-white body gradient (top-left lit) === */}
-            <radialGradient id="rg-body" cx="36%" cy="26%" r="70%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="#ffffff"/>
-              <stop offset="30%"  stopColor="#e2edf8"/>
-              <stop offset="65%"  stopColor="#b8cfe6"/>
-              <stop offset="100%" stopColor="#7a9fc0"/>
-            </radialGradient>
-
-            {/* Head same gradient */}
-            <radialGradient id="rg-head" cx="32%" cy="24%" r="72%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="#ffffff"/>
-              <stop offset="28%"  stopColor="#e8f2fc"/>
-              <stop offset="60%"  stopColor="#c0d8ee"/>
-              <stop offset="100%" stopColor="#80a8c8"/>
-            </radialGradient>
-
-            {/* Arm gradient */}
-            <radialGradient id="rg-arm" cx="30%" cy="20%" r="75%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="#f0f6fc"/>
-              <stop offset="50%"  stopColor="#c0d4e8"/>
-              <stop offset="100%" stopColor="#7898b8"/>
-            </radialGradient>
-
-            {/* Eye — deep blue glow */}
-            <radialGradient id="rg-eye" cx="45%" cy="40%" r="60%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="#80ccff"/>
-              <stop offset="35%"  stopColor="#2060f0"/>
-              <stop offset="70%"  stopColor="#0830a0"/>
-              <stop offset="100%" stopColor="#001030"/>
-            </radialGradient>
-
-            {/* Eye inner bright spot */}
-            <radialGradient id="rg-eye-shine" cx="38%" cy="30%" r="50%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="rgba(200,230,255,0.9)"/>
-              <stop offset="100%" stopColor="rgba(100,180,255,0)"/>
-            </radialGradient>
-
-            {/* Chest LED */}
-            <radialGradient id="rg-led" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"   stopColor="#aae0ff"/>
-              <stop offset="40%"  stopColor="#1870ff"/>
-              <stop offset="100%" stopColor="#002080"/>
-            </radialGradient>
-
-            {/* Gloss highlight ellipse */}
-            <radialGradient id="rg-gloss" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"   stopColor="rgba(255,255,255,0.7)"/>
-              <stop offset="100%" stopColor="rgba(255,255,255,0)"/>
-            </radialGradient>
-
-            {/* Blue eye outer glow (blur layer) */}
-            <filter id="f-eye-glow" x="-80%" y="-80%" width="260%" height="260%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-
-            {/* Soft body shadow */}
-            <filter id="f-drop" x="-15%" y="-8%" width="130%" height="130%">
-              <feDropShadow dx="0" dy="10" stdDeviation="14" floodColor="#07152a" floodOpacity="0.6"/>
-            </filter>
-
-            {/* Chest LED glow */}
-            <filter id="f-led" x="-200%" y="-200%" width="500%" height="500%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-
-          {/* ── LEFT ARM (flipper, slightly down) ── */}
-          <motion.g
-            style={{ originX: "100px", originY: "295px" }}
-            animate={{ rotate: [-12, 5, -12] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            {/* shadow under arm */}
-            <ellipse cx="98" cy="345" rx="20" ry="48" fill="#06111f" opacity="0.28"
-              transform="rotate(22, 98, 295) translate(6,8)"/>
-            <ellipse cx="98" cy="345" rx="20" ry="48"
-              fill="url(#rg-arm)" transform="rotate(22, 98, 295)"/>
-            {/* arm gloss */}
-            <ellipse cx="93" cy="320" rx="7" ry="15"
-              fill="url(#rg-gloss)" opacity="0.6" transform="rotate(22, 98, 295)"/>
-          </motion.g>
-
-          {/* ── RIGHT ARM (flipper, waving up) ── */}
-          <motion.g
-            style={{ originX: "302px", originY: "295px" }}
-            animate={{ rotate: [15, -28, 15] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <ellipse cx="302" cy="345" rx="20" ry="48" fill="#06111f" opacity="0.28"
-              transform="rotate(-22, 302, 295) translate(-6,8)"/>
-            <ellipse cx="302" cy="345" rx="20" ry="48"
-              fill="url(#rg-arm)" transform="rotate(-22, 302, 295)"/>
-            <ellipse cx="297" cy="320" rx="7" ry="15"
-              fill="url(#rg-gloss)" opacity="0.6" transform="rotate(-22, 302, 295)"/>
-          </motion.g>
-
-          {/* ── BODY (large rounded oval) ── */}
-          <ellipse cx="200" cy="340" rx="85" ry="95" fill="url(#rg-body)" filter="url(#f-drop)"/>
-          {/* body gloss top-left */}
-          <ellipse cx="162" cy="278" rx="42" ry="26" fill="url(#rg-gloss)" opacity="0.55"/>
-          {/* body rim highlight right */}
-          <ellipse cx="265" cy="345" rx="12" ry="55" fill="rgba(255,255,255,0.10)"/>
-
-          {/* ── CHEST LED ── */}
-          <motion.g animate={{ opacity: [0.65, 1, 0.65], scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            style={{ originX: "200px", originY: "330px" }}>
-            {/* glow halo */}
-            <circle cx="200" cy="330" r="20" fill="#1860ff" opacity="0.25" filter="url(#f-led)"/>
-            <circle cx="200" cy="330" r="13" fill="url(#rg-led)" filter="url(#f-led)"/>
-            {/* bright core */}
-            <circle cx="200" cy="330" r="7"  fill="#b8e8ff" opacity="0.95"/>
-            {/* specular dot */}
-            <circle cx="196" cy="326" r="3"  fill="white"   opacity="0.85"/>
-          </motion.g>
-
-          {/* ── HEAD (large egg, sits on body) ── */}
-          <motion.g
-            style={{ originX: "200px", originY: "175px" }}
-            animate={{ rotate: [-6, 6, -6] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            {/* head shape */}
-            <ellipse cx="200" cy="175" rx="100" ry="90" fill="url(#rg-head)" filter="url(#f-drop)"/>
-
-            {/* large gloss ellipse top-left */}
-            <ellipse cx="158" cy="128" rx="52" ry="30" fill="url(#rg-gloss)" opacity="0.6"/>
-            {/* subtle rim right */}
-            <ellipse cx="278" cy="185" rx="14" ry="52" fill="rgba(255,255,255,0.10)"/>
-
-            {/* ── LEFT EYE ── */}
-            <motion.g
-              style={{ originX: "164px", originY: "178px" }}
-              animate={{ scaleY: [1, 0.04, 1] }}
-              transition={{ duration: 0.18, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
-            >
-              {/* outer glow */}
-              <circle cx="164" cy="178" r="34" fill="#1050e0" opacity="0.35" filter="url(#f-eye-glow)"/>
-              {/* eye ball */}
-              <circle cx="164" cy="178" r="28" fill="url(#rg-eye)" filter="url(#f-eye-glow)"/>
-              {/* shine layer */}
-              <circle cx="164" cy="178" r="28" fill="url(#rg-eye-shine)" opacity="0.5"/>
-              {/* bright inner pupil */}
-              <motion.circle r="9" fill="#d0eeff" opacity="0.95"
-                animate={{ cx: [162, 167, 162], cy: [176, 181, 176] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-              />
-              {/* specular dot */}
-              <circle cx="151" cy="163" r="5" fill="white" opacity="0.85"/>
-              <circle cx="148" cy="160" r="2.5" fill="white" opacity="0.6"/>
-            </motion.g>
-
-            {/* ── RIGHT EYE ── */}
-            <motion.g
-              style={{ originX: "236px", originY: "178px" }}
-              animate={{ scaleY: [1, 0.04, 1] }}
-              transition={{ duration: 0.18, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
-            >
-              <circle cx="236" cy="178" r="34" fill="#1050e0" opacity="0.35" filter="url(#f-eye-glow)"/>
-              <circle cx="236" cy="178" r="28" fill="url(#rg-eye)" filter="url(#f-eye-glow)"/>
-              <circle cx="236" cy="178" r="28" fill="url(#rg-eye-shine)" opacity="0.5"/>
-              <motion.circle r="9" fill="#d0eeff" opacity="0.95"
-                animate={{ cx: [234, 239, 234], cy: [176, 181, 176] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <circle cx="223" cy="163" r="5" fill="white" opacity="0.85"/>
-              <circle cx="220" cy="160" r="2.5" fill="white" opacity="0.6"/>
-            </motion.g>
-          </motion.g>
-
-        </svg>
-      </motion.div>
-    </div>
-  );
-}
-
 /* ------------------------------- components ------------------------------- */
+
 
 function Nav({ ctaTarget }: { ctaTarget: string }) {
   const [scrolled, setScrolled] = useState(false);
@@ -1098,88 +894,72 @@ function Hero() {
         style={{ y: contentY, opacity: contentOpacity }}
         className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-32 md:px-8"
       >
-        {/* Absolute Robot Container for Desktop / Relative for Mobile */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: EASE, delay: 0.4 }}
-          className="relative mt-8 h-[300px] w-full z-10 flex items-center justify-center lg:absolute lg:right-8 lg:top-1/2 lg:-translate-y-1/2 lg:mt-0 lg:h-[520px] lg:w-[450px] xl:w-[500px]"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+          className="mb-8 flex items-center gap-3"
         >
-          {/* Glow backdrop */}
-          <div className="absolute inset-0 bg-primary/15 blur-[100px] rounded-full -z-10" />
-
-          {/* 3D Robot Model */}
-          <RobotModel />
+          <Badge
+            variant="outline"
+            className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
+          >
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+              <span className="relative inline-flex size-2 rounded-full bg-primary" />
+            </span>
+            Enterprise IT Solutions Provider — Salem, India
+          </Badge>
         </motion.div>
 
-        <div className="relative z-20 w-full lg:w-[65%] xl:w-[70%]">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-            className="mb-8 flex items-center gap-3"
-          >
-            <Badge
-              variant="outline"
-              className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
+        <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
+          <RevealLine text="Powering your" delay={0.15} />
+          <RevealLine text="business with" delay={0.27} />
+          <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
+          <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+            <motion.span
+              className="block"
+              initial={{ y: "112%" }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.85, ease: EASE, delay: 0.51 }}
             >
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-                <span className="relative inline-flex size-2 rounded-full bg-primary" />
-              </span>
-              Enterprise IT Solutions Provider — Salem, India
-            </Badge>
-          </motion.div>
+              <RotatingWord words={ROTATING_WORDS} />
+            </motion.span>
+          </span>
+        </h1>
 
-          <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
-            <RevealLine text="Powering your" delay={0.15} />
-            <RevealLine text="business with" delay={0.27} />
-            <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
-            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
-              <motion.span
-                className="block"
-                initial={{ y: "112%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.85, ease: EASE, delay: 0.51 }}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
+          className="mt-10 flex max-w-xl flex-col gap-8"
+        >
+          <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
+            From high-performance servers and firewalls to complete networking
+            solutions — UBIT Technologiez delivers cutting-edge technology
+            infrastructure that scales with your business.
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Magnetic>
+              <Button asChild size="lg" className="rounded-full">
+                <Link to="/quote">
+                  Get a quote
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            </Magnetic>
+            <Magnetic strength={0.18}>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="rounded-full border-white/15 bg-white/5 backdrop-blur"
               >
-                <RotatingWord words={ROTATING_WORDS} />
-              </motion.span>
-            </span>
-          </h1>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
-            className="mt-10 flex max-w-xl flex-col gap-8"
-          >
-            <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-              From high-performance servers and firewalls to complete networking
-              solutions — UBIT Technologiez delivers cutting-edge technology
-              infrastructure that scales with your business.
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Magnetic>
-                <Button asChild size="lg" className="rounded-full">
-                  <Link to="/quote">
-                    Get a quote
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
-              </Magnetic>
-              <Magnetic strength={0.18}>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="rounded-full border-white/15 bg-white/5 backdrop-blur"
-                >
-                  <a href="#solutions">Explore solutions</a>
-                </Button>
-              </Magnetic>
-            </div>
-          </motion.div>
-        </div>
+                <a href="#solutions">Explore solutions</a>
+              </Button>
+            </Magnetic>
+          </div>
+        </motion.div>
 
 
         <motion.dl
