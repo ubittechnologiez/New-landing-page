@@ -707,148 +707,202 @@ function HorizontalScrollSection({
 
 function RobotModel() {
   return (
-    <div className="relative w-[280px] h-[380px] md:w-[340px] md:h-[460px] lg:w-[380px] lg:h-[520px] select-none flex items-end justify-center pb-6">
-      {/* Ground glow shadow */}
+    <div className="relative w-[300px] h-[400px] md:w-[360px] md:h-[480px] lg:w-[400px] lg:h-[530px] select-none flex items-center justify-center">
+
+      {/* Ambient glow behind robot */}
       <motion.div
-        animate={{ scaleX: [1, 0.85, 1], opacity: [0.5, 0.25, 0.5] }}
+        animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.08, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 bg-primary/40 blur-2xl rounded-full"
+        className="absolute w-56 h-56 rounded-full bg-blue-500/20 blur-3xl"
       />
 
-      {/* Floating robot SVG */}
+      {/* Ground shadow */}
       <motion.div
-        animate={{ y: [0, -18, 0] }}
+        animate={{ scaleX: [1, 0.8, 1], opacity: [0.35, 0.15, 0.35] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="w-full h-full"
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 w-44 h-5 bg-black/50 blur-xl rounded-full"
+      />
+
+      {/* Robot — float animation */}
+      <motion.div
+        animate={{ y: [0, -16, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="relative w-full h-full"
       >
-        <svg viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_20px_60px_rgba(96,165,250,0.25)]">
+        <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
           <defs>
-            <radialGradient id="bodyGrad" cx="38%" cy="28%" r="65%">
-              <stop offset="0%" stopColor="#f8fafc" />
-              <stop offset="45%" stopColor="#cbd8e8" />
-              <stop offset="100%" stopColor="#7a9ab8" />
+            {/* === Pearl-white body gradient (top-left lit) === */}
+            <radialGradient id="rg-body" cx="36%" cy="26%" r="70%" gradientUnits="objectBoundingBox">
+              <stop offset="0%"   stopColor="#ffffff"/>
+              <stop offset="30%"  stopColor="#e2edf8"/>
+              <stop offset="65%"  stopColor="#b8cfe6"/>
+              <stop offset="100%" stopColor="#7a9fc0"/>
             </radialGradient>
-            <radialGradient id="headGrad" cx="35%" cy="28%" r="65%">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="40%" stopColor="#d4e4f4" />
-              <stop offset="100%" stopColor="#8aacc8" />
+
+            {/* Head same gradient */}
+            <radialGradient id="rg-head" cx="32%" cy="24%" r="72%" gradientUnits="objectBoundingBox">
+              <stop offset="0%"   stopColor="#ffffff"/>
+              <stop offset="28%"  stopColor="#e8f2fc"/>
+              <stop offset="60%"  stopColor="#c0d8ee"/>
+              <stop offset="100%" stopColor="#80a8c8"/>
             </radialGradient>
-            <radialGradient id="armGrad" cx="35%" cy="22%" r="70%">
-              <stop offset="0%" stopColor="#eef4fa" />
-              <stop offset="55%" stopColor="#b8cede" />
-              <stop offset="100%" stopColor="#6888a4" />
+
+            {/* Arm gradient */}
+            <radialGradient id="rg-arm" cx="30%" cy="20%" r="75%" gradientUnits="objectBoundingBox">
+              <stop offset="0%"   stopColor="#f0f6fc"/>
+              <stop offset="50%"  stopColor="#c0d4e8"/>
+              <stop offset="100%" stopColor="#7898b8"/>
             </radialGradient>
-            <radialGradient id="eyeGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#60afff" />
-              <stop offset="40%" stopColor="#1a5fff" />
-              <stop offset="100%" stopColor="#001440" />
+
+            {/* Eye — deep blue glow */}
+            <radialGradient id="rg-eye" cx="45%" cy="40%" r="60%" gradientUnits="objectBoundingBox">
+              <stop offset="0%"   stopColor="#80ccff"/>
+              <stop offset="35%"  stopColor="#2060f0"/>
+              <stop offset="70%"  stopColor="#0830a0"/>
+              <stop offset="100%" stopColor="#001030"/>
             </radialGradient>
-            <radialGradient id="eyeHL" cx="38%" cy="32%" r="40%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.7)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+
+            {/* Eye inner bright spot */}
+            <radialGradient id="rg-eye-shine" cx="38%" cy="30%" r="50%" gradientUnits="objectBoundingBox">
+              <stop offset="0%"   stopColor="rgba(200,230,255,0.9)"/>
+              <stop offset="100%" stopColor="rgba(100,180,255,0)"/>
             </radialGradient>
-            <radialGradient id="chestLight" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#90d0ff" />
-              <stop offset="50%" stopColor="#2080ff" />
-              <stop offset="100%" stopColor="#0030a0" />
+
+            {/* Chest LED */}
+            <radialGradient id="rg-led" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stopColor="#aae0ff"/>
+              <stop offset="40%"  stopColor="#1870ff"/>
+              <stop offset="100%" stopColor="#002080"/>
             </radialGradient>
-            <radialGradient id="gloss" cx="40%" cy="22%" r="55%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+
+            {/* Gloss highlight ellipse */}
+            <radialGradient id="rg-gloss" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stopColor="rgba(255,255,255,0.7)"/>
+              <stop offset="100%" stopColor="rgba(255,255,255,0)"/>
             </radialGradient>
-            <filter id="eyeGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+
+            {/* Blue eye outer glow (blur layer) */}
+            <filter id="f-eye-glow" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
-            <filter id="chestGlow" x="-100%" y="-100%" width="300%" height="300%">
-              <feGaussianBlur stdDeviation="6" result="blur" />
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+
+            {/* Soft body shadow */}
+            <filter id="f-drop" x="-15%" y="-8%" width="130%" height="130%">
+              <feDropShadow dx="0" dy="10" stdDeviation="14" floodColor="#07152a" floodOpacity="0.6"/>
             </filter>
-            <filter id="shadow" x="-20%" y="-10%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#0a1628" floodOpacity="0.5" />
+
+            {/* Chest LED glow */}
+            <filter id="f-led" x="-200%" y="-200%" width="500%" height="500%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
           </defs>
 
-          {/* LEFT ARM */}
+          {/* ── LEFT ARM (flipper, slightly down) ── */}
           <motion.g
-            animate={{ rotate: [-20, -5, -20] }}
-            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-            style={{ originX: "85px", originY: "215px" }}
+            style={{ originX: "100px", originY: "295px" }}
+            animate={{ rotate: [-12, 5, -12] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <ellipse cx="68" cy="250" rx="18" ry="44" fill="url(#armGrad)" filter="url(#shadow)" transform="rotate(-10, 68, 215)" />
-            <ellipse cx="62" cy="232" rx="7" ry="14" fill="rgba(255,255,255,0.35)" transform="rotate(-10, 68, 215)" />
+            {/* shadow under arm */}
+            <ellipse cx="98" cy="345" rx="20" ry="48" fill="#06111f" opacity="0.28"
+              transform="rotate(22, 98, 295) translate(6,8)"/>
+            <ellipse cx="98" cy="345" rx="20" ry="48"
+              fill="url(#rg-arm)" transform="rotate(22, 98, 295)"/>
+            {/* arm gloss */}
+            <ellipse cx="93" cy="320" rx="7" ry="15"
+              fill="url(#rg-gloss)" opacity="0.6" transform="rotate(22, 98, 295)"/>
           </motion.g>
 
-          {/* RIGHT ARM (WAVING) */}
+          {/* ── RIGHT ARM (flipper, waving up) ── */}
           <motion.g
-            animate={{ rotate: [18, -22, 18] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-            style={{ originX: "215px", originY: "215px" }}
+            style={{ originX: "302px", originY: "295px" }}
+            animate={{ rotate: [15, -28, 15] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
           >
-            <ellipse cx="232" cy="250" rx="18" ry="44" fill="url(#armGrad)" filter="url(#shadow)" transform="rotate(10, 232, 215)" />
-            <ellipse cx="226" cy="232" rx="7" ry="14" fill="rgba(255,255,255,0.35)" transform="rotate(10, 232, 215)" />
+            <ellipse cx="302" cy="345" rx="20" ry="48" fill="#06111f" opacity="0.28"
+              transform="rotate(-22, 302, 295) translate(-6,8)"/>
+            <ellipse cx="302" cy="345" rx="20" ry="48"
+              fill="url(#rg-arm)" transform="rotate(-22, 302, 295)"/>
+            <ellipse cx="297" cy="320" rx="7" ry="15"
+              fill="url(#rg-gloss)" opacity="0.6" transform="rotate(-22, 302, 295)"/>
           </motion.g>
 
-          {/* BODY */}
-          <ellipse cx="150" cy="270" rx="75" ry="88" fill="url(#bodyGrad)" filter="url(#shadow)" />
-          <ellipse cx="128" cy="230" rx="38" ry="22" fill="url(#gloss)" />
+          {/* ── BODY (large rounded oval) ── */}
+          <ellipse cx="200" cy="340" rx="85" ry="95" fill="url(#rg-body)" filter="url(#f-drop)"/>
+          {/* body gloss top-left */}
+          <ellipse cx="162" cy="278" rx="42" ry="26" fill="url(#rg-gloss)" opacity="0.55"/>
+          {/* body rim highlight right */}
+          <ellipse cx="265" cy="345" rx="12" ry="55" fill="rgba(255,255,255,0.10)"/>
 
-          {/* Chest light */}
-          <motion.g
-            animate={{ opacity: [0.7, 1, 0.7] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <circle cx="150" cy="255" r="13" fill="url(#chestLight)" filter="url(#chestGlow)" />
-            <circle cx="150" cy="255" r="7" fill="#aadeFF" opacity="0.9" />
-            <circle cx="146" cy="251" r="3" fill="white" opacity="0.7" />
+          {/* ── CHEST LED ── */}
+          <motion.g animate={{ opacity: [0.65, 1, 0.65], scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            style={{ originX: "200px", originY: "330px" }}>
+            {/* glow halo */}
+            <circle cx="200" cy="330" r="20" fill="#1860ff" opacity="0.25" filter="url(#f-led)"/>
+            <circle cx="200" cy="330" r="13" fill="url(#rg-led)" filter="url(#f-led)"/>
+            {/* bright core */}
+            <circle cx="200" cy="330" r="7"  fill="#b8e8ff" opacity="0.95"/>
+            {/* specular dot */}
+            <circle cx="196" cy="326" r="3"  fill="white"   opacity="0.85"/>
           </motion.g>
 
-          {/* NECK */}
-          <rect x="138" y="168" width="24" height="18" rx="6" fill="#9ab4c8" />
-          <rect x="140" y="168" width="10" height="18" rx="3" fill="rgba(255,255,255,0.2)" />
-
-          {/* HEAD */}
+          {/* ── HEAD (large egg, sits on body) ── */}
           <motion.g
-            animate={{ rotate: [-8, 8, -8] }}
+            style={{ originX: "200px", originY: "175px" }}
+            animate={{ rotate: [-6, 6, -6] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            style={{ originX: "150px", originY: "120px" }}
           >
-            <ellipse cx="150" cy="120" rx="82" ry="72" fill="url(#headGrad)" filter="url(#shadow)" />
-            <ellipse cx="118" cy="90" rx="36" ry="20" fill="rgba(255,255,255,0.45)" />
-            <ellipse cx="210" cy="130" rx="10" ry="40" fill="rgba(255,255,255,0.12)" />
+            {/* head shape */}
+            <ellipse cx="200" cy="175" rx="100" ry="90" fill="url(#rg-head)" filter="url(#f-drop)"/>
 
-            {/* Left eye */}
+            {/* large gloss ellipse top-left */}
+            <ellipse cx="158" cy="128" rx="52" ry="30" fill="url(#rg-gloss)" opacity="0.6"/>
+            {/* subtle rim right */}
+            <ellipse cx="278" cy="185" rx="14" ry="52" fill="rgba(255,255,255,0.10)"/>
+
+            {/* ── LEFT EYE ── */}
             <motion.g
-              animate={{ scaleY: [1, 0.05, 1] }}
-              transition={{ duration: 0.25, repeat: Infinity, repeatDelay: 4.5, ease: "easeInOut" }}
-              style={{ originX: "118px", originY: "118px" }}
+              style={{ originX: "164px", originY: "178px" }}
+              animate={{ scaleY: [1, 0.04, 1] }}
+              transition={{ duration: 0.18, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
             >
-              <ellipse cx="118" cy="118" rx="26" ry="20" fill="url(#eyeGrad)" filter="url(#eyeGlow)" />
-              <ellipse cx="118" cy="118" rx="26" ry="20" fill="url(#eyeHL)" opacity="0.6" />
-              <motion.circle
-                cx="118" cy="118" r="7" fill="#c8e8ff" opacity="0.9"
-                animate={{ cx: [116, 120, 116], cy: [116, 120, 116] }}
+              {/* outer glow */}
+              <circle cx="164" cy="178" r="34" fill="#1050e0" opacity="0.35" filter="url(#f-eye-glow)"/>
+              {/* eye ball */}
+              <circle cx="164" cy="178" r="28" fill="url(#rg-eye)" filter="url(#f-eye-glow)"/>
+              {/* shine layer */}
+              <circle cx="164" cy="178" r="28" fill="url(#rg-eye-shine)" opacity="0.5"/>
+              {/* bright inner pupil */}
+              <motion.circle r="9" fill="#d0eeff" opacity="0.95"
+                animate={{ cx: [162, 167, 162], cy: [176, 181, 176] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
               />
-              <circle cx="112" cy="112" r="3.5" fill="white" opacity="0.7" />
+              {/* specular dot */}
+              <circle cx="151" cy="163" r="5" fill="white" opacity="0.85"/>
+              <circle cx="148" cy="160" r="2.5" fill="white" opacity="0.6"/>
             </motion.g>
 
-            {/* Right eye */}
+            {/* ── RIGHT EYE ── */}
             <motion.g
-              animate={{ scaleY: [1, 0.05, 1] }}
-              transition={{ duration: 0.25, repeat: Infinity, repeatDelay: 4.5, ease: "easeInOut" }}
-              style={{ originX: "182px", originY: "118px" }}
+              style={{ originX: "236px", originY: "178px" }}
+              animate={{ scaleY: [1, 0.04, 1] }}
+              transition={{ duration: 0.18, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
             >
-              <ellipse cx="182" cy="118" rx="26" ry="20" fill="url(#eyeGrad)" filter="url(#eyeGlow)" />
-              <ellipse cx="182" cy="118" rx="26" ry="20" fill="url(#eyeHL)" opacity="0.6" />
-              <motion.circle
-                cx="182" cy="118" r="7" fill="#c8e8ff" opacity="0.9"
-                animate={{ cx: [180, 184, 180], cy: [116, 120, 116] }}
+              <circle cx="236" cy="178" r="34" fill="#1050e0" opacity="0.35" filter="url(#f-eye-glow)"/>
+              <circle cx="236" cy="178" r="28" fill="url(#rg-eye)" filter="url(#f-eye-glow)"/>
+              <circle cx="236" cy="178" r="28" fill="url(#rg-eye-shine)" opacity="0.5"/>
+              <motion.circle r="9" fill="#d0eeff" opacity="0.95"
+                animate={{ cx: [234, 239, 234], cy: [176, 181, 176] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
               />
-              <circle cx="176" cy="112" r="3.5" fill="white" opacity="0.7" />
+              <circle cx="223" cy="163" r="5" fill="white" opacity="0.85"/>
+              <circle cx="220" cy="160" r="2.5" fill="white" opacity="0.6"/>
             </motion.g>
           </motion.g>
+
         </svg>
       </motion.div>
     </div>
