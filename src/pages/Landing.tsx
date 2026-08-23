@@ -707,153 +707,149 @@ function HorizontalScrollSection({
 
 function RobotModel() {
   return (
-    <div className="relative w-[240px] h-[340px] md:w-[280px] md:h-[400px] lg:w-[320px] lg:h-[460px] select-none" style={{ perspective: "1200px" }}>
-      {/* Shadow on ground */}
+    <div className="relative w-[280px] h-[380px] md:w-[340px] md:h-[460px] lg:w-[380px] lg:h-[520px] select-none flex items-end justify-center pb-6">
+      {/* Ground glow shadow */}
       <motion.div
-        animate={{ scaleX: [1, 0.9, 1], opacity: [0.4, 0.25, 0.4] }}
+        animate={{ scaleX: [1, 0.85, 1], opacity: [0.5, 0.25, 0.5] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-primary/30 blur-xl rounded-full"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 bg-primary/40 blur-2xl rounded-full"
       />
 
-      {/* Entire body wrapper — floats */}
+      {/* Floating robot SVG */}
       <motion.div
-        animate={{ y: [0, -22, 0] }}
+        animate={{ y: [0, -18, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 flex flex-col items-center justify-center"
-        style={{ transformStyle: "preserve-3d" }}
+        className="w-full h-full"
       >
-        {/* === HEAD === */}
-        <motion.div
-          animate={{ rotateY: [-15, 15, -15], rotateX: [5, -5, 5] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="relative z-20 flex flex-col items-center"
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          {/* Head shell — egg shaped */}
-          <div
-            className="relative w-[120px] h-[80px] md:w-[140px] md:h-[95px] rounded-[50%] flex items-center justify-center"
-            style={{
-              background: "radial-gradient(circle at 35% 30%, #ffffff 0%, #c8d8e8 40%, #8fa8c0 100%)",
-              boxShadow: "inset -8px -8px 20px rgba(0,0,0,0.3), inset 4px 4px 12px rgba(255,255,255,0.8), 0 8px 32px rgba(0,0,0,0.4)",
-            }}
-          >
-            {/* Highlight gloss */}
-            <div
-              className="absolute top-2 left-4 w-10 h-5 rounded-full opacity-60"
-              style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.9), transparent)" }}
-            />
-            {/* Eyes container */}
-            <div className="flex gap-4 mt-1">
-              {/* Left eye */}
-              <motion.div
-                animate={{ scaleY: [1, 0.1, 1] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", times: [0, 0.5, 1], repeatDelay: 2 }}
-                className="relative w-8 h-5 md:w-10 md:h-6 rounded-full overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #001a3a, #003080)",
-                  boxShadow: "0 0 12px rgba(30, 100, 255, 0.9), 0 0 24px rgba(30, 100, 255, 0.5), inset 0 0 8px rgba(0, 60, 200, 0.8)",
-                }}
-              >
-                <motion.div
-                  animate={{ x: [-2, 2, -2], y: [-1, 1, -1] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <div className="w-3 h-3 rounded-full bg-blue-300 opacity-80" style={{ boxShadow: "0 0 6px white" }} />
-                </motion.div>
-              </motion.div>
-              {/* Right eye */}
-              <motion.div
-                animate={{ scaleY: [1, 0.1, 1] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", times: [0, 0.5, 1], repeatDelay: 2 }}
-                className="relative w-8 h-5 md:w-10 md:h-6 rounded-full overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #001a3a, #003080)",
-                  boxShadow: "0 0 12px rgba(30, 100, 255, 0.9), 0 0 24px rgba(30, 100, 255, 0.5), inset 0 0 8px rgba(0, 60, 200, 0.8)",
-                }}
-              >
-                <motion.div
-                  animate={{ x: [-2, 2, -2], y: [-1, 1, -1] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <div className="w-3 h-3 rounded-full bg-blue-300 opacity-80" style={{ boxShadow: "0 0 6px white" }} />
-                </motion.div>
-              </motion.div>
-            </div>
-          </div>
+        <svg viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_20px_60px_rgba(96,165,250,0.25)]">
+          <defs>
+            <radialGradient id="bodyGrad" cx="38%" cy="28%" r="65%">
+              <stop offset="0%" stopColor="#f8fafc" />
+              <stop offset="45%" stopColor="#cbd8e8" />
+              <stop offset="100%" stopColor="#7a9ab8" />
+            </radialGradient>
+            <radialGradient id="headGrad" cx="35%" cy="28%" r="65%">
+              <stop offset="0%" stopColor="#ffffff" />
+              <stop offset="40%" stopColor="#d4e4f4" />
+              <stop offset="100%" stopColor="#8aacc8" />
+            </radialGradient>
+            <radialGradient id="armGrad" cx="35%" cy="22%" r="70%">
+              <stop offset="0%" stopColor="#eef4fa" />
+              <stop offset="55%" stopColor="#b8cede" />
+              <stop offset="100%" stopColor="#6888a4" />
+            </radialGradient>
+            <radialGradient id="eyeGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#60afff" />
+              <stop offset="40%" stopColor="#1a5fff" />
+              <stop offset="100%" stopColor="#001440" />
+            </radialGradient>
+            <radialGradient id="eyeHL" cx="38%" cy="32%" r="40%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.7)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </radialGradient>
+            <radialGradient id="chestLight" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#90d0ff" />
+              <stop offset="50%" stopColor="#2080ff" />
+              <stop offset="100%" stopColor="#0030a0" />
+            </radialGradient>
+            <radialGradient id="gloss" cx="40%" cy="22%" r="55%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </radialGradient>
+            <filter id="eyeGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="chestGlow" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="shadow" x="-20%" y="-10%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#0a1628" floodOpacity="0.5" />
+            </filter>
+          </defs>
 
-          {/* Neck */}
-          <div
-            className="w-6 h-4 rounded-b-lg"
-            style={{
-              background: "linear-gradient(to bottom, #a0b8cc, #8090a0)",
-              boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.3)",
-            }}
-          />
-        </motion.div>
-
-        {/* === BODY === */}
-        <div className="relative flex items-center gap-1 -mt-1 z-10">
           {/* LEFT ARM */}
-          <motion.div
-            animate={{ rotate: [-25, -10, -25] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="relative mt-4"
-            style={{ transformOrigin: "top center" }}
+          <motion.g
+            animate={{ rotate: [-20, -5, -20] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+            style={{ originX: "85px", originY: "215px" }}
           >
-            <div
-              className="w-[28px] h-[60px] md:w-[32px] md:h-[72px] rounded-[40%_40%_60%_60%]"
-              style={{
-                background: "radial-gradient(circle at 35% 25%, #e8eef4 0%, #b0c4d4 50%, #7090a8 100%)",
-                boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.25), inset 2px 2px 8px rgba(255,255,255,0.7), 0 4px 12px rgba(0,0,0,0.3)",
-                transform: "rotate(15deg)",
-              }}
-            />
-          </motion.div>
+            <ellipse cx="68" cy="250" rx="18" ry="44" fill="url(#armGrad)" filter="url(#shadow)" transform="rotate(-10, 68, 215)" />
+            <ellipse cx="62" cy="232" rx="7" ry="14" fill="rgba(255,255,255,0.35)" transform="rotate(-10, 68, 215)" />
+          </motion.g>
 
-          {/* TORSO */}
-          <div
-            className="relative w-[90px] h-[110px] md:w-[110px] md:h-[130px] rounded-[50%_50%_45%_45%] flex flex-col items-center justify-center"
-            style={{
-              background: "radial-gradient(circle at 38% 28%, #f0f5fa 0%, #c0d4e4 45%, #7898b4 100%)",
-              boxShadow: "inset -10px -10px 24px rgba(0,0,0,0.3), inset 5px 5px 16px rgba(255,255,255,0.7), 0 12px 40px rgba(0,0,0,0.4)",
-            }}
+          {/* RIGHT ARM (WAVING) */}
+          <motion.g
+            animate={{ rotate: [18, -22, 18] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            style={{ originX: "215px", originY: "215px" }}
           >
-            {/* Torso gloss */}
-            <div
-              className="absolute top-3 left-5 w-12 h-6 rounded-full opacity-50"
-              style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.9), transparent)" }}
-            />
-            {/* Chest light */}
-            <motion.div
-              animate={{ opacity: [0.6, 1, 0.6], scale: [1, 1.15, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              className="w-5 h-5 rounded-full mt-2"
-              style={{
-                background: "radial-gradient(circle, #60c0ff, #0060ff)",
-                boxShadow: "0 0 10px rgba(60,150,255,0.9), 0 0 20px rgba(60,150,255,0.5)",
-              }}
-            />
-          </div>
+            <ellipse cx="232" cy="250" rx="18" ry="44" fill="url(#armGrad)" filter="url(#shadow)" transform="rotate(10, 232, 215)" />
+            <ellipse cx="226" cy="232" rx="7" ry="14" fill="rgba(255,255,255,0.35)" transform="rotate(10, 232, 215)" />
+          </motion.g>
 
-          {/* RIGHT ARM — waves up and down */}
-          <motion.div
-            animate={{ rotate: [20, -20, 20] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            className="relative mt-4"
-            style={{ transformOrigin: "top center" }}
+          {/* BODY */}
+          <ellipse cx="150" cy="270" rx="75" ry="88" fill="url(#bodyGrad)" filter="url(#shadow)" />
+          <ellipse cx="128" cy="230" rx="38" ry="22" fill="url(#gloss)" />
+
+          {/* Chest light */}
+          <motion.g
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div
-              className="w-[28px] h-[60px] md:w-[32px] md:h-[72px] rounded-[40%_40%_60%_60%]"
-              style={{
-                background: "radial-gradient(circle at 35% 25%, #e8eef4 0%, #b0c4d4 50%, #7090a8 100%)",
-                boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.25), inset 2px 2px 8px rgba(255,255,255,0.7), 0 4px 12px rgba(0,0,0,0.3)",
-                transform: "rotate(-15deg)",
-              }}
-            />
-          </motion.div>
-        </div>
+            <circle cx="150" cy="255" r="13" fill="url(#chestLight)" filter="url(#chestGlow)" />
+            <circle cx="150" cy="255" r="7" fill="#aadeFF" opacity="0.9" />
+            <circle cx="146" cy="251" r="3" fill="white" opacity="0.7" />
+          </motion.g>
+
+          {/* NECK */}
+          <rect x="138" y="168" width="24" height="18" rx="6" fill="#9ab4c8" />
+          <rect x="140" y="168" width="10" height="18" rx="3" fill="rgba(255,255,255,0.2)" />
+
+          {/* HEAD */}
+          <motion.g
+            animate={{ rotate: [-8, 8, -8] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            style={{ originX: "150px", originY: "120px" }}
+          >
+            <ellipse cx="150" cy="120" rx="82" ry="72" fill="url(#headGrad)" filter="url(#shadow)" />
+            <ellipse cx="118" cy="90" rx="36" ry="20" fill="rgba(255,255,255,0.45)" />
+            <ellipse cx="210" cy="130" rx="10" ry="40" fill="rgba(255,255,255,0.12)" />
+
+            {/* Left eye */}
+            <motion.g
+              animate={{ scaleY: [1, 0.05, 1] }}
+              transition={{ duration: 0.25, repeat: Infinity, repeatDelay: 4.5, ease: "easeInOut" }}
+              style={{ originX: "118px", originY: "118px" }}
+            >
+              <ellipse cx="118" cy="118" rx="26" ry="20" fill="url(#eyeGrad)" filter="url(#eyeGlow)" />
+              <ellipse cx="118" cy="118" rx="26" ry="20" fill="url(#eyeHL)" opacity="0.6" />
+              <motion.circle
+                cx="118" cy="118" r="7" fill="#c8e8ff" opacity="0.9"
+                animate={{ cx: [116, 120, 116], cy: [116, 120, 116] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <circle cx="112" cy="112" r="3.5" fill="white" opacity="0.7" />
+            </motion.g>
+
+            {/* Right eye */}
+            <motion.g
+              animate={{ scaleY: [1, 0.05, 1] }}
+              transition={{ duration: 0.25, repeat: Infinity, repeatDelay: 4.5, ease: "easeInOut" }}
+              style={{ originX: "182px", originY: "118px" }}
+            >
+              <ellipse cx="182" cy="118" rx="26" ry="20" fill="url(#eyeGrad)" filter="url(#eyeGlow)" />
+              <ellipse cx="182" cy="118" rx="26" ry="20" fill="url(#eyeHL)" opacity="0.6" />
+              <motion.circle
+                cx="182" cy="118" r="7" fill="#c8e8ff" opacity="0.9"
+                animate={{ cx: [180, 184, 180], cy: [116, 120, 116] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <circle cx="176" cy="112" r="3.5" fill="white" opacity="0.7" />
+            </motion.g>
+          </motion.g>
+        </svg>
       </motion.div>
     </div>
   );
