@@ -910,9 +910,13 @@ function Hero() {
               repeat: Infinity, 
               ease: "easeInOut" 
             }}
-            className="w-full h-full flex items-center justify-center"
+            className="w-full h-full flex items-center justify-center relative"
           >
-            <Bot className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 text-primary drop-shadow-[0_0_40px_rgba(var(--primary),0.6)]" strokeWidth={1} />
+            <img 
+              src="/robot.png" 
+              alt="Greeting Toy Robot" 
+              className="w-64 h-auto md:w-80 lg:w-96 object-contain drop-shadow-[0_0_40px_rgba(var(--primary),0.6)]" 
+            />
           </motion.div>
         </motion.div>
 
