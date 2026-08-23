@@ -39,6 +39,9 @@ import { Link } from "react-router";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BrandLockup } from "@/components/BrandImage";
+import { lazy, Suspense } from "react";
+
+const TechOrb = lazy(() => import("@/components/TechOrb"));
 
 
 
@@ -894,72 +897,94 @@ function Hero() {
         style={{ y: contentY, opacity: contentOpacity }}
         className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-32 md:px-8"
       >
+        {/* ── TechOrb — right side desktop / top on mobile ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-          className="mb-8 flex items-center gap-3"
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: EASE, delay: 0.5 }}
+          className="
+            relative w-full h-[280px] mb-4
+            sm:h-[320px]
+            lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2
+            lg:h-[560px] lg:w-[480px] lg:mb-0
+            xl:w-[540px]
+            pointer-events-none lg:pointer-events-auto
+          "
         >
-          <Badge
-            variant="outline"
-            className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
+          <Suspense fallback={null}>
+            <TechOrb />
+          </Suspense>
+        </motion.div>
+
+        {/* ── Text content — full-width mobile / 60% desktop ── */}
+        <div className="relative z-10 lg:max-w-[58%] xl:max-w-[62%]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+            className="mb-8 flex items-center gap-3"
           >
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-              <span className="relative inline-flex size-2 rounded-full bg-primary" />
-            </span>
-            Enterprise IT Solutions Provider — Salem, India
-          </Badge>
-        </motion.div>
-
-        <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
-          <RevealLine text="Powering your" delay={0.15} />
-          <RevealLine text="business with" delay={0.27} />
-          <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
-          <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
-            <motion.span
-              className="block"
-              initial={{ y: "112%" }}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.85, ease: EASE, delay: 0.51 }}
+            <Badge
+              variant="outline"
+              className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
             >
-              <RotatingWord words={ROTATING_WORDS} />
-            </motion.span>
-          </span>
-        </h1>
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-primary" />
+              </span>
+              Enterprise IT Solutions Provider — Salem, India
+            </Badge>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
-          className="mt-10 flex max-w-xl flex-col gap-8"
-        >
-          <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-            From high-performance servers and firewalls to complete networking
-            solutions — UBIT Technologiez delivers cutting-edge technology
-            infrastructure that scales with your business.
-          </p>
-          <div className="flex flex-wrap items-center gap-4">
-            <Magnetic>
-              <Button asChild size="lg" className="rounded-full">
-                <Link to="/quote">
-                  Get a quote
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            </Magnetic>
-            <Magnetic strength={0.18}>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="rounded-full border-white/15 bg-white/5 backdrop-blur"
+          <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
+            <RevealLine text="Powering your" delay={0.15} />
+            <RevealLine text="business with" delay={0.27} />
+            <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
+            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+              <motion.span
+                className="block"
+                initial={{ y: "112%" }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.85, ease: EASE, delay: 0.51 }}
               >
-                <a href="#solutions">Explore solutions</a>
-              </Button>
-            </Magnetic>
-          </div>
-        </motion.div>
+                <RotatingWord words={ROTATING_WORDS} />
+              </motion.span>
+            </span>
+          </h1>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
+            className="mt-10 flex max-w-xl flex-col gap-8"
+          >
+            <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
+              From high-performance servers and firewalls to complete networking
+              solutions — UBIT Technologiez delivers cutting-edge technology
+              infrastructure that scales with your business.
+            </p>
+            <div className="flex flex-wrap items-center gap-4">
+              <Magnetic>
+                <Button asChild size="lg" className="rounded-full">
+                  <Link to="/quote">
+                    Get a quote
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </Magnetic>
+              <Magnetic strength={0.18}>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="rounded-full border-white/15 bg-white/5 backdrop-blur"
+                >
+                  <a href="#solutions">Explore solutions</a>
+                </Button>
+              </Magnetic>
+            </div>
+          </motion.div>
+        </div>
 
 
         <motion.dl
