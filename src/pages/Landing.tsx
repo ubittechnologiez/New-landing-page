@@ -703,6 +703,162 @@ function HorizontalScrollSection({
   );
 }
 
+/* ------------------------------- 3D Robot --------------------------------- */
+
+function RobotModel() {
+  return (
+    <div className="relative w-[240px] h-[340px] md:w-[280px] md:h-[400px] lg:w-[320px] lg:h-[460px] select-none" style={{ perspective: "1200px" }}>
+      {/* Shadow on ground */}
+      <motion.div
+        animate={{ scaleX: [1, 0.9, 1], opacity: [0.4, 0.25, 0.4] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-primary/30 blur-xl rounded-full"
+      />
+
+      {/* Entire body wrapper — floats */}
+      <motion.div
+        animate={{ y: [0, -22, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 flex flex-col items-center justify-center"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {/* === HEAD === */}
+        <motion.div
+          animate={{ rotateY: [-15, 15, -15], rotateX: [5, -5, 5] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="relative z-20 flex flex-col items-center"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          {/* Head shell — egg shaped */}
+          <div
+            className="relative w-[120px] h-[80px] md:w-[140px] md:h-[95px] rounded-[50%] flex items-center justify-center"
+            style={{
+              background: "radial-gradient(circle at 35% 30%, #ffffff 0%, #c8d8e8 40%, #8fa8c0 100%)",
+              boxShadow: "inset -8px -8px 20px rgba(0,0,0,0.3), inset 4px 4px 12px rgba(255,255,255,0.8), 0 8px 32px rgba(0,0,0,0.4)",
+            }}
+          >
+            {/* Highlight gloss */}
+            <div
+              className="absolute top-2 left-4 w-10 h-5 rounded-full opacity-60"
+              style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.9), transparent)" }}
+            />
+            {/* Eyes container */}
+            <div className="flex gap-4 mt-1">
+              {/* Left eye */}
+              <motion.div
+                animate={{ scaleY: [1, 0.1, 1] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", times: [0, 0.5, 1], repeatDelay: 2 }}
+                className="relative w-8 h-5 md:w-10 md:h-6 rounded-full overflow-hidden"
+                style={{
+                  background: "linear-gradient(135deg, #001a3a, #003080)",
+                  boxShadow: "0 0 12px rgba(30, 100, 255, 0.9), 0 0 24px rgba(30, 100, 255, 0.5), inset 0 0 8px rgba(0, 60, 200, 0.8)",
+                }}
+              >
+                <motion.div
+                  animate={{ x: [-2, 2, -2], y: [-1, 1, -1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <div className="w-3 h-3 rounded-full bg-blue-300 opacity-80" style={{ boxShadow: "0 0 6px white" }} />
+                </motion.div>
+              </motion.div>
+              {/* Right eye */}
+              <motion.div
+                animate={{ scaleY: [1, 0.1, 1] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", times: [0, 0.5, 1], repeatDelay: 2 }}
+                className="relative w-8 h-5 md:w-10 md:h-6 rounded-full overflow-hidden"
+                style={{
+                  background: "linear-gradient(135deg, #001a3a, #003080)",
+                  boxShadow: "0 0 12px rgba(30, 100, 255, 0.9), 0 0 24px rgba(30, 100, 255, 0.5), inset 0 0 8px rgba(0, 60, 200, 0.8)",
+                }}
+              >
+                <motion.div
+                  animate={{ x: [-2, 2, -2], y: [-1, 1, -1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <div className="w-3 h-3 rounded-full bg-blue-300 opacity-80" style={{ boxShadow: "0 0 6px white" }} />
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Neck */}
+          <div
+            className="w-6 h-4 rounded-b-lg"
+            style={{
+              background: "linear-gradient(to bottom, #a0b8cc, #8090a0)",
+              boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.3)",
+            }}
+          />
+        </motion.div>
+
+        {/* === BODY === */}
+        <div className="relative flex items-center gap-1 -mt-1 z-10">
+          {/* LEFT ARM */}
+          <motion.div
+            animate={{ rotate: [-25, -10, -25] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="relative mt-4"
+            style={{ transformOrigin: "top center" }}
+          >
+            <div
+              className="w-[28px] h-[60px] md:w-[32px] md:h-[72px] rounded-[40%_40%_60%_60%]"
+              style={{
+                background: "radial-gradient(circle at 35% 25%, #e8eef4 0%, #b0c4d4 50%, #7090a8 100%)",
+                boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.25), inset 2px 2px 8px rgba(255,255,255,0.7), 0 4px 12px rgba(0,0,0,0.3)",
+                transform: "rotate(15deg)",
+              }}
+            />
+          </motion.div>
+
+          {/* TORSO */}
+          <div
+            className="relative w-[90px] h-[110px] md:w-[110px] md:h-[130px] rounded-[50%_50%_45%_45%] flex flex-col items-center justify-center"
+            style={{
+              background: "radial-gradient(circle at 38% 28%, #f0f5fa 0%, #c0d4e4 45%, #7898b4 100%)",
+              boxShadow: "inset -10px -10px 24px rgba(0,0,0,0.3), inset 5px 5px 16px rgba(255,255,255,0.7), 0 12px 40px rgba(0,0,0,0.4)",
+            }}
+          >
+            {/* Torso gloss */}
+            <div
+              className="absolute top-3 left-5 w-12 h-6 rounded-full opacity-50"
+              style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.9), transparent)" }}
+            />
+            {/* Chest light */}
+            <motion.div
+              animate={{ opacity: [0.6, 1, 0.6], scale: [1, 1.15, 1] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              className="w-5 h-5 rounded-full mt-2"
+              style={{
+                background: "radial-gradient(circle, #60c0ff, #0060ff)",
+                boxShadow: "0 0 10px rgba(60,150,255,0.9), 0 0 20px rgba(60,150,255,0.5)",
+              }}
+            />
+          </div>
+
+          {/* RIGHT ARM — waves up and down */}
+          <motion.div
+            animate={{ rotate: [20, -20, 20] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            className="relative mt-4"
+            style={{ transformOrigin: "top center" }}
+          >
+            <div
+              className="w-[28px] h-[60px] md:w-[32px] md:h-[72px] rounded-[40%_40%_60%_60%]"
+              style={{
+                background: "radial-gradient(circle at 35% 25%, #e8eef4 0%, #b0c4d4 50%, #7090a8 100%)",
+                boxShadow: "inset -4px -4px 10px rgba(0,0,0,0.25), inset 2px 2px 8px rgba(255,255,255,0.7), 0 4px 12px rgba(0,0,0,0.3)",
+                transform: "rotate(-15deg)",
+              }}
+            />
+          </motion.div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 /* ------------------------------- components ------------------------------- */
 
 function Nav({ ctaTarget }: { ctaTarget: string }) {
@@ -897,27 +1053,13 @@ function Hero() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: EASE, delay: 0.4 }}
-          className="relative mt-8 h-[300px] w-full z-10 flex items-center justify-center lg:absolute lg:right-8 lg:top-1/2 lg:-translate-y-1/2 lg:mt-0 lg:h-[500px] lg:w-[450px] xl:w-[500px]"
+          className="relative mt-8 h-[300px] w-full z-10 flex items-center justify-center lg:absolute lg:right-8 lg:top-1/2 lg:-translate-y-1/2 lg:mt-0 lg:h-[520px] lg:w-[450px] xl:w-[500px]"
         >
-          <div className="absolute inset-0 bg-primary/20 blur-[120px] rounded-full -z-10" />
-          <motion.div
-            animate={{ 
-              y: [0, -20, 0],
-              rotate: [-2, 2, -2]
-            }}
-            transition={{ 
-              duration: 6, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
-            }}
-            className="w-full h-full flex items-center justify-center relative"
-          >
-            <img 
-              src="/robot.png" 
-              alt="Greeting Toy Robot" 
-              className="w-64 h-auto md:w-80 lg:w-96 object-contain drop-shadow-[0_0_40px_rgba(var(--primary),0.6)]" 
-            />
-          </motion.div>
+          {/* Glow backdrop */}
+          <div className="absolute inset-0 bg-primary/15 blur-[100px] rounded-full -z-10" />
+
+          {/* 3D Robot Model */}
+          <RobotModel />
         </motion.div>
 
         <div className="relative z-20 w-full lg:w-[65%] xl:w-[70%]">
