@@ -1654,9 +1654,9 @@ export default function Landing() {
 
       <main>
         <Hero />
+        <Solutions />
         <Brands />
         <GhostTicker words={GHOST_WORDS} />
-        <Solutions />
         <Analytics />
         <WhyUs />
         <About />
