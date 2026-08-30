@@ -932,7 +932,7 @@ function Hero() {
 
         <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
           <RevealLine text="Powering your" delay={0.15} />
-          <RevealLine text="business with" delay={0.27} />
+          <RevealLine text="Business with" delay={0.27} />
           <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
           <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
             <motion.span
