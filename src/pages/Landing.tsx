@@ -1002,10 +1002,6 @@ function Hero() {
           ))}
         </motion.dl>
       </motion.div>
-
-      <div className="relative mt-auto">
-        <Marquee items={BRANDS} className="border-b-0" />
-      </div>
     </section>
   );
 }
