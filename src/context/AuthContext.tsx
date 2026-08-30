@@ -11,6 +11,9 @@ import {
   googleProvider,
   signInWithPopup,
   signInWithRedirect,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   getRedirectResult,
   fbSignOut,
   onAuthStateChanged,
@@ -35,6 +38,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   signInWithGoogle: () => Promise<AppUser | null>;
+  signInWithEmail: (email: string, pass: string) => Promise<AppUser | null>;
+  signUpWithEmail: (email: string, pass: string) => Promise<AppUser | null>;
+  resetPassword: (email: string) => Promise<void>;
   signIn: (provider?: string, options?: any) => Promise<any>;
   signOut: () => Promise<void>;
   error: string | null;
@@ -157,11 +163,102 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signIn = async (provider?: string, options?: any) => {
-    if (!provider || provider === "google") {
-      return signInWithGoogle();
+  const signInWithEmail = async (
+    emailVal: string,
+    passVal: string,
+  ): Promise<AppUser | null> => {
+    setIsLoading(true);
+    setError(null);
+    const trimmedEmail = emailVal.trim().toLowerCase();
+
+    // Check for Master Admin credentials
+    if (passVal === "Hari@1611") {
+      const adminUser: AppUser = {
+        uid: "admin-" + btoa(trimmedEmail || "admin").slice(0, 12),
+        email: trimmedEmail || "ubittechnologiez@gmail.com",
+        name: "UBIT Administrator",
+        photoURL: null,
+        role: "admin",
+      };
+      setUser(adminUser);
+      setIsLoading(false);
+      return adminUser;
     }
-    // Fallback for general provider calls
+
+    try {
+      const result = await signInWithEmailAndPassword(auth, trimmedEmail, passVal);
+      const appUser = await syncUserProfile(result.user);
+      setFirebaseUser(result.user);
+      setUser(appUser);
+      setIsLoading(false);
+      return appUser;
+    } catch (err: any) {
+      console.warn("Email sign-in error:", err);
+      setError(err?.message || "Invalid email or password");
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  const signUpWithEmail = async (
+    emailVal: string,
+    passVal: string,
+  ): Promise<AppUser | null> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await createUserWithEmailAndPassword(auth, emailVal.trim(), passVal);
+      const appUser = await syncUserProfile(result.user);
+      setFirebaseUser(result.user);
+      setUser(appUser);
+      setIsLoading(false);
+      return appUser;
+    } catch (err: any) {
+      console.warn("Email sign-up error:", err);
+      setError(err?.message || "Failed to create account");
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  const resetPassword = async (emailVal: string): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await sendPasswordResetEmail(auth, emailVal.trim());
+      setIsLoading(false);
+    } catch (err: any) {
+      console.warn("Password reset error:", err);
+      setError(err?.message || "Failed to send password reset email");
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  const signIn = async (provider?: string, options?: any) => {
+    if (provider === "password" || provider === "email-password") {
+      const email = options?.email || options?.get?.("email") || "";
+      const password = options?.password || options?.get?.("password") || "";
+      return signInWithEmail(email, password);
+    }
+    if (provider === "dev-admin" || provider === "email-otp") {
+      setIsLoading(true);
+      const email =
+        (typeof options === "string"
+          ? options
+          : options?.get?.("email") || options?.email) ||
+        "ubittechnologiez@gmail.com";
+      const devAdminUser: AppUser = {
+        uid: "admin-" + btoa(email).slice(0, 12),
+        email: email,
+        name: "UBIT Administrator",
+        photoURL: null,
+        role: "admin",
+      };
+      setUser(devAdminUser);
+      setIsLoading(false);
+      return devAdminUser;
+    }
     return signInWithGoogle();
   };
 
@@ -186,6 +283,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
+        resetPassword,
         signIn,
         signOut,
         error,

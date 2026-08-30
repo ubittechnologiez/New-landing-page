@@ -416,7 +416,7 @@ export default function GalleryPage() {
             className="text-[11px] text-muted-foreground/70 hover:text-primary transition-colors flex items-center gap-1"
           >
             <Lock className="size-3" />
-            <span>Staff & Admin Portal</span>
+            <span>Portal</span>
           </Link>
         </div>
       </footer>

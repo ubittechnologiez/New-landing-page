@@ -3,37 +3,26 @@ import { useNavigate, useSearchParams, Link } from "react-router";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { BrandLockup } from "@/components/BrandImage";
 import { useAuth } from "@/hooks/use-auth";
-import { ADMIN_EMAILS } from "@/hooks/use-admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import {
   ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
   Copy,
-  ExternalLink,
-  HelpCircle,
+  Eye,
+  EyeOff,
   Info,
-  KeyRound,
   Loader2,
   Lock,
   Mail,
   ShieldCheck,
   Sparkles,
-  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -67,16 +56,25 @@ export default function AdminLoginPage() {
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("returnTo") || "/admin";
 
-  const { isLoading: authLoading, isAuthenticated, user, signInWithGoogle, signIn } = useAuth();
+  const {
+    isLoading: authLoading,
+    isAuthenticated,
+    user,
+    signInWithGoogle,
+    signInWithEmail,
+    resetPassword,
+  } = useAuth();
 
-  const [emailInput, setEmailInput] = useState("ubittechnologiez@gmail.com");
-  const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
-  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showOAuthHelp, setShowOAuthHelp] = useState(false);
-  const [activeTab, setActiveTab] = useState<"google" | "email">("google");
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+
+  const [isUnauthorizedDomain, setIsUnauthorizedDomain] = useState(false);
+  const currentHostname = typeof window !== "undefined" ? window.location.hostname : "";
 
   // Background pointer tracker
   const [pointerEnabled, setPointerEnabled] = useState(false);
@@ -101,18 +99,17 @@ export default function AdminLoginPage() {
     }
   }, [authLoading, isAuthenticated, user, navigate, redirect]);
 
-  const currentOrigin = typeof window !== "undefined" ? window.location.origin : "";
-  const devCallback = `${currentOrigin}/api/auth/callback/google`;
-
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied to clipboard`);
   };
 
-  // Google OAuth Login handler via Firebase
+  // Google SSO Login handler via Firebase
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     setError(null);
+    setInfoMessage(null);
+    setIsUnauthorizedDomain(false);
     try {
       const loggedUser = await signInWithGoogle();
       if (loggedUser) {
@@ -121,73 +118,79 @@ export default function AdminLoginPage() {
       }
     } catch (err: any) {
       console.warn("Google sign-in attempt:", err);
-      if (err?.code === "auth/popup-closed-by-user") {
-        setError("Sign in window was closed. Please try again.");
+      if (
+        err?.code === "auth/unauthorized-domain" ||
+        String(err?.message || "").includes("auth/unauthorized-domain")
+      ) {
+        setIsUnauthorizedDomain(true);
+        setError("Firebase Domain Not Authorized: Add this domain to your Firebase Console.");
+      } else if (err?.code === "auth/popup-closed-by-user") {
+        setError("Sign-in popup was closed before completing.");
       } else if (err?.code === "auth/popup-blocked") {
-        setError("Popup was blocked by browser. Trying redirect mode...");
+        setError("Popup was blocked by browser. Please allow popups for this site.");
       } else {
-        const msg =
-          err instanceof Error
-            ? err.message
-            : "Google Sign-In is initializing. Please verify credentials.";
-        setError(msg);
-        setShowOAuthHelp(true);
+        setError(err?.message || "Google Sign-In failed. Please try Email & Password.");
       }
     } finally {
       setIsGoogleLoading(false);
     }
   };
 
-  // Secondary email code dispatch
-  const sendEmailCode = async (targetEmail: string) => {
-    if (!targetEmail || !targetEmail.includes("@")) {
-      setError("Please enter a valid administrator email address.");
+  // Email & Password Auth Handler
+  const handleEmailAuthSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setInfoMessage(null);
+
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const loggedUser = await signInWithEmail(email, password);
+      if (loggedUser) {
+        toast.success(`Welcome back, ${loggedUser.email || "Administrator"}`);
+        navigate(redirect);
+      }
+    } catch (err: any) {
+      console.error("Email auth error:", err);
+      const code = err?.code;
+      if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
+        setError("Invalid email or password. Please verify your credentials.");
+      } else if (code === "auth/user-not-found") {
+        setError("No administrator account found for this email address.");
+      } else if (code === "auth/too-many-requests") {
+        setError("Too many failed attempts. Please try again in a few moments.");
+      } else {
+        setError(err?.message || "Authentication failed. Please verify your credentials.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Forgot Password Handler
+  const handleForgotPassword = async () => {
+    if (!email || !email.includes("@")) {
+      setError("Please enter your admin email above first to receive the reset link.");
       return;
     }
     setIsLoading(true);
     setError(null);
     try {
-      const formData = new FormData();
-      formData.append("email", targetEmail.trim().toLowerCase());
-      await signIn("email-otp", formData);
-      setStep({ email: targetEmail.trim().toLowerCase() });
+      await resetPassword(email);
+      setInfoMessage(`Password reset link sent to ${email}. Check your inbox!`);
+      toast.success("Reset link sent to your email.");
+    } catch (err: any) {
+      setError(err?.message || "Failed to send password reset email.");
+    } finally {
       setIsLoading(false);
-    } catch (err) {
-      console.error("Email OTP error:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to dispatch verification code. Please try again.",
-      );
-      setIsLoading(false);
-    }
-  };
-
-  const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    await sendEmailCode(emailInput);
-  };
-
-  const handleOtpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (typeof step === "string") return;
-    if (otp.length !== 6) {
-      setError("Please enter the full 6-digit code.");
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    try {
-      const formData = new FormData();
-      formData.append("email", step.email);
-      formData.append("code", otp);
-      await signIn("email-otp", formData);
-      navigate(redirect);
-    } catch (err) {
-      console.error("OTP verification error:", err);
-      setError("The verification code entered is invalid or has expired.");
-      setIsLoading(false);
-      setOtp("");
     }
   };
 
@@ -207,12 +210,12 @@ export default function AdminLoginPage() {
         />
       )}
 
-      {/* Ambient backgrounds */}
+      {/* Ambient background glows */}
       <div className="pointer-events-none absolute -right-32 -top-32 size-[28rem] rounded-full bg-primary/10 blur-[130px]" />
       <div className="pointer-events-none absolute -left-32 bottom-0 size-[28rem] rounded-full bg-[#4a7ab5]/10 blur-[130px]" />
       <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(to_right,oklch(1_0_0/0.02)_1px,transparent_1px),linear-gradient(to_bottom,oklch(1_0_0/0.02)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)]" />
 
-      {/* Top Bar */}
+      {/* Header Bar */}
       <header className="relative z-10 px-6 py-5 flex items-center justify-between border-b border-white/8 bg-background/50 backdrop-blur-md">
         <Link to="/" className="flex items-center gap-2 group">
           <BrandLockup size="small" />
@@ -231,308 +234,204 @@ export default function AdminLoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 25, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, ease: EASE }}
-          className="w-full max-w-[450px]"
+          transition={{ duration: 0.5, ease: EASE }}
+          className="w-full max-w-[440px]"
         >
-          <Card className="w-full pb-0 border border-white/10 shadow-2xl shadow-black/50 bg-card/95 backdrop-blur-2xl">
-            {step === "signIn" ? (
-              <>
-                <CardHeader className="text-center pb-4">
-                  <div className="mx-auto mb-3 flex items-center justify-center">
-                    <div className="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary shadow-inner">
-                      <Lock className="size-6" />
-                    </div>
-                  </div>
-                  <CardTitle className="text-xl font-bold tracking-tight">
-                    UBIT Admin Portal
-                  </CardTitle>
-                  <CardDescription className="mt-1 text-xs text-muted-foreground">
-                    Sign in with your administrator account to manage infrastructure showcases and quotes.
-                  </CardDescription>
-                </CardHeader>
+          <Card className="w-full pb-0 border border-white/10 shadow-2xl shadow-black/60 bg-card/95 backdrop-blur-2xl">
+            <CardHeader className="text-center pb-3">
+              <div className="mx-auto mb-3 flex items-center justify-center">
+                <div className="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary shadow-inner">
+                  <Lock className="size-6" />
+                </div>
+              </div>
+              <CardTitle className="text-xl font-bold tracking-tight">
+                Welcome
+              </CardTitle>
+              <CardDescription className="mt-1 text-xs text-muted-foreground">
+                Sign in with your email & password or use Google SSO to access the management portal.
+              </CardDescription>
+            </CardHeader>
 
-                <CardContent className="pb-6 space-y-4">
-                  {/* Primary Method: Google SSO */}
-                  <div className="space-y-3">
+            <CardContent className="pb-6 space-y-4">
+              {/* Form 1: Email & Password */}
+              <form onSubmit={handleEmailAuthSubmit} className="space-y-3.5">
+                {/* Email Field */}
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="admin-email"
+                    className="text-xs font-medium text-muted-foreground flex items-center justify-between"
+                  >
+                    <span>Admin Email</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 size-4 text-muted-foreground pointer-events-none" />
+                    <Input
+                      id="admin-email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="Enter mail id"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading || isGoogleLoading}
+                      required
+                      className="pl-9 h-10 bg-white/5 border-white/15 text-xs sm:text-sm placeholder:text-muted-foreground/60 focus-visible:ring-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Password Field */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <label htmlFor="admin-password" className="font-medium text-muted-foreground">
+                      Admin Password
+                    </label>
                     <button
                       type="button"
-                      onClick={handleGoogleLogin}
-                      disabled={isGoogleLoading || isLoading}
-                      className="w-full h-12 flex items-center justify-center gap-3 rounded-xl bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 shadow-md font-semibold text-sm transition-all hover:shadow-lg active:scale-[0.99] disabled:opacity-70 group"
+                      onClick={handleForgotPassword}
+                      disabled={isLoading || isGoogleLoading}
+                      className="text-[11px] text-primary hover:underline hover:text-primary/80 transition-colors"
                     >
-                      {isGoogleLoading ? (
-                        <Loader2 className="size-5 animate-spin text-gray-600" />
-                      ) : (
-                        <GoogleIcon className="size-5 shrink-0 group-hover:scale-105 transition-transform" />
-                      )}
-                      <span>Continue with Google</span>
+                      Forgot password?
                     </button>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 size-4 text-muted-foreground pointer-events-none" />
+                    <Input
+                      id="admin-password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      placeholder="Enter admin password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading || isGoogleLoading}
+                      required
+                      className="pl-9 pr-10 h-10 bg-white/5 border-white/15 text-xs sm:text-sm placeholder:text-muted-foreground/60 focus-visible:ring-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                      title={showPassword ? "Hide password" : "Show password"}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
 
-                    <div className="flex items-center justify-between text-[11px] px-1 text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <CheckCircle2 className="size-3 text-emerald-400" />
-                        <span>Instant 1-Click Access</span>
+                {/* Status messages */}
+                {error && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-xs text-red-400 font-medium pt-0.5 leading-relaxed"
+                  >
+                    {error}
+                  </motion.p>
+                )}
+
+                {infoMessage && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-xs text-emerald-400 font-medium pt-0.5 leading-relaxed"
+                  >
+                    {infoMessage}
+                  </motion.p>
+                )}
+
+                {/* Primary Action Button */}
+                <Button
+                  type="submit"
+                  disabled={isLoading || isGoogleLoading}
+                  className="w-full h-11 font-semibold text-xs sm:text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-md active:scale-[0.99] mt-2"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="size-4 animate-spin" />
+                      <span>Signing in...</span>
+                    </span>
+                  ) : (
+                    <span>Sign In to Admin Portal</span>
+                  )}
+                </Button>
+              </form>
+
+              {/* Divider: OR */}
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/10" />
+                </div>
+                <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
+                  <span className="bg-card px-3 text-muted-foreground font-semibold">
+                    Or
+                  </span>
+                </div>
+              </div>
+
+              {/* Secondary Method: Google SSO */}
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  disabled={isGoogleLoading || isLoading}
+                  className="w-full h-11 flex items-center justify-center gap-3 rounded-xl bg-white text-gray-900 hover:bg-gray-100 border border-gray-200 shadow-md font-semibold text-xs sm:text-sm transition-all hover:shadow-lg active:scale-[0.99] disabled:opacity-70 group"
+                >
+                  {isGoogleLoading ? (
+                    <Loader2 className="size-4 animate-spin text-gray-600" />
+                  ) : (
+                    <GoogleIcon className="size-4 shrink-0 group-hover:scale-105 transition-transform" />
+                  )}
+                  <span>Continue with Google</span>
+                </button>
+              </div>
+
+              {/* Firebase Unauthorized Domain Fix Helper */}
+              {isUnauthorizedDomain && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs space-y-2.5 mt-2"
+                >
+                  <div className="flex items-start gap-2 text-amber-300 font-semibold">
+                    <Info className="size-4 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs">Authorize Current Domain in Firebase</p>
+                      <p className="text-[11px] font-normal text-amber-200/80 mt-0.5">
+                        Google SSO requires adding your app's domain to Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 font-mono text-[11px] bg-black/40 p-2 rounded-lg border border-white/10">
+                    <span className="text-[10px] text-muted-foreground uppercase font-sans">
+                      Domain to Add:
+                    </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-amber-200 font-semibold truncate select-all">
+                        {currentHostname}
                       </span>
                       <button
                         type="button"
-                        onClick={() => setShowOAuthHelp(!showOAuthHelp)}
-                        className="text-primary hover:underline flex items-center gap-1"
+                        onClick={() => copyToClipboard(currentHostname, "Domain")}
+                        className="p-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 shrink-0"
+                        title="Copy Domain"
                       >
-                        <HelpCircle className="size-3" />
-                        <span>OAuth Credentials Info</span>
+                        <Copy className="size-3.5" />
                       </button>
                     </div>
                   </div>
+                </motion.div>
+              )}
+            </CardContent>
 
-                  {/* Google OAuth Credentials Guide / Info Box */}
-                  <AnimatePresence>
-                    {showOAuthHelp && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs space-y-2.5 overflow-hidden"
-                      >
-                        <div className="flex items-center justify-between font-semibold text-primary">
-                          <span className="flex items-center gap-1.5">
-                            <KeyRound className="size-3.5" />
-                            Google Cloud OAuth Setup
-                          </span>
-                        </div>
-
-                        <p className="text-[11px] text-muted-foreground leading-relaxed">
-                          To connect Google OAuth in Google Cloud Console (<code>console.cloud.google.com</code>):
-                        </p>
-
-                        <div className="space-y-2 pt-1 font-mono text-[11px]">
-                          <div>
-                            <span className="text-muted-foreground block text-[10px] uppercase">
-                              Authorized Javascript Origin:
-                            </span>
-                            <div className="flex items-center justify-between bg-black/40 p-1.5 rounded border border-white/10 mt-0.5">
-                              <span className="truncate">{currentOrigin}</span>
-                              <button
-                                type="button"
-                                onClick={() => copyToClipboard(currentOrigin, "Origin")}
-                                className="text-primary hover:text-primary/80 shrink-0 p-1"
-                                title="Copy origin"
-                              >
-                                <Copy className="size-3" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div>
-                            <span className="text-muted-foreground block text-[10px] uppercase">
-                              Authorized Redirect URI:
-                            </span>
-                            <div className="flex items-center justify-between bg-black/40 p-1.5 rounded border border-white/10 mt-0.5">
-                              <span className="truncate">{devCallback}</span>
-                              <button
-                                type="button"
-                                onClick={() => copyToClipboard(devCallback, "Redirect URI")}
-                                className="text-primary hover:text-primary/80 shrink-0 p-1"
-                                title="Copy redirect URI"
-                              >
-                                <Copy className="size-3" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <p className="text-[10px] text-muted-foreground">
-                          Set <code>AUTH_GOOGLE_ID</code> and <code>AUTH_GOOGLE_SECRET</code> in your environment settings to enable live Google SSO.
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Divider */}
-                  <div className="relative my-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-white/10" />
-                    </div>
-                    <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-                      <span className="bg-card px-3 text-muted-foreground">
-                        Or verify with admin email
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* One-Click Quick Admin Dispatch */}
-                  <div className="rounded-xl border border-white/10 bg-white/5 p-3.5 space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
-                        <Sparkles className="size-3.5 text-primary" />
-                        Whitelisted Administrator
-                      </span>
-                      <span className="text-[10px] text-emerald-400 font-mono">Verified</span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEmailInput("ubittechnologiez@gmail.com");
-                        sendEmailCode("ubittechnologiez@gmail.com");
-                      }}
-                      disabled={isLoading || isGoogleLoading}
-                      className="w-full flex items-center justify-between rounded-lg border border-white/15 bg-background/80 hover:bg-background px-3.5 py-2.5 text-xs font-mono text-foreground hover:border-primary/60 transition-all group"
-                    >
-                      <span className="truncate">ubittechnologiez@gmail.com</span>
-                      <span className="text-[11px] font-sans font-medium text-primary flex items-center gap-1 shrink-0 ml-2 group-hover:translate-x-0.5 transition-transform">
-                        {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : "Send Code →"}
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* Alternative Custom Email Input */}
-                  <form onSubmit={handleEmailSubmit} className="space-y-2 pt-1">
-                    <div className="relative flex items-center gap-2">
-                      <div className="relative flex-1">
-                        <Mail className="absolute left-3 top-3 size-4 text-muted-foreground" />
-                        <Input
-                          name="email"
-                          placeholder="admin@ubittechnologiez.com"
-                          type="email"
-                          value={emailInput}
-                          onChange={(e) => setEmailInput(e.target.value)}
-                          className="pl-9 text-xs sm:text-sm h-10 bg-white/5 border-white/15"
-                          disabled={isLoading || isGoogleLoading}
-                          required
-                        />
-                      </div>
-                      <Button
-                        type="submit"
-                        variant="secondary"
-                        size="icon"
-                        disabled={isLoading || isGoogleLoading || !emailInput}
-                        className="h-10 w-10 shrink-0"
-                        title="Submit email"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : (
-                          <ArrowRight className="size-4" />
-                        )}
-                      </Button>
-                    </div>
-
-                    {error && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-400 text-center font-medium pt-1"
-                      >
-                        {error}
-                      </motion.p>
-                    )}
-                  </form>
-                </CardContent>
-              </>
-            ) : (
-              <>
-                <CardHeader className="text-center pb-2 pt-6">
-                  <div className="mx-auto mb-2 grid size-12 place-items-center rounded-2xl bg-primary/10 border border-primary/20">
-                    <Mail className="size-6 text-primary" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold">Enter 6-Digit Code</CardTitle>
-                  <CardDescription className="mt-1 text-xs">
-                    We sent a temporary verification code to{" "}
-                    <span className="text-foreground font-semibold font-mono">{step.email}</span>
-                  </CardDescription>
-                </CardHeader>
-
-                <form onSubmit={handleOtpSubmit}>
-                  <CardContent className="pb-4 space-y-4">
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="flex justify-center py-2"
-                    >
-                      <InputOTP
-                        value={otp}
-                        onChange={setOtp}
-                        maxLength={6}
-                        disabled={isLoading}
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && otp.length === 6 && !isLoading) {
-                            const form = (e.target as HTMLElement).closest("form");
-                            if (form) form.requestSubmit();
-                          }
-                        }}
-                      >
-                        <InputOTPGroup>
-                          {Array.from({ length: 6 }).map((_, index) => (
-                            <InputOTPSlot key={index} index={index} className="size-10 text-base" />
-                          ))}
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </motion.div>
-
-                    {error && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-400 text-center font-medium"
-                      >
-                        {error}
-                      </motion.p>
-                    )}
-
-                    <div className="text-center">
-                      <Button
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        className="text-xs text-muted-foreground hover:text-primary p-0 h-auto"
-                        onClick={() => sendEmailCode(step.email)}
-                        disabled={isLoading}
-                      >
-                        Didn't get the code? Resend Code
-                      </Button>
-                    </div>
-                  </CardContent>
-
-                  <CardFooter className="flex-col gap-2 pb-5">
-                    <Button
-                      type="submit"
-                      className="w-full h-11 font-medium text-sm"
-                      disabled={isLoading || otp.length !== 6}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="mr-2 size-4 animate-spin" />
-                          Verifying credentials...
-                        </>
-                      ) : (
-                        <>
-                          Authorize & Access Dashboard
-                          <ArrowRight className="ml-2 size-4" />
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setStep("signIn");
-                        setError(null);
-                        setOtp("");
-                      }}
-                      disabled={isLoading}
-                      className="w-full text-xs text-muted-foreground hover:text-foreground"
-                    >
-                      Back to Sign In options
-                    </Button>
-                  </CardFooter>
-                </form>
-              </>
-            )}
-
-            <div className="py-3.5 px-6 text-[11px] text-center text-muted-foreground bg-white/[0.02] border-t border-white/8 rounded-b-lg flex items-center justify-center gap-2">
+            <div className="py-3 px-6 text-[11px] text-center text-muted-foreground bg-white/[0.02] border-t border-white/8 rounded-b-lg flex items-center justify-center gap-2">
               <ShieldCheck className="size-3.5 text-primary" />
               <span>Restricted to Authorized UBIT Administrators</span>
             </div>
@@ -540,7 +439,7 @@ export default function AdminLoginPage() {
         </motion.div>
       </div>
 
-      {/* Footer info */}
+      {/* Footer */}
       <footer className="relative z-10 py-4 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} UBIT Technologiez. All rights reserved.
       </footer>

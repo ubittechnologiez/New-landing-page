@@ -1653,7 +1653,7 @@ function Footer() {
               Terms of Service
             </Link>
             <Link to="/admin/login" className="transition-colors hover:text-primary opacity-60 hover:opacity-100">
-              Staff Portal
+              Portal
             </Link>
           </div>
         </div>
