@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { BrandLockup } from "@/components/BrandImage";
 import { useAuth } from "@/hooks/use-auth";
 import { ADMIN_EMAILS } from "@/hooks/use-admin";
@@ -23,17 +23,23 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  Copy,
+  ExternalLink,
+  HelpCircle,
   Info,
+  KeyRound,
   Loader2,
   Lock,
   Mail,
   ShieldCheck,
   Sparkles,
+  Zap,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-function GoogleIcon({ className }: { className?: string }) {
+function GoogleIcon({ className = "size-5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24">
       <path
@@ -61,14 +67,16 @@ export default function AdminLoginPage() {
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("returnTo") || "/admin";
 
-  const { isLoading: authLoading, isAuthenticated, user, signIn } = useAuth();
+  const { isLoading: authLoading, isAuthenticated, user, signInWithGoogle, signIn } = useAuth();
 
   const [emailInput, setEmailInput] = useState("ubittechnologiez@gmail.com");
   const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [oauthNote, setOauthNote] = useState<string | null>(null);
+  const [showOAuthHelp, setShowOAuthHelp] = useState(false);
+  const [activeTab, setActiveTab] = useState<"google" | "email">("google");
 
   // Background pointer tracker
   const [pointerEnabled, setPointerEnabled] = useState(false);
@@ -93,6 +101,44 @@ export default function AdminLoginPage() {
     }
   }, [authLoading, isAuthenticated, user, navigate, redirect]);
 
+  const currentOrigin = typeof window !== "undefined" ? window.location.origin : "";
+  const devCallback = `${currentOrigin}/api/auth/callback/google`;
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied to clipboard`);
+  };
+
+  // Google OAuth Login handler via Firebase
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    setError(null);
+    try {
+      const loggedUser = await signInWithGoogle();
+      if (loggedUser) {
+        toast.success(`Signed in as ${loggedUser.email || "Administrator"}`);
+        navigate(redirect);
+      }
+    } catch (err: any) {
+      console.warn("Google sign-in attempt:", err);
+      if (err?.code === "auth/popup-closed-by-user") {
+        setError("Sign in window was closed. Please try again.");
+      } else if (err?.code === "auth/popup-blocked") {
+        setError("Popup was blocked by browser. Trying redirect mode...");
+      } else {
+        const msg =
+          err instanceof Error
+            ? err.message
+            : "Google Sign-In is initializing. Please verify credentials.";
+        setError(msg);
+        setShowOAuthHelp(true);
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  // Secondary email code dispatch
   const sendEmailCode = async (targetEmail: string) => {
     if (!targetEmail || !targetEmail.includes("@")) {
       setError("Please enter a valid administrator email address.");
@@ -145,22 +191,6 @@ export default function AdminLoginPage() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-    setOauthNote(null);
-    try {
-      await signIn("google", { redirectTo: redirect });
-    } catch (err) {
-      console.warn("Google sign in notice:", err);
-      setOauthNote(
-        "Google OAuth requires AUTH_GOOGLE_ID & AUTH_GOOGLE_SECRET in Convex. Use the instant Email OTP below for 1-click access.",
-      );
-      setEmailInput("ubittechnologiez@gmail.com");
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-primary/20">
       {/* Interactive cursor glow */}
@@ -177,7 +207,7 @@ export default function AdminLoginPage() {
         />
       )}
 
-      {/* Background ambient lighting */}
+      {/* Ambient backgrounds */}
       <div className="pointer-events-none absolute -right-32 -top-32 size-[28rem] rounded-full bg-primary/10 blur-[130px]" />
       <div className="pointer-events-none absolute -left-32 bottom-0 size-[28rem] rounded-full bg-[#4a7ab5]/10 blur-[130px]" />
       <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(to_right,oklch(1_0_0/0.02)_1px,transparent_1px),linear-gradient(to_bottom,oklch(1_0_0/0.02)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)]" />
@@ -202,34 +232,141 @@ export default function AdminLoginPage() {
           initial={{ opacity: 0, y: 25, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, ease: EASE }}
-          className="w-full max-w-[430px]"
+          className="w-full max-w-[450px]"
         >
-          <Card className="w-full pb-0 border border-white/10 shadow-2xl shadow-black/40 bg-card/90 backdrop-blur-2xl">
+          <Card className="w-full pb-0 border border-white/10 shadow-2xl shadow-black/50 bg-card/95 backdrop-blur-2xl">
             {step === "signIn" ? (
               <>
-                <CardHeader className="text-center pb-3">
+                <CardHeader className="text-center pb-4">
                   <div className="mx-auto mb-3 flex items-center justify-center">
-                    <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary">
+                    <div className="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary shadow-inner">
                       <Lock className="size-6" />
                     </div>
                   </div>
-                  <CardTitle className="text-xl font-semibold tracking-tight">
+                  <CardTitle className="text-xl font-bold tracking-tight">
                     UBIT Admin Portal
                   </CardTitle>
                   <CardDescription className="mt-1 text-xs text-muted-foreground">
-                    Secure access for Gallery & Content Management
+                    Sign in with your administrator account to manage infrastructure showcases and quotes.
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="pb-5 space-y-4">
-                  {/* Quick One-Click Admin Dispatch */}
-                  <div className="rounded-xl border border-primary/25 bg-primary/10 p-3.5 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                        <Sparkles className="size-3.5" />
-                        Admin Quick Login
+                <CardContent className="pb-6 space-y-4">
+                  {/* Primary Method: Google SSO */}
+                  <div className="space-y-3">
+                    <button
+                      type="button"
+                      onClick={handleGoogleLogin}
+                      disabled={isGoogleLoading || isLoading}
+                      className="w-full h-12 flex items-center justify-center gap-3 rounded-xl bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 shadow-md font-semibold text-sm transition-all hover:shadow-lg active:scale-[0.99] disabled:opacity-70 group"
+                    >
+                      {isGoogleLoading ? (
+                        <Loader2 className="size-5 animate-spin text-gray-600" />
+                      ) : (
+                        <GoogleIcon className="size-5 shrink-0 group-hover:scale-105 transition-transform" />
+                      )}
+                      <span>Continue with Google</span>
+                    </button>
+
+                    <div className="flex items-center justify-between text-[11px] px-1 text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <CheckCircle2 className="size-3 text-emerald-400" />
+                        <span>Instant 1-Click Access</span>
                       </span>
-                      <span className="text-[10px] text-muted-foreground">Pre-authorized</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowOAuthHelp(!showOAuthHelp)}
+                        className="text-primary hover:underline flex items-center gap-1"
+                      >
+                        <HelpCircle className="size-3" />
+                        <span>OAuth Credentials Info</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Google OAuth Credentials Guide / Info Box */}
+                  <AnimatePresence>
+                    {showOAuthHelp && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs space-y-2.5 overflow-hidden"
+                      >
+                        <div className="flex items-center justify-between font-semibold text-primary">
+                          <span className="flex items-center gap-1.5">
+                            <KeyRound className="size-3.5" />
+                            Google Cloud OAuth Setup
+                          </span>
+                        </div>
+
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          To connect Google OAuth in Google Cloud Console (<code>console.cloud.google.com</code>):
+                        </p>
+
+                        <div className="space-y-2 pt-1 font-mono text-[11px]">
+                          <div>
+                            <span className="text-muted-foreground block text-[10px] uppercase">
+                              Authorized Javascript Origin:
+                            </span>
+                            <div className="flex items-center justify-between bg-black/40 p-1.5 rounded border border-white/10 mt-0.5">
+                              <span className="truncate">{currentOrigin}</span>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(currentOrigin, "Origin")}
+                                className="text-primary hover:text-primary/80 shrink-0 p-1"
+                                title="Copy origin"
+                              >
+                                <Copy className="size-3" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="text-muted-foreground block text-[10px] uppercase">
+                              Authorized Redirect URI:
+                            </span>
+                            <div className="flex items-center justify-between bg-black/40 p-1.5 rounded border border-white/10 mt-0.5">
+                              <span className="truncate">{devCallback}</span>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(devCallback, "Redirect URI")}
+                                className="text-primary hover:text-primary/80 shrink-0 p-1"
+                                title="Copy redirect URI"
+                              >
+                                <Copy className="size-3" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <p className="text-[10px] text-muted-foreground">
+                          Set <code>AUTH_GOOGLE_ID</code> and <code>AUTH_GOOGLE_SECRET</code> in your environment settings to enable live Google SSO.
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Divider */}
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-white/10" />
+                    </div>
+                    <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
+                      <span className="bg-card px-3 text-muted-foreground">
+                        Or verify with admin email
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* One-Click Quick Admin Dispatch */}
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3.5 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                        <Sparkles className="size-3.5 text-primary" />
+                        Whitelisted Administrator
+                      </span>
+                      <span className="text-[10px] text-emerald-400 font-mono">Verified</span>
                     </div>
 
                     <button
@@ -238,29 +375,18 @@ export default function AdminLoginPage() {
                         setEmailInput("ubittechnologiez@gmail.com");
                         sendEmailCode("ubittechnologiez@gmail.com");
                       }}
-                      disabled={isLoading}
-                      className="w-full flex items-center justify-between rounded-lg border border-primary/30 bg-background/80 hover:bg-background px-3 py-2 text-xs font-mono text-foreground hover:border-primary/60 transition-all group"
+                      disabled={isLoading || isGoogleLoading}
+                      className="w-full flex items-center justify-between rounded-lg border border-white/15 bg-background/80 hover:bg-background px-3.5 py-2.5 text-xs font-mono text-foreground hover:border-primary/60 transition-all group"
                     >
                       <span className="truncate">ubittechnologiez@gmail.com</span>
                       <span className="text-[11px] font-sans font-medium text-primary flex items-center gap-1 shrink-0 ml-2 group-hover:translate-x-0.5 transition-transform">
-                        Send OTP &rarr;
+                        {isLoading ? <Loader2 className="size-3.5 animate-spin" /> : "Send Code →"}
                       </span>
                     </button>
                   </div>
 
-                  <div className="relative my-2">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-white/10" />
-                    </div>
-                    <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-                      <span className="bg-card px-2 text-muted-foreground">
-                        Or enter admin email
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Manual Email Input Form */}
-                  <form onSubmit={handleEmailSubmit} className="space-y-3">
+                  {/* Alternative Custom Email Input */}
+                  <form onSubmit={handleEmailSubmit} className="space-y-2 pt-1">
                     <div className="relative flex items-center gap-2">
                       <div className="relative flex-1">
                         <Mail className="absolute left-3 top-3 size-4 text-muted-foreground" />
@@ -271,16 +397,17 @@ export default function AdminLoginPage() {
                           value={emailInput}
                           onChange={(e) => setEmailInput(e.target.value)}
                           className="pl-9 text-xs sm:text-sm h-10 bg-white/5 border-white/15"
-                          disabled={isLoading}
+                          disabled={isLoading || isGoogleLoading}
                           required
                         />
                       </div>
                       <Button
                         type="submit"
-                        variant="default"
+                        variant="secondary"
                         size="icon"
-                        disabled={isLoading || !emailInput}
+                        disabled={isLoading || isGoogleLoading || !emailInput}
                         className="h-10 w-10 shrink-0"
+                        title="Submit email"
                       >
                         {isLoading ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -294,51 +421,17 @@ export default function AdminLoginPage() {
                       <motion.p
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-400 text-center font-medium"
+                        className="text-xs text-red-400 text-center font-medium pt-1"
                       >
                         {error}
                       </motion.p>
                     )}
                   </form>
-
-                  {/* Optional Google Login */}
-                  <div className="pt-1">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="w-full h-10 border-white/15 bg-white/5 font-normal hover:bg-white/10 hover:border-white/25 text-xs text-foreground/80 transition-all"
-                      onClick={handleGoogleLogin}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="mr-2 size-3.5 animate-spin" />
-                      ) : (
-                        <GoogleIcon className="mr-2 size-3.5" />
-                      )}
-                      <span>Continue with Google (OAuth)</span>
-                    </Button>
-                  </div>
-
-                  {oauthNote && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-200"
-                    >
-                      <div className="flex items-start gap-2">
-                        <Info className="size-3.5 shrink-0 text-amber-400 mt-0.5" />
-                        <p className="text-[11px] leading-relaxed text-amber-200/90">
-                          {oauthNote}
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
                 </CardContent>
               </>
             ) : (
               <>
-                <CardHeader className="text-center pb-2 pt-5">
+                <CardHeader className="text-center pb-2 pt-6">
                   <div className="mx-auto mb-2 grid size-12 place-items-center rounded-2xl bg-primary/10 border border-primary/20">
                     <Mail className="size-6 text-primary" />
                   </div>
@@ -432,14 +525,14 @@ export default function AdminLoginPage() {
                       disabled={isLoading}
                       className="w-full text-xs text-muted-foreground hover:text-foreground"
                     >
-                      Use a different email
+                      Back to Sign In options
                     </Button>
                   </CardFooter>
                 </form>
               </>
             )}
 
-            <div className="py-3 px-6 text-[11px] text-center text-muted-foreground bg-white/[0.02] border-t border-white/8 rounded-b-lg flex items-center justify-center gap-1.5">
+            <div className="py-3.5 px-6 text-[11px] text-center text-muted-foreground bg-white/[0.02] border-t border-white/8 rounded-b-lg flex items-center justify-center gap-2">
               <ShieldCheck className="size-3.5 text-primary" />
               <span>Restricted to Authorized UBIT Administrators</span>
             </div>

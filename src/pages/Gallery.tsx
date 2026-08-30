@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { subscribeToGallery, type FirestoreGalleryItem, INITIAL_SHOWCASE_DATA } from "@/lib/firestore-service";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -19,6 +20,11 @@ import {
 import { BrandLockup } from "@/components/BrandImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  getDisplayCategory,
+  getDisplayDescription,
+  getDisplayClient,
+} from "@/lib/image-utils";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -62,20 +68,46 @@ function CursorGlow() {
 
 export default function GalleryPage() {
   const images = useQuery(api.gallery.list);
+  const [firestoreImages, setFirestoreImages] = useState<FirestoreGalleryItem[]>([]);
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  // Subscribe to real-time Firestore gallery collection
+  useEffect(() => {
+    const unsub = subscribeToGallery(
+      (items) => {
+        if (items && items.length > 0) {
+          setFirestoreImages(items);
+        }
+      },
+      (err) => console.warn("Firestore gallery subscription:", err),
+    );
+    return () => unsub();
+  }, []);
+
+  // Use Convex items first, then Firestore items, then default showcase data
+  const resolvedImages =
+    images && images.length > 0
+      ? images
+      : firestoreImages.length > 0
+        ? firestoreImages
+        : INITIAL_SHOWCASE_DATA;
 
   // Extract unique categories from actual database records
   const dynamicCategories = [
     "All",
     ...Array.from(
-      new Set((images ?? []).map((img) => img.category).filter(Boolean)),
+      new Set(
+        resolvedImages.map((img: any) => getDisplayCategory(img)).filter(Boolean),
+      ),
     ),
   ];
 
-  const filteredImages = (images ?? []).filter((img) => {
+  const filteredImages = resolvedImages.filter((img: any) => {
     if (activeCategory === "All") return true;
-    return img.category?.toLowerCase() === activeCategory.toLowerCase();
+    return (
+      getDisplayCategory(img).toLowerCase() === activeCategory.toLowerCase()
+    );
   });
 
   // Handle keyboard navigation for lightbox
@@ -211,9 +243,9 @@ export default function GalleryPage() {
           </div>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredImages.map((img, i) => (
+            {filteredImages.map((img: any, i) => (
               <motion.div
-                key={img._id}
+                key={img._id || img.id || `${img.url}-${i}`}
                 initial={{ opacity: 0, y: 25, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{
@@ -239,11 +271,9 @@ export default function GalleryPage() {
 
                   {/* Badges on image */}
                   <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                    {img.category && (
-                      <span className="px-2.5 py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-white/15 text-[10px] font-mono text-white/90">
-                        {img.category}
-                      </span>
-                    )}
+                    <span className="px-2.5 py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-white/15 text-[10px] font-mono text-white/90">
+                      {getDisplayCategory(img)}
+                    </span>
                   </div>
 
                   <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -261,16 +291,16 @@ export default function GalleryPage() {
                     </h3>
                   </div>
 
-                  {img.description && (
+                  {getDisplayDescription(img) && (
                     <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                      {img.description}
+                      {getDisplayDescription(img)}
                     </p>
                   )}
 
-                  {img.client && (
+                  {getDisplayClient(img) && (
                     <div className="pt-2 flex items-center gap-1.5 text-[11px] text-primary/80 font-mono">
                       <span>Facility:</span>
-                      <span className="text-muted-foreground">{img.client}</span>
+                      <span className="text-muted-foreground">{getDisplayClient(img)}</span>
                     </div>
                   )}
                 </div>
@@ -349,7 +379,7 @@ export default function GalleryPage() {
               <div className="p-5 sm:p-6 space-y-2 bg-card">
                 <div className="flex items-center justify-between gap-2">
                   <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-xs">
-                    {filteredImages[lightboxIndex].category || "Infrastructure"}
+                    {getDisplayCategory(filteredImages[lightboxIndex])}
                   </Badge>
                   <span className="text-xs font-mono text-muted-foreground">
                     {lightboxIndex + 1} of {filteredImages.length}
@@ -360,15 +390,15 @@ export default function GalleryPage() {
                   {filteredImages[lightboxIndex].title || "Enterprise Hardware Deployment"}
                 </h2>
 
-                {filteredImages[lightboxIndex].description && (
+                {getDisplayDescription(filteredImages[lightboxIndex]) && (
                   <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    {filteredImages[lightboxIndex].description}
+                    {getDisplayDescription(filteredImages[lightboxIndex])}
                   </p>
                 )}
 
-                {filteredImages[lightboxIndex].client && (
+                {getDisplayClient(filteredImages[lightboxIndex]) && (
                   <p className="text-xs font-mono text-primary/90 pt-1">
-                    Client & Site: {filteredImages[lightboxIndex].client}
+                    Client & Site: {getDisplayClient(filteredImages[lightboxIndex])}
                   </p>
                 )}
               </div>
@@ -393,4 +423,5 @@ export default function GalleryPage() {
     </main>
   );
 }
+
 

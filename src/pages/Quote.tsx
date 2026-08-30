@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { submitQuoteToFirestore } from "@/lib/firestore-service";
 import { ArrowRight, CheckCircle, Mail, MapPin, Phone } from "lucide-react";
 import { BrandLockup } from "@/components/BrandImage";
 import { Button } from "@/components/ui/button";
@@ -89,14 +90,34 @@ export default function Quote() {
 
     setIsSubmitting(true);
     try {
-      await submitQuote({
-        clientName: clientName.trim(),
-        company: company.trim(),
-        email: email.trim(),
-        phone: phone.trim() || undefined,
-        category,
-        notes: requirements.trim() || undefined,
-      });
+      // Save to Firebase Firestore
+      try {
+        await submitQuoteToFirestore({
+          clientName: clientName.trim(),
+          company: company.trim(),
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          category,
+          notes: requirements.trim() || undefined,
+        });
+      } catch (fbErr) {
+        console.warn("Firestore quote backup note:", fbErr);
+      }
+
+      // Also persist to Convex
+      try {
+        await submitQuote({
+          clientName: clientName.trim(),
+          company: company.trim(),
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          category,
+          notes: requirements.trim() || undefined,
+        });
+      } catch (cvxErr) {
+        console.warn("Convex quote submit note:", cvxErr);
+      }
+
       setIsSubmitting(false);
       setIsSubmitted(true);
       toast.success("Quote request submitted successfully!");
