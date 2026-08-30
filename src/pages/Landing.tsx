@@ -286,8 +286,8 @@ function CursorGlow() {
   useEffect(() => {
     if (!enabled) return;
     const onMove = (event: MouseEvent) => {
-      x.set(event.clientX - 320);
-      y.set(event.clientY - 320);
+      x.set(event.clientX - 128);
+      y.set(event.clientY - 128);
     };
     window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
@@ -298,12 +298,12 @@ function CursorGlow() {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[5] hidden size-[40rem] rounded-full md:block"
+      className="pointer-events-none fixed left-0 top-0 z-[5] hidden size-[16rem] rounded-full md:block"
       style={{
         x: sx,
         y: sy,
         background:
-          "radial-gradient(circle, oklch(0.72 0.14 75 / 0.08), transparent 62%)",
+          "radial-gradient(circle, oklch(0.72 0.14 75 / 0.09), transparent 68%)",
       }}
     />
   );
@@ -365,9 +365,9 @@ function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
   }, [inView, motionValue, value]);
 
   return (
-    <span ref={ref} className="tabular-nums">
-      {display}
-      {suffix}
+    <span ref={ref} className="tabular-nums inline-flex items-baseline">
+      <span>{display}</span>
+      {suffix && <span className="ml-[0.05em]">{suffix}</span>}
     </span>
   );
 }
@@ -433,7 +433,7 @@ function SpotlightCard({
         className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "radial-gradient(300px circle at var(--spot-x, 50%) var(--spot-y, 50%), oklch(0.72 0.14 75 / 0.12), transparent 70%)",
+            "radial-gradient(200px circle at var(--spot-x, 50%) var(--spot-y, 50%), oklch(0.72 0.14 75 / 0.12), transparent 70%)",
         }}
       />
       <div className="relative z-10">{children}</div>
@@ -718,6 +718,18 @@ function Nav({ ctaTarget }: { ctaTarget: string }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   return (
     <header
       className={cn(
@@ -756,12 +768,13 @@ function Nav({ ctaTarget }: { ctaTarget: string }) {
           ))}
         </div>
 
-        <div className="hidden lg:block">              <Button asChild size="lg" className="rounded-full">
-                <Link to="/quote">
-                  Get a quote
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
+        <div className="hidden lg:block">
+          <Button asChild size="lg" className="rounded-full">
+            <Link to="/quote">
+              Get a quote
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
         </div>
 
         <button
@@ -777,57 +790,62 @@ function Nav({ ctaTarget }: { ctaTarget: string }) {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-2xl lg:hidden"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex h-dvh w-screen flex-col overflow-y-auto bg-[oklch(0.18_0.02_260)] text-foreground lg:hidden"
           >
-            <div className="flex h-16 items-center justify-between px-5">
-              <BrandLockup />
+            <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-5">
+              <a href="#top" onClick={() => setMenuOpen(false)}>
+                <BrandLockup />
+              </a>
               <button
                 type="button"
                 aria-label="Close menu"
-                className="grid size-10 place-items-center rounded-full border border-white/10 bg-card text-foreground"
+                className="grid size-10 place-items-center rounded-full border border-white/10 bg-white/5 text-foreground hover:bg-white/10"
                 onClick={() => setMenuOpen(false)}
               >
                 <X className="size-5" />
               </button>
             </div>
-            <div className="flex flex-1 flex-col justify-center gap-2 px-8">
+            <div className="flex flex-1 flex-col justify-start gap-1 overflow-y-auto px-6 py-6">
               {NAV_LINKS.map((link, i) => (
                 link.href.startsWith("/") ? (
                   <motion.div
                     key={link.href}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.08 * i, duration: 0.4, ease: EASE }}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * i, duration: 0.3, ease: EASE }}
                   >
                     <Link
                       to={link.href}
                       onClick={() => setMenuOpen(false)}
-                      className="block border-b border-white/8 py-5 font-display text-4xl font-bold tracking-tight"
+                      className="block border-b border-white/8 py-4 font-display text-2xl font-semibold tracking-tight text-white hover:text-primary transition-colors"
                     >
                       {link.label}
                     </Link>
                   </motion.div>
                 ) : (
-                  <motion.a
+                  <motion.div
                     key={link.href}
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.08 * i, duration: 0.4, ease: EASE }}
-                    className="border-b border-white/8 py-5 font-display text-4xl font-bold tracking-tight"
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * i, duration: 0.3, ease: EASE }}
                   >
-                    {link.label}
-                  </motion.a>
+                    <a
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="block border-b border-white/8 py-4 font-display text-2xl font-semibold tracking-tight text-white hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  </motion.div>
                 )
               ))}
             </div>
-            <div className="px-8 pb-10">
-              <Button asChild size="lg" className="w-full rounded-full">
+            <div className="shrink-0 border-t border-white/10 p-6">
+              <Button asChild size="lg" className="w-full rounded-full shadow-lg">
                 <Link to={ctaTarget} onClick={() => setMenuOpen(false)}>
                   Get a quote
                   <ArrowRight className="size-4" />
@@ -1623,7 +1641,7 @@ function Footer() {
             <ul className="mt-4 flex flex-col gap-2.5 text-sm text-muted-foreground">
               <li>Monday – Saturday</li>
               <li>9:00 AM – 6:00 PM IST</li>
-              <li className="mt-2 text-primary/80">24/7 Technical Support</li>
+              <li className="mt-2 text-primary/80">12/7 Technical Support</li>
             </ul>
           </div>
         </div>

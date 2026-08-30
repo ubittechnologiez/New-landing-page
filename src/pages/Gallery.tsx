@@ -23,8 +23,8 @@ function CursorGlow() {
   useEffect(() => {
     if (!enabled) return;
     const onMove = (event: MouseEvent) => {
-      x.set(event.clientX - 320);
-      y.set(event.clientY - 320);
+      x.set(event.clientX - 128);
+      y.set(event.clientY - 128);
     };
     window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
@@ -35,12 +35,12 @@ function CursorGlow() {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[5] hidden size-[40rem] rounded-full md:block"
+      className="pointer-events-none fixed left-0 top-0 z-[5] hidden size-[16rem] rounded-full md:block"
       style={{
         x: sx,
         y: sy,
         background:
-          "radial-gradient(circle, oklch(0.72 0.14 75 / 0.08), transparent 62%)",
+          "radial-gradient(circle, oklch(0.72 0.14 75 / 0.09), transparent 68%)",
       }}
     />
   );

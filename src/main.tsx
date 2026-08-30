@@ -82,7 +82,13 @@ class RootErrorBoundary extends React.Component<
   }
 }
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+const convexUrl =
+  (import.meta.env.VITE_CONVEX_URL &&
+    typeof import.meta.env.VITE_CONVEX_URL === "string" &&
+    import.meta.env.VITE_CONVEX_URL.trim() !== "")
+    ? import.meta.env.VITE_CONVEX_URL
+    : "https://happy-otter-123.convex.cloud";
+const convex = new ConvexReactClient(convexUrl);
 
 // UBIT runs the brand navy + bronze dark theme — force the dark palette app-wide.
 if (typeof document !== "undefined") {

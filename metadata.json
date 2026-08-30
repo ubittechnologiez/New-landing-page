@@ -1,0 +1,6 @@
+{
+  "name": "UBIT TECHNOLOGIEZ",
+  "description": "Enterprise IT Infrastructure & Solutions in Salem, India. Servers, firewalls, networking, NAS, workstations, desktops & laptops from Cisco, Dell, HP, Lenovo, Sophos, Fortinet, plus financial analytics & ERP services.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
