@@ -33,6 +33,12 @@ import {
   Wallet,
   Workflow,
   X,
+  Code2,
+  Globe,
+  Layout,
+  Smartphone,
+  Layers,
+  Cloud,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
@@ -97,12 +103,12 @@ const slideInRight: Variants = {
 
 const NAV_LINKS = [
   { label: "Solutions", href: "#solutions" },
-  { label: "Brands", href: "#brands" },
+  { label: "Web Dev", href: "#web-dev" },
   { label: "Analytics", href: "#analytics" },
+  { label: "Gallery", href: "/gallery" },
   { label: "Why Us", href: "#why" },
   { label: "About Us", href: "#about" },
   { label: "Contact", href: "#contact" },
-  { label: "Gallery", href: "/gallery" },
 ];
 
 const BRANDS = [
@@ -128,6 +134,7 @@ const BRANDS = [
 
 const ROTATING_WORDS = [
   "Servers",
+  "Web Applications",
   "Firewalls",
   "Networking",
   "Storage",
@@ -197,6 +204,45 @@ const ANALYTICS = [
     title: "Management Consultancy",
     copy: "CA-led consultancy providing financial clarity, cost control, and strategic direction for business owners and CFOs. Turn complex data into confident decisions.",
     chips: ["CA-Led Advisory", "Cost Analysis", "Strategic Planning", "CFO Support"],
+  },
+];
+
+const WEB_DEV = [
+  {
+    icon: Globe,
+    title: "Corporate & Enterprise Websites",
+    copy: "Modern, responsive, ultra-fast websites designed to elevate your brand presence with clean UI/UX, SEO optimization, and lightning-fast load times.",
+    chips: ["React / Next.js", "Tailwind CSS", "SEO Optimized", "Responsive"],
+  },
+  {
+    icon: Layout,
+    title: "Custom Web Applications & Portals",
+    copy: "Bespoke internal portals, client dashboards, ERP modules, inventory management systems, and automated workflows.",
+    chips: ["Full-Stack", "Role-Based Access", "Real-Time Data", "REST APIs"],
+  },
+  {
+    icon: Layers,
+    title: "E-Commerce & Digital Stores",
+    copy: "Secure online stores, B2B procurement portals, payment gateway integrations (Razorpay, Stripe), product catalog, and order tracking.",
+    chips: ["Payment Gateways", "Inventory Sync", "Order Engine", "SSL Secured"],
+  },
+  {
+    icon: Smartphone,
+    title: "Progressive Web Apps (PWA) & Mobile",
+    copy: "Cross-device web applications that feel like native apps, complete with offline support, fast touch responsiveness, and mobile-first design.",
+    chips: ["PWA", "Mobile-First", "Offline Ready", "Cross-Platform"],
+  },
+  {
+    icon: Cloud,
+    title: "Cloud Hosting, DevOps & Security",
+    copy: "High-availability server deployment, SSL configuration, Cloudflare CDN setup, automated backups, and 24x7 security monitoring.",
+    chips: ["Cloud Deployment", "SSL & Firewall", "CI/CD", "Automated Backups"],
+  },
+  {
+    icon: Code2,
+    title: "API & System Integration",
+    copy: "Seamlessly integrate third-party APIs, CRM/ERP connectors, SMS/WhatsApp gateways, and custom database synchronization pipelines.",
+    chips: ["Webhooks", "Third-Party APIs", "Database Sync", "Automation"],
   },
 ];
 
@@ -1005,60 +1051,6 @@ function Hero() {
   );
 }
 
-function Brands() {
-  return (
-    <section
-      id="brands"
-      className="relative border-t border-white/5 bg-white/[0.02] py-24 md:py-32"
-    >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <SectionHeading
-          eyebrow="Brands we supply"
-          title={
-            <>
-              18+ world-class
-              <span className="text-primary"> technology brands</span>
-            </>
-          }
-        />
-        <motion.p
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          className="-mt-8 mb-12 max-w-2xl text-base leading-relaxed text-muted-foreground md:-mt-10 md:mb-16"
-        >
-          We are authorised suppliers of the industry's most trusted names — so
-          you always get genuine products, full warranty support, and expert
-          configuration.
-        </motion.p>
-
-        <div className="flex flex-wrap gap-3">
-          {BRANDS.map((brand) => (
-            <motion.span
-              key={brand}
-              variants={stagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-40px" }}
-            >
-              <motion.span
-                variants={fadeUp}
-                whileHover={{ y: -3, scale: 1.04 }}
-                transition={{ type: "spring", stiffness: 300, damping: 18 }}
-                className="inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-card/50 px-5 py-2.5 font-display text-sm font-semibold text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary"
-              >
-                <Dot />
-                {brand}
-              </motion.span>
-            </motion.span>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Solutions() {
   return (
     <section
@@ -1113,6 +1105,137 @@ function Solutions() {
                 </SpotlightCard>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Integrated OEM & Authorized Technology Brands */}
+        <div className="mt-20 pt-16 border-t border-white/6">
+          <div className="max-w-2xl mb-8 space-y-2">
+            <span className="text-xs font-mono font-medium uppercase tracking-[0.2em] text-primary">
+              Authorized OEM Partners
+            </span>
+            <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+              18+ World-Class <span className="text-primary">Technology Brands</span>
+            </h3>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              We are authorised suppliers of the industry's most trusted names — ensuring 100% genuine products, OEM warranties, and expert configuration.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {BRANDS.map((brand) => (
+              <motion.span
+                key={brand}
+                variants={stagger}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-40px" }}
+              >
+                <motion.span
+                  variants={fadeUp}
+                  whileHover={{ y: -3, scale: 1.04 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                  className="inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-card/50 px-5 py-2.5 font-display text-sm font-semibold text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary"
+                >
+                  <Dot />
+                  {brand}
+                </motion.span>
+              </motion.span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WebDevelopment() {
+  return (
+    <section
+      id="web-dev"
+      className="relative border-t border-white/5 bg-white/[0.015] py-24 md:py-36"
+    >
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <SectionHeading
+          eyebrow="Software & Digital Solutions"
+          title={
+            <>
+              Custom web, portal &{" "}
+              <span className="text-primary">application development</span>
+            </>
+          }
+        />
+
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-60px" }}
+          className="-mt-8 mb-12 max-w-3xl text-base leading-relaxed text-muted-foreground md:-mt-10 md:mb-16"
+        >
+          Beyond hardware, UBIT builds high-performance web applications, enterprise portals, e-commerce platforms, and cloud-native digital systems tailored for businesses, educational institutions, and enterprises across South India.
+        </motion.p>
+
+        <motion.div
+          variants={staggerFast}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-40px" }}
+          className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+        >
+          {WEB_DEV.map((item, index) => (
+            <motion.div key={item.title} variants={scaleUp} className="h-full">
+              <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
+                <div className="flex items-start justify-between">
+                  <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                    <item.icon className="size-6" />
+                  </div>
+                  <span className="font-mono text-xs text-muted-foreground/60">
+                    0{index + 1}
+                  </span>
+                </div>
+                <h3 className="mt-6 font-display text-xl font-bold tracking-tight">
+                  {item.title}
+                </h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                  {item.copy}
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {item.chips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="rounded-full border border-white/6 bg-white/[0.03] px-3 py-1 text-xs text-muted-foreground"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </SpotlightCard>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Action banner */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-40px" }}
+          className="mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-primary/20 bg-primary/5 p-8 backdrop-blur-sm sm:flex-row"
+        >
+          <div className="space-y-1 text-center sm:text-left">
+            <h4 className="font-display text-lg font-bold text-foreground">
+              Have a web or software project requirement?
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              From responsive websites to custom ERP portals, get a transparent estimate and consultation.
+            </p>
+          </div>
+          <Button asChild size="lg" className="rounded-full shrink-0">
+            <Link to="/quote?category=Web+%26+Application+Development">
+              Request Web Dev Quote
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
         </motion.div>
       </div>
     </section>
@@ -1675,7 +1798,7 @@ export default function Landing() {
       <main>
         <Hero />
         <Solutions />
-        <Brands />
+        <WebDevelopment />
         <GhostTicker words={GHOST_WORDS} />
         <Analytics />
         <WhyUs />
