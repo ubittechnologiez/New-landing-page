@@ -277,7 +277,8 @@ export default function AdminGalleryPage() {
         }
       }
 
-      // Try full schema payload first
+      // Attempt Convex DB sync
+      let addedToConvex = false;
       try {
         await addMutation({
           url: finalUrl,
@@ -289,25 +290,31 @@ export default function AdminGalleryPage() {
           featured: formFeatured,
           position: formPosition,
         });
-      } catch (mutationErr) {
-        console.warn("Retrying with compact payload fallback:", mutationErr);
-        // Fallback: encode category and client in description
-        const compositeDesc = [
-          formCategory ? `[${formCategory}]` : "",
-          formClient ? `(Client: ${formClient})` : "",
-          formDescription,
-        ]
-          .filter(Boolean)
-          .join(" ");
+        addedToConvex = true;
+      } catch (mutationErr: any) {
+        console.warn("Full payload add failed, attempting simplified mutation:", mutationErr);
+        try {
+          const compositeDesc = [
+            formCategory ? `[${formCategory}]` : "",
+            formClient ? `(Client: ${formClient})` : "",
+            formDescription,
+          ]
+            .filter(Boolean)
+            .join(" ");
 
-        await addMutation({
-          url: finalUrl,
-          title: formTitle || undefined,
-          description: compositeDesc || undefined,
-        });
+          await addMutation({
+            url: finalUrl,
+            title: formTitle || undefined,
+            description: compositeDesc || undefined,
+          });
+          addedToConvex = true;
+        } catch (compactErr) {
+          console.warn("Convex mutation note:", compactErr);
+        }
       }
 
       // Sync to Firebase Firestore
+      let addedToFirestore = false;
       try {
         await addGalleryItemToFirestore({
           url: finalUrl,
@@ -319,8 +326,14 @@ export default function AdminGalleryPage() {
           featured: formFeatured,
           position: formPosition ?? 0,
         });
+        addedToFirestore = true;
+        await refreshFirestoreStats();
       } catch (fbErr) {
         console.warn("Firestore gallery sync note:", fbErr);
+      }
+
+      if (!addedToConvex && !addedToFirestore) {
+        throw new Error("Unable to save image to backend database. Please check connection.");
       }
 
       toast.success("Gallery image added successfully!");
