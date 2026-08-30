@@ -1,4 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+import sharp from 'sharp';
+import fs from 'fs';
+import path from 'path';
+
+// Clean SVG matching the user's emblem with perfect square proportions & safe margins for maskable icons
+const emblemSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
     <!-- Sapphire Metallic Gradient -->
     <linearGradient id="mainBlue" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -163,4 +168,30 @@
     <path d="M 63,70 L 63,135 C 63,162 78,181 94,182" stroke="#FFFFFF" stroke-width="1.1" stroke-opacity="0.75" fill="none"/>
     <path d="M 137,70 L 137,135 C 137,162 122,181 106,182" stroke="#FFFFFF" stroke-width="1.1" stroke-opacity="0.75" fill="none"/>
   </g>
-</svg>
+</svg>`;
+
+async function generate() {
+  const publicDir = path.resolve(process.cwd(), 'public');
+  fs.writeFileSync(path.join(publicDir, 'logo.svg'), emblemSvg);
+  fs.writeFileSync(path.join(publicDir, 'favicon.svg'), emblemSvg);
+
+  const svgBuffer = Buffer.from(emblemSvg);
+
+  // High-res rasterization of all public assets
+  await sharp(svgBuffer).resize(512, 512).png().toFile(path.join(publicDir, 'web-app-manifest-512x512.png'));
+  await sharp(svgBuffer).resize(192, 192).png().toFile(path.join(publicDir, 'web-app-manifest-192x192.png'));
+  await sharp(svgBuffer).resize(512, 512).png().toFile(path.join(publicDir, 'icon1.png'));
+  await sharp(svgBuffer).resize(180, 180).png().toFile(path.join(publicDir, 'apple-icon.png'));
+  await sharp(svgBuffer).resize(180, 180).png().toFile(path.join(publicDir, 'apple-touch-icon.png'));
+  await sharp(svgBuffer).resize(96, 96).png().toFile(path.join(publicDir, 'favicon-96x96.png'));
+  await sharp(svgBuffer).resize(32, 32).png().toFile(path.join(publicDir, 'favicon-32x32.png'));
+  await sharp(svgBuffer).resize(16, 16).png().toFile(path.join(publicDir, 'favicon-16x16.png'));
+  await sharp(svgBuffer).resize(32, 32).png().toFile(path.join(publicDir, 'favicon.ico'));
+
+  console.log('Successfully updated web-app-manifest-512x512.png, web-app-manifest-192x192.png and all public icons!');
+}
+
+generate().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

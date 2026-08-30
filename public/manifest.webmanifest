@@ -1,15 +1,22 @@
 {
-  "name": "UBIT Technologiez",
+  "name": "UBIT TECHNOLOGIEZ",
   "short_name": "UBIT",
-  "description": "Enterprise IT infrastructure solutions provider",
-  "theme_color": "#141c2e",
-  "background_color": "#141c2e",
-  "display": "standalone",
+  "description": "Enterprise IT Infrastructure & Solutions",
   "icons": [
     {
-      "src": "/logo.svg",
-      "type": "image/svg+xml",
-      "sizes": "any"
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "theme_color": "#141c2e",
+  "background_color": "#141c2e",
+  "display": "standalone"
 }
