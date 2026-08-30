@@ -262,12 +262,10 @@ export function AdminOverview({
 
             <Link
               to="/gallery"
-              target="_blank"
-              rel="noreferrer"
               className="h-16 inline-flex flex-col items-center justify-center gap-1.5 p-2 rounded-md border border-border/60 bg-background/50 hover:bg-muted/40 text-foreground transition-colors"
             >
-              <ArrowUpRight className="size-4 text-amber-400" />
-              <span className="font-medium text-[11px]">View Public Site</span>
+              <ImageIcon className="size-4 text-amber-400" />
+              <span className="font-medium text-[11px]">Public Gallery</span>
             </Link>
           </div>
         </div>

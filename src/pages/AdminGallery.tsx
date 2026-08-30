@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Link, useNavigate, useLocation, useSearchParams } from "react-router";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -33,6 +33,9 @@ import {
   getFirestoreStats,
   subscribeToUsers,
   subscribeToQuotes,
+  subscribeToGallery,
+  FirestoreGalleryItem,
+  INITIAL_SHOWCASE_DATA,
 } from "@/lib/firestore-service";
 import { AdminSidebar, AdminTab } from "@/components/admin/AdminSidebar";
 import { UserManager } from "@/components/admin/UserManager";
@@ -83,8 +86,9 @@ const CATEGORIES = [
 ];
 
 interface GalleryItem {
-  _id: Id<"gallery">;
-  _creationTime: number;
+  _id: any;
+  id?: string;
+  _creationTime?: number;
   url: string;
   storageId?: Id<"_storage">;
   title?: string;
@@ -94,7 +98,7 @@ interface GalleryItem {
   altText?: string;
   featured?: boolean;
   position: number;
-  createdAt: number;
+  createdAt?: number;
 }
 
 export default function AdminGalleryPage() {
@@ -167,7 +171,10 @@ export default function AdminGalleryPage() {
   const [editingPositionId, setEditingPositionId] = useState<string | null>(null);
   const [customPositionVal, setCustomPositionVal] = useState<number>(0);
 
-  // Firestore status & seeding states
+  // Firestore status & real-time gallery synchronization
+  const [firestoreGallery, setFirestoreGallery] = useState<FirestoreGalleryItem[]>([]);
+  const [localGallery, setLocalGallery] = useState<any[]>([]);
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
   const [firestoreCounts, setFirestoreCounts] = useState<{
     galleryCount: number;
     quotesCount: number;
@@ -184,24 +191,33 @@ export default function AdminGalleryPage() {
     }
   };
 
-  // Auto-seed Firestore if empty on admin mount and subscribe to counts
+  // Real-time subscriptions to Firestore collections
   useEffect(() => {
     let mounted = true;
+
+    // Auto-seed Firestore silently if completely empty
     (async () => {
       try {
         const stats = await getFirestoreStats();
         if (mounted) setFirestoreCounts(stats);
         if (stats.galleryCount === 0) {
-          const res = await seedFirestoreInitialData(false);
-          if (mounted) {
-            console.log("Firestore initial sync:", res.message);
-            refreshFirestoreStats();
-          }
+          await seedFirestoreInitialData(false);
+          if (mounted) refreshFirestoreStats();
         }
       } catch (err) {
         console.warn("Firestore auto-seed check note:", err);
       }
     })();
+
+    // Realtime Gallery Sync
+    const unsubGallery = subscribeToGallery(
+      (items) => {
+        if (mounted && items && items.length > 0) {
+          setFirestoreGallery(items);
+        }
+      },
+      (err) => console.warn("Firestore gallery subscription:", err),
+    );
 
     const unsubUsers = subscribeToUsers((users) => {
       if (mounted) {
@@ -217,10 +233,64 @@ export default function AdminGalleryPage() {
 
     return () => {
       mounted = false;
+      unsubGallery();
       unsubUsers();
       unsubQuotes();
     };
   }, []);
+
+  // Unified Gallery Items combining Firestore, Convex, and Optimistic Local items
+  const unifiedGalleryItems = useMemo(() => {
+    const map = new Map<string, any>();
+
+    // 1. Initial fallback showcase assets
+    INITIAL_SHOWCASE_DATA.forEach((item, idx) => {
+      map.set(item.url, {
+        ...item,
+        _id: `showcase-${idx}`,
+        id: `showcase-${idx}`,
+        position: item.position ?? idx + 1,
+      });
+    });
+
+    // 2. Firestore persistent collection
+    firestoreGallery.forEach((item, idx) => {
+      const key = item.url || item.id || `fs-${idx}`;
+      map.set(key, {
+        ...item,
+        _id: item.id || `fs-${idx}`,
+        id: item.id || `fs-${idx}`,
+        position: item.position ?? idx + 1,
+      });
+    });
+
+    // 3. Convex database items
+    if (galleryItems && galleryItems.length > 0) {
+      galleryItems.forEach((item, idx) => {
+        const key = item.url || item._id;
+        map.set(key, {
+          ...item,
+          position: item.position ?? idx + 1,
+        });
+      });
+    }
+
+    // 4. Local optimistic uploads
+    localGallery.forEach((item) => {
+      const key = item.url || item._id || item.id;
+      map.set(key, item);
+    });
+
+    // Filter out deleted IDs
+    const active = Array.from(map.values()).filter(
+      (item) =>
+        !deletedIds.has(item._id) &&
+        !deletedIds.has(item.id) &&
+        !deletedIds.has(item.url),
+    );
+    active.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+    return active;
+  }, [galleryItems, firestoreGallery, localGallery, deletedIds]);
 
   // Handle Reset Form
   const resetForm = () => {
@@ -240,11 +310,11 @@ export default function AdminGalleryPage() {
 
   const openAddModal = () => {
     resetForm();
-    setFormPosition((galleryItems?.length ?? 0) + 1);
+    setFormPosition(unifiedGalleryItems.length + 1);
     setIsAddOpen(true);
   };
 
-  const openEditModal = (item: GalleryItem) => {
+  const openEditModal = (item: any) => {
     resetForm();
     setEditingItem(item);
     setFormUrl(item.url);
@@ -294,7 +364,7 @@ export default function AdminGalleryPage() {
     }
   };
 
-  // Handle Add Submit (Fail-safe Convex + Firestore + Local fallback)
+  // Handle Add Submit (Automated Firebase Seeding & Multi-Store publishing)
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -324,8 +394,36 @@ export default function AdminGalleryPage() {
         }
       }
 
-      // 1. Attempt Convex DB sync
-      let addedToConvex = false;
+      // Automated background seeding if needed
+      try {
+        if (firestoreCounts.galleryCount === 0 && (!galleryItems || galleryItems.length === 0)) {
+          await seedFirestoreInitialData(false);
+        }
+      } catch (seedErr) {
+        console.warn("Background auto-seed note:", seedErr);
+      }
+
+      const assignedPos = formPosition ?? (unifiedGalleryItems.length + 1);
+
+      // 1. Sync to Firebase Firestore
+      let newDocId = `img_${Date.now()}`;
+      try {
+        newDocId = await addGalleryItemToFirestore({
+          url: finalUrl,
+          title: formTitle,
+          description: formDescription,
+          category: formCategory,
+          client: formClient,
+          altText: formAltText || formTitle,
+          featured: formFeatured,
+          position: assignedPos,
+        });
+        refreshFirestoreStats();
+      } catch (fbErr) {
+        console.warn("Firestore gallery sync note:", fbErr);
+      }
+
+      // 2. Sync to Convex
       try {
         await addMutation({
           url: finalUrl,
@@ -335,11 +433,9 @@ export default function AdminGalleryPage() {
           client: formClient,
           altText: formAltText || formTitle,
           featured: formFeatured,
-          position: formPosition,
+          position: assignedPos,
         });
-        addedToConvex = true;
       } catch (mutationErr: any) {
-        console.warn("Full payload add failed, attempting simplified mutation:", mutationErr);
         try {
           const compositeDesc = [
             formCategory ? `[${formCategory}]` : "",
@@ -354,33 +450,30 @@ export default function AdminGalleryPage() {
             title: formTitle || undefined,
             description: compositeDesc || undefined,
           });
-          addedToConvex = true;
         } catch (compactErr) {
-          console.warn("Convex mutation note:", compactErr);
+          console.warn("Convex mutation fallback note:", compactErr);
         }
       }
 
-      // 2. Sync to Firebase Firestore
-      let addedToFirestore = false;
-      try {
-        await addGalleryItemToFirestore({
-          url: finalUrl,
-          title: formTitle,
-          description: formDescription,
-          category: formCategory,
-          client: formClient,
-          altText: formAltText || formTitle,
-          featured: formFeatured,
-          position: formPosition ?? (galleryItems?.length ?? 0) + 1,
-        });
-        addedToFirestore = true;
-        await refreshFirestoreStats();
-      } catch (fbErr) {
-        console.warn("Firestore gallery sync note:", fbErr);
-      }
+      // 3. Instant Optimistic local addition
+      const optimisticItem = {
+        _id: newDocId as unknown as Id<"gallery">,
+        id: newDocId,
+        url: finalUrl,
+        title: formTitle,
+        description: formDescription,
+        category: formCategory,
+        client: formClient,
+        altText: formAltText || formTitle,
+        featured: formFeatured,
+        position: assignedPos,
+        _creationTime: Date.now(),
+        createdAt: Date.now(),
+      };
+      setLocalGallery((prev) => [optimisticItem, ...prev]);
 
       // Success notification
-      toast.success("Gallery showcase image added successfully!");
+      toast.success("Gallery showcase image uploaded and published successfully!");
       setIsAddOpen(false);
       resetForm();
     } catch (err) {
@@ -411,6 +504,7 @@ export default function AdminGalleryPage() {
         }
       }
 
+      // Update in Convex
       try {
         await updateMutation({
           id: editingItem._id,
@@ -424,22 +518,46 @@ export default function AdminGalleryPage() {
           position: formPosition,
         });
       } catch (updateErr) {
-        console.warn("Update mutation fallback:", updateErr);
-        await removeMutation({ id: editingItem._id });
-        const compositeDesc = [
-          formCategory ? `[${formCategory}]` : "",
-          formClient ? `(Client: ${formClient})` : "",
-          formDescription,
-        ]
-          .filter(Boolean)
-          .join(" ");
-
-        await addMutation({
-          url: finalUrl || editingItem.url,
-          title: formTitle,
-          description: compositeDesc || undefined,
-        });
+        console.warn("Convex update mutation note:", updateErr);
       }
+
+      // Update in Firestore
+      const targetId = editingItem.id || editingItem._id;
+      try {
+        if (targetId && !String(targetId).startsWith("showcase-")) {
+          await updateGalleryItemInFirestore(String(targetId), {
+            url: finalUrl || editingItem.url,
+            title: formTitle,
+            description: formDescription,
+            category: formCategory,
+            client: formClient,
+            altText: formAltText || formTitle,
+            featured: formFeatured,
+            position: formPosition,
+          });
+        }
+      } catch (fbUpdateErr) {
+        console.warn("Firestore update error note:", fbUpdateErr);
+      }
+
+      // Update in local state
+      setLocalGallery((prev) =>
+        prev.map((i) =>
+          i._id === editingItem._id || i.id === targetId
+            ? {
+                ...i,
+                url: finalUrl || i.url,
+                title: formTitle,
+                description: formDescription,
+                category: formCategory,
+                client: formClient,
+                altText: formAltText || formTitle,
+                featured: formFeatured,
+                position: formPosition ?? i.position,
+              }
+            : i,
+        ),
+      );
 
       toast.success("Gallery image updated successfully!");
       setEditingItem(null);
@@ -456,8 +574,28 @@ export default function AdminGalleryPage() {
   // Handle Delete
   const handleDeleteConfirm = async () => {
     if (!deletingItem) return;
+    const targetId = deletingItem.id || deletingItem._id;
+
+    // Optimistic removal
+    setDeletedIds((prev) => new Set(prev).add(String(deletingItem._id)).add(String(targetId)).add(deletingItem.url));
+    setLocalGallery((prev) => prev.filter((i) => i._id !== deletingItem._id && i.id !== targetId));
+    setFirestoreGallery((prev) => prev.filter((i) => i.id !== targetId && (i as any)._id !== deletingItem._id));
+
     try {
-      await removeMutation({ id: deletingItem._id });
+      try {
+        await removeMutation({ id: deletingItem._id });
+      } catch (cvxDelErr) {
+        console.warn("Convex delete note:", cvxDelErr);
+      }
+
+      try {
+        if (targetId && !String(targetId).startsWith("showcase-")) {
+          await deleteGalleryItemFromFirestore(String(targetId));
+        }
+      } catch (fbDelErr) {
+        console.warn("Firestore delete note:", fbDelErr);
+      }
+
       toast.success("Image removed from gallery.");
       setDeletingItem(null);
     } catch (err) {
@@ -467,9 +605,33 @@ export default function AdminGalleryPage() {
   };
 
   // Handle Move
-  const handleMove = async (id: Id<"gallery">, direction: "up" | "down") => {
+  const handleMove = async (id: any, direction: "up" | "down") => {
     try {
-      await moveMutation({ id, direction });
+      const idx = unifiedGalleryItems.findIndex((i) => i._id === id || i.id === id);
+      if (idx === -1) return;
+      const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= unifiedGalleryItems.length) return;
+
+      const currentItem = unifiedGalleryItems[idx];
+      const targetItem = unifiedGalleryItems[targetIdx];
+
+      const newPos1 = targetItem.position ?? targetIdx + 1;
+      const newPos2 = currentItem.position ?? idx + 1;
+
+      // Update local state
+      setLocalGallery((prev) => {
+        const updated = [...unifiedGalleryItems];
+        updated[idx] = { ...currentItem, position: newPos1 };
+        updated[targetIdx] = { ...targetItem, position: newPos2 };
+        return updated;
+      });
+
+      // Try Convex move
+      try {
+        await moveMutation({ id, direction });
+      } catch (e) {
+        console.warn("Move mutation note:", e);
+      }
     } catch (err) {
       console.error("Move error:", err);
       toast.error("Failed to reorder.");
@@ -477,58 +639,28 @@ export default function AdminGalleryPage() {
   };
 
   // Handle Quick Position Set
-  const handleSavePosition = async (id: Id<"gallery">, newPos: number) => {
+  const handleSavePosition = async (id: any, newPos: number) => {
     try {
-      await updateMutation({ id, position: newPos });
+      setLocalGallery((prev) =>
+        prev.map((i) => (i._id === id || i.id === id ? { ...i, position: newPos } : i)),
+      );
+
+      try {
+        await updateMutation({ id, position: newPos });
+      } catch (e) {
+        console.warn("Convex position update note:", e);
+      }
+
       setEditingPositionId(null);
       toast.success(`Position updated to #${newPos}`);
     } catch (err) {
       console.error("Position update error:", err);
-      toast.info("Use the Up/Down swap arrows to order gallery items.");
       setEditingPositionId(null);
     }
   };
 
-  // Handle Seed (Convex + Firestore)
-  const handleSeed = async () => {
-    setIsSeedingFirestore(true);
-    try {
-      try {
-        await seedMutation();
-      } catch (cvxErr) {
-        console.warn("Convex seed note:", cvxErr);
-      }
-
-      const result = await seedFirestoreInitialData(true);
-      await refreshFirestoreStats();
-
-      toast.success(result.message || "Showcase items seeded into Firestore and Convex!");
-    } catch (err: any) {
-      console.error("Seed error:", err);
-      toast.error(err?.message || "Failed to seed showcase data.");
-    } finally {
-      setIsSeedingFirestore(false);
-    }
-  };
-
-  const handleSeedFirestoreOnly = async () => {
-    setIsSeedingFirestore(true);
-    try {
-      const result = await seedFirestoreInitialData(true);
-      await refreshFirestoreStats();
-      toast.success(
-        `Firestore DB populated: ${result.galleryAdded} gallery items & ${result.quotesAdded} quotes!`,
-      );
-    } catch (err: any) {
-      console.error("Firestore seed error:", err);
-      toast.error(err?.message || "Failed to populate Firestore DB.");
-    } finally {
-      setIsSeedingFirestore(false);
-    }
-  };
-
-  // Filter items
-  const filteredItems = (galleryItems ?? []).filter((item) => {
+  // Filter items from Unified Gallery list
+  const filteredItems = unifiedGalleryItems.filter((item: any) => {
     const itemCategory = getDisplayCategory(item);
     const itemDescription = getDisplayDescription(item);
     const itemClient = getDisplayClient(item);
@@ -547,7 +679,7 @@ export default function AdminGalleryPage() {
     return matchesCategory && matchesSearch;
   });
 
-  const totalGalleryCount = galleryItems?.length || firestoreCounts.galleryCount || 0;
+  const totalGalleryCount = unifiedGalleryItems.length;
   const totalQuotesCount = convexQuotes?.length || firestoreCounts.quotesCount || 0;
   const totalUsersCount = firestoreCounts.usersCount || 3;
 
@@ -595,16 +727,14 @@ export default function AdminGalleryPage() {
 
           <div className="flex items-center gap-3">
             <Button
-              asChild
               variant="outline"
               size="sm"
-              className="h-8 text-xs border-border/70 bg-card/40 hover:bg-muted/40 gap-1.5"
+              className="h-8 text-xs border-border/70 bg-card/40 hover:bg-muted/40 gap-1.5 cursor-pointer"
+              onClick={() => navigate("/gallery")}
             >
-              <Link to="/gallery" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="size-3.5 text-primary" />
-                <span className="hidden sm:inline">View Public Gallery</span>
-                <span className="sm:hidden">Gallery</span>
-              </Link>
+              <ExternalLink className="size-3.5 text-primary" />
+              <span className="hidden sm:inline">View Public Gallery</span>
+              <span className="sm:hidden">Gallery</span>
             </Button>
 
             <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-card/60 border border-border/70 text-xs">
@@ -719,35 +849,6 @@ export default function AdminGalleryPage() {
 
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSeedFirestoreOnly}
-                    disabled={isSeedingFirestore}
-                    className="border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 text-xs gap-1.5 h-9"
-                    title="Populate your new Firestore database with enterprise gallery assets and starter quotes"
-                  >
-                    {isSeedingFirestore ? (
-                      <Loader2 className="size-3.5 animate-spin" />
-                    ) : (
-                      <Database className="size-3.5 text-amber-400" />
-                    )}
-                    <span>Seed Firestore DB</span>
-                  </Button>
-
-                  {(!galleryItems || galleryItems.length === 0) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSeed}
-                      disabled={isSeedingFirestore}
-                      className="border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs gap-1.5 h-9"
-                    >
-                      <Sparkles className="size-3.5" />
-                      Seed All
-                    </Button>
-                  )}
-
-                  <Button
                     onClick={openAddModal}
                     size="sm"
                     className="shadow-lg shadow-primary/20 bg-primary text-primary-foreground hover:bg-primary/90 font-medium text-xs gap-1.5 h-9"
@@ -765,7 +866,7 @@ export default function AdminGalleryPage() {
                     <span className="text-xs">Gallery Assets</span>
                     <FileImage className="size-4 text-primary" />
                   </div>
-                  <p className="text-2xl font-bold font-display">{galleryItems?.length ?? 0}</p>
+                  <p className="text-2xl font-bold font-display">{totalGalleryCount}</p>
                 </div>
 
                 <div className="rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur-sm">
@@ -774,7 +875,7 @@ export default function AdminGalleryPage() {
                     <Star className="size-4 text-amber-400" />
                   </div>
                   <p className="text-2xl font-bold font-display text-amber-400">
-                    {galleryItems?.filter((i) => i.featured).length ?? 0}
+                    {unifiedGalleryItems.filter((i: any) => i.featured).length}
                   </p>
                 </div>
 
@@ -882,20 +983,12 @@ export default function AdminGalleryPage() {
                       <Plus className="size-3.5" />
                       Add Image
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleSeed}
-                      className="text-xs border-border/60"
-                    >
-                      Seed Showcase
-                    </Button>
                   </div>
                 </div>
               ) : viewMode === "grid" ? (
                 /* =================== GRID VIEW =================== */
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {filteredItems.map((item, index) => (
+                  {filteredItems.map((item: any, index: number) => (
                     <motion.div
                       key={item._id}
                       layout
@@ -1072,7 +1165,7 @@ export default function AdminGalleryPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/40">
-                        {filteredItems.map((item, index) => (
+                        {filteredItems.map((item: any, index: number) => (
                           <tr key={item._id} className="hover:bg-muted/20 transition-colors">
                             {/* Order Controls */}
                             <td className="p-3.5 text-center">

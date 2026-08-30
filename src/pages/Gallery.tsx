@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router";
 import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useQuery } from "convex/react";
@@ -85,13 +85,34 @@ export default function GalleryPage() {
     return () => unsub();
   }, []);
 
-  // Use Convex items first, then Firestore items, then default showcase data
-  const resolvedImages =
-    images && images.length > 0
-      ? images
-      : firestoreImages.length > 0
-        ? firestoreImages
-        : INITIAL_SHOWCASE_DATA;
+  // Use unified merge of Convex items, Firestore items, and default showcase data
+  const resolvedImages = useMemo(() => {
+    const map = new Map<string, any>();
+
+    INITIAL_SHOWCASE_DATA.forEach((item, idx) => {
+      map.set(item.url, { ...item, position: item.position ?? idx + 1 });
+    });
+
+    firestoreImages.forEach((item, idx) => {
+      map.set(item.url || item.id || `fs-${idx}`, {
+        ...item,
+        position: item.position ?? idx + 1,
+      });
+    });
+
+    if (images && images.length > 0) {
+      images.forEach((item, idx) => {
+        map.set(item.url || item._id, {
+          ...item,
+          position: item.position ?? idx + 1,
+        });
+      });
+    }
+
+    const list = Array.from(map.values());
+    list.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+    return list;
+  }, [images, firestoreImages]);
 
   // Extract unique categories from actual database records
   const dynamicCategories = [

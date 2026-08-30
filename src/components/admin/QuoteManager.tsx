@@ -139,8 +139,8 @@ export function QuoteManager() {
       status: q.status,
       createdAt: q.createdAt,
     })),
-    ...firestoreQuotes.map((q) => ({
-      id: q.id || `fs-${Math.random()}`,
+    ...firestoreQuotes.map((q, idx) => ({
+      id: q.id || `fs-quote-${idx}`,
       source: "firestore" as const,
       clientName: q.clientName,
       company: q.company,
@@ -149,7 +149,7 @@ export function QuoteManager() {
       category: q.category,
       notes: q.notes,
       status: q.status,
-      createdAt: q.createdAt?.seconds ? q.createdAt.seconds * 1000 : Date.now(),
+      createdAt: q.createdAt?.seconds ? q.createdAt.seconds * 1000 : 0,
     })),
   ];
 
