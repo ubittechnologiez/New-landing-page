@@ -156,6 +156,38 @@ createRoot(document.getElementById("root")!).render(
                   }
                 />
                 <Route
+                  path="/admin/users"
+                  element={
+                    <RequireAdmin>
+                      <AdminGalleryPage />
+                    </RequireAdmin>
+                  }
+                />
+                <Route
+                  path="/admin/quotes"
+                  element={
+                    <RequireAdmin>
+                      <AdminGalleryPage />
+                    </RequireAdmin>
+                  }
+                />
+                <Route
+                  path="/admin/overview"
+                  element={
+                    <RequireAdmin>
+                      <AdminGalleryPage />
+                    </RequireAdmin>
+                  }
+                />
+                <Route
+                  path="/admin/settings"
+                  element={
+                    <RequireAdmin>
+                      <AdminGalleryPage />
+                    </RequireAdmin>
+                  }
+                />
+                <Route
                   path="/dashboard"
                   element={
                     <RequireAdmin>

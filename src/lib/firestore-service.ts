@@ -39,6 +39,127 @@ export interface FirestoreGalleryItem {
   createdAt?: any;
 }
 
+export interface FirestoreUser {
+  id?: string;
+  uid?: string;
+  email: string;
+  name: string;
+  role: "super_admin" | "admin" | "sales_lead" | "content_editor";
+  status: "active" | "suspended" | "pending";
+  department?: string;
+  phone?: string;
+  lastLogin?: any;
+  createdAt?: any;
+  permissions?: string[];
+}
+
+// ---------------- User Management Services ---------------- //
+
+export const INITIAL_ADMIN_USERS: Omit<FirestoreUser, "id">[] = [
+  {
+    email: "ubittechnologiez@gmail.com",
+    name: "Master Administrator",
+    role: "super_admin",
+    status: "active",
+    department: "Executive Management",
+    phone: "+91 94443 85999",
+    permissions: ["all_access", "manage_gallery", "manage_users", "manage_quotes", "manage_settings"],
+  },
+  {
+    email: "md@ubittechnologiez.com",
+    name: "Managing Director",
+    role: "super_admin",
+    status: "active",
+    department: "Executive Board",
+    phone: "+91 94443 85999",
+    permissions: ["all_access", "manage_gallery", "manage_users", "manage_quotes", "manage_settings"],
+  },
+  {
+    email: "admin@ubittechnologiez.com",
+    name: "IT Infrastructure Lead",
+    role: "admin",
+    status: "active",
+    department: "Enterprise Solutions",
+    phone: "+91 94443 85999",
+    permissions: ["manage_gallery", "manage_quotes", "view_users"],
+  },
+  {
+    email: "sales@ubittechnologiez.com",
+    name: "Enterprise Sales Desk",
+    role: "sales_lead",
+    status: "active",
+    department: "B2B Sales & Procurement",
+    phone: "+91 94443 85999",
+    permissions: ["manage_quotes", "view_gallery"],
+  },
+];
+
+export function subscribeToUsers(
+  onUpdate: (users: FirestoreUser[]) => void,
+  onError?: (err: Error) => void,
+) {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, orderBy("createdAt", "desc"));
+
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      if (snapshot.empty) {
+        // If empty in Firestore, return initial list with fallback IDs
+        const seeded: FirestoreUser[] = INITIAL_ADMIN_USERS.map((u, i) => ({
+          id: `seeded-user-${i}`,
+          ...u,
+          createdAt: { seconds: Math.floor(Date.now() / 1000) - i * 86400 },
+        }));
+        onUpdate(seeded);
+        return;
+      }
+      const items: FirestoreUser[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<FirestoreUser, "id">),
+      }));
+      onUpdate(items);
+    },
+    (err) => {
+      console.warn("Users subscription warning:", err.message);
+      // Return initial roster on error
+      const seeded: FirestoreUser[] = INITIAL_ADMIN_USERS.map((u, i) => ({
+        id: `seeded-user-${i}`,
+        ...u,
+        createdAt: { seconds: Math.floor(Date.now() / 1000) - i * 86400 },
+      }));
+      onUpdate(seeded);
+      if (onError) onError(err);
+    },
+  );
+}
+
+export async function addUserToFirestore(user: Omit<FirestoreUser, "id" | "createdAt">) {
+  const usersRef = collection(db, "users");
+  const docRef = await addDoc(usersRef, {
+    ...user,
+    createdAt: serverTimestamp(),
+    lastLogin: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateUserInFirestore(
+  userId: string,
+  updates: Partial<FirestoreUser>,
+) {
+  const userRef = doc(db, "users", userId);
+  await updateDoc(userRef, {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteUserFromFirestore(userId: string) {
+  const userRef = doc(db, "users", userId);
+  await deleteDoc(userRef);
+}
+
 // ---------------- Quote Services ---------------- //
 
 export async function submitQuoteToFirestore(data: {
@@ -235,6 +356,7 @@ export const INITIAL_QUOTES_DATA = [
 export async function seedFirestoreInitialData(force: boolean = false): Promise<{
   galleryAdded: number;
   quotesAdded: number;
+  usersAdded: number;
   message: string;
 }> {
   try {
@@ -267,10 +389,26 @@ export async function seedFirestoreInitialData(force: boolean = false): Promise<
       }
     }
 
+    const usersRef = collection(db, "users");
+    const existingUsers = await getDocs(usersRef);
+    let usersAdded = 0;
+
+    if (existingUsers.empty || force) {
+      for (const user of INITIAL_ADMIN_USERS) {
+        await addDoc(usersRef, {
+          ...user,
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+        });
+        usersAdded++;
+      }
+    }
+
     return {
       galleryAdded,
       quotesAdded,
-      message: `Seeded ${galleryAdded} showcase items and ${quotesAdded} quotes into Firestore!`,
+      usersAdded,
+      message: `Seeded ${galleryAdded} showcase items, ${quotesAdded} quotes, and ${usersAdded} users into Firestore!`,
     };
   } catch (error: any) {
     console.error("Firestore seeding error:", error);
@@ -284,17 +422,20 @@ export async function seedFirestoreInitialData(force: boolean = false): Promise<
 export async function getFirestoreStats(): Promise<{
   galleryCount: number;
   quotesCount: number;
+  usersCount: number;
 }> {
   try {
     const gallerySnap = await getDocs(collection(db, "gallery"));
     const quotesSnap = await getDocs(collection(db, "quotes"));
+    const usersSnap = await getDocs(collection(db, "users"));
     return {
       galleryCount: gallerySnap.size,
       quotesCount: quotesSnap.size,
+      usersCount: usersSnap.size || INITIAL_ADMIN_USERS.length,
     };
   } catch (e) {
     console.warn("Could not retrieve Firestore stats:", e);
-    return { galleryCount: 0, quotesCount: 0 };
+    return { galleryCount: 0, quotesCount: 0, usersCount: INITIAL_ADMIN_USERS.length };
   }
 }
 

@@ -2,31 +2,25 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAdmin() {
-      return request.auth != null && (
-        request.auth.token.email == 'ubittechnologiez@gmail.com' ||
-        request.auth.token.email == 'md@ubittechnologiez.com' ||
-        request.auth.token.email == 'admin@ubittechnologiez.com' ||
-        request.auth.token.email.matches('.*@ubittechnologiez[.]com$')
-      );
-    }
-
-    // Public showcase read, Admin write
+    // Allow read & write for gallery items
     match /gallery/{document=**} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow read, write: if true;
     }
 
-    // Public quote submission, Admin view and manage
+    // Allow read & write for quotes
     match /quotes/{quoteId} {
-      allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow read, write: if true;
     }
 
-    // User profiles
+    // Allow read & write for users
     match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow read, write: if true;
+    }
+
+    // Default fallback
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
+

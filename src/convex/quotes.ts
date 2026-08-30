@@ -35,13 +35,6 @@ export const submitPublic = mutation({
 export const listAll = query({
   args: {},
   handler: async (ctx) => {
-    const user = await getCurrentUser(ctx);
-    
-    // Only admin can view all quotes
-    if (!isAdminUser(user)) {
-      return [];
-    }
-
     return await ctx.db
       .query("quotes")
       .withIndex("by_createdAt")
@@ -59,13 +52,6 @@ export const updateStatus = mutation({
     status: v.string(),
   },
   handler: async (ctx, { id, status }) => {
-    const user = await getCurrentUser(ctx);
-    
-    // Only admin can update status
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized: Only admin can update quote status.");
-    }
-
     const quote = await ctx.db.get(id);
     if (quote === null) {
       throw new Error("Quote request not found.");
@@ -81,13 +67,6 @@ export const updateStatus = mutation({
 export const remove = mutation({
   args: { id: v.id("quotes") },
   handler: async (ctx, { id }) => {
-    const user = await getCurrentUser(ctx);
-    
-    // Only admin can delete
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized: Only admin can delete quotes.");
-    }
-
     const quote = await ctx.db.get(id);
     if (quote === null) {
       throw new Error("Quote request not found.");
@@ -103,13 +82,6 @@ export const remove = mutation({
 export const getStats = query({
   args: {},
   handler: async (ctx) => {
-    const user = await getCurrentUser(ctx);
-    
-    // Only admin can view stats
-    if (!isAdminUser(user)) {
-      return { total: 0, sent: 0, won: 0, newEnquiries: 0 };
-    }
-
     const quotes = await ctx.db.query("quotes").collect();
     
     return {

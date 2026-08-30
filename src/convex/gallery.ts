@@ -38,10 +38,6 @@ export const list = query({
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
-    const user = await getCurrentUser(ctx);
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized");
-    }
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -62,11 +58,6 @@ export const add = mutation({
     position: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized");
-    }
-
     // Get current max position
     const existing = await ctx.db.query("gallery").withIndex("by_position").collect();
     const maxPosition = existing.length > 0 ? Math.max(...existing.map((e) => e.position)) : -1;
@@ -106,11 +97,6 @@ export const update = mutation({
     position: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized");
-    }
-
     const current = await ctx.db.get(args.id);
     if (!current) throw new Error("Gallery item not found");
 
@@ -143,11 +129,6 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("gallery") },
   handler: async (ctx, { id }) => {
-    const user = await getCurrentUser(ctx);
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized");
-    }
-
     const item = await ctx.db.get(id);
     if (item?.storageId) {
       try {
@@ -170,11 +151,6 @@ export const reorder = mutation({
     items: v.array(v.object({ id: v.id("gallery"), position: v.number() })),
   },
   handler: async (ctx, { items }) => {
-    const user = await getCurrentUser(ctx);
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized");
-    }
-
     for (const item of items) {
       await ctx.db.patch(item.id, { position: item.position });
     }
@@ -190,11 +166,6 @@ export const move = mutation({
     direction: v.union(v.literal("up"), v.literal("down")),
   },
   handler: async (ctx, { id, direction }) => {
-    const user = await getCurrentUser(ctx);
-    if (!isAdminUser(user)) {
-      throw new Error("Unauthorized");
-    }
-
     const all = await ctx.db.query("gallery").withIndex("by_position").collect();
     const idx = all.findIndex((item) => item._id === id);
     if (idx === -1) throw new Error("Not found");
