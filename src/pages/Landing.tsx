@@ -97,8 +97,8 @@ const slideInRight: Variants = {
 /* ---------------------------------- data ---------------------------------- */
 
 const NAV_LINKS = [
-  { label: "Brands", href: "#brands" },
   { label: "Solutions", href: "#solutions" },
+  { label: "Brands", href: "#brands" },
   { label: "Analytics", href: "#analytics" },
   { label: "Why Us", href: "#why" },
   { label: "About Us", href: "#about" },
@@ -237,7 +237,7 @@ const WHY = [
 const STATS: Array<{ value: number; suffix: string; label: string }> = [
   { value: 18, suffix: "+", label: "Trusted global brands" },
   { value: 90, suffix: "+", label: "Projects delivered" },
-  { value: 6, suffix: "", label: "Core solutions" },
+  { value: 11, suffix: "", label: "Core solutions" },
   { value: 12, suffix: "/7", label: "Support coverage" },
 ];
 
@@ -933,7 +933,7 @@ function Hero() {
         <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
           <RevealLine text="Powering your" delay={0.15} />
           <RevealLine text="Business with" delay={0.27} />
-          <RevealLine text="enterprise IT" delay={0.39} className="text-primary" />
+          <RevealLine text="Enterprise" delay={0.39} className="text-primary" />
           <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
             <motion.span
               className="block"
