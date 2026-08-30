@@ -49,9 +49,14 @@ const schema = defineSchema(
 
     // Gallery images
     gallery: defineTable({
-      url: v.string(), // image URL
-      title: v.optional(v.string()), // optional caption
+      url: v.string(), // image URL or storage URL
+      storageId: v.optional(v.id("_storage")), // optional storageId if uploaded directly
+      title: v.optional(v.string()), // caption/title
       description: v.optional(v.string()), // optional description
+      category: v.optional(v.string()), // e.g. "Server Solutions", "Networking", "Cybersecurity", "Storage", "Workstations"
+      client: v.optional(v.string()), // e.g. "FinTech Data Center", "Enterprise Campus"
+      altText: v.optional(v.string()), // accessibility alt text
+      featured: v.optional(v.boolean()), // featured highlight
       position: v.number(), // sort order
       createdAt: v.number(),
     }).index("by_position", ["position"]),

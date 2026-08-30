@@ -44,7 +44,6 @@ import { BrandLockup } from "@/components/BrandImage";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -707,7 +706,7 @@ function HorizontalScrollSection({
 /* ------------------------------- components ------------------------------- */
 
 
-function Nav({ ctaTarget }: { ctaTarget: string }) {
+function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -846,7 +845,7 @@ function Nav({ ctaTarget }: { ctaTarget: string }) {
             </div>
             <div className="shrink-0 border-t border-white/10 p-6">
               <Button asChild size="lg" className="w-full rounded-full shadow-lg">
-                <Link to={ctaTarget} onClick={() => setMenuOpen(false)}>
+                <Link to="/quote" onClick={() => setMenuOpen(false)}>
                   Get a quote
                   <ArrowRight className="size-4" />
                 </Link>
@@ -1653,6 +1652,9 @@ function Footer() {
             <Link to="/terms" className="transition-colors hover:text-primary">
               Terms of Service
             </Link>
+            <Link to="/admin/login" className="transition-colors hover:text-primary opacity-60 hover:opacity-100">
+              Staff Portal
+            </Link>
           </div>
         </div>
       </div>
@@ -1663,15 +1665,12 @@ function Footer() {
 /* --------------------------------- page ---------------------------------- */
 
 export default function Landing() {
-  const { user } = useAuth();
-  const ctaTarget = user ? "/dashboard" : "/auth?returnTo=%2Fdashboard";
-
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <ScrollBackground />
       <ScrollProgress />
       <CursorGlow />
-      <Nav ctaTarget={ctaTarget} />
+      <Nav />
 
       <main>
         <Hero />

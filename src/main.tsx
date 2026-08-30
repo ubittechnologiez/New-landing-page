@@ -1,6 +1,5 @@
 import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
-import { RequireAdmin } from "@/components/RequireAdmin";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
@@ -11,13 +10,14 @@ import "./index.css";
 
 // Lazy load route components for better code splitting
 const Landing = lazy(() => import("./pages/Landing.tsx"));
-const AuthPage = lazy(() => import("./pages/Auth.tsx"));
-const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
 const QuotePage = lazy(() => import("./pages/Quote.tsx"));
 const GalleryPage = lazy(() => import("./pages/Gallery.tsx"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin.tsx"));
+const AdminGalleryPage = lazy(() => import("./pages/AdminGallery.tsx"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.tsx"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+import { RequireAdmin } from "./components/RequireAdmin.tsx";
 
 // Simple loading fallback for route transitions
 function RouteLoading() {
@@ -133,30 +133,36 @@ createRoot(document.getElementById("root")!).render(
           <Suspense fallback={<RouteLoading />}>
             <Routes>
               <Route path="/" element={<Landing />} />
-              <Route
-                path="/auth"
-                element={<AuthPage redirectAfterAuth="/dashboard" />}
-              />
               <Route path="/quote" element={<QuotePage />} />
               <Route path="/gallery" element={<GalleryPage />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsOfService />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <RequireAdmin>
-                    <Dashboard />
-                  </RequireAdmin>
-                }
-              />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/auth" element={<AdminLogin />} />
               <Route
                 path="/admin"
                 element={
                   <RequireAdmin>
-                    <Dashboard />
+                    <AdminGalleryPage />
                   </RequireAdmin>
                 }
               />
+              <Route
+                path="/admin/gallery"
+                element={
+                  <RequireAdmin>
+                    <AdminGalleryPage />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <RequireAdmin>
+                    <AdminGalleryPage />
+                  </RequireAdmin>
+                }
+              />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

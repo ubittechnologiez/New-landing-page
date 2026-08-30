@@ -1,9 +1,10 @@
+import { ReactNode } from "react";
 import { useAdmin } from "@/hooks/use-admin";
-import { Loader2, ShieldX } from "lucide-react";
-import type { ReactNode } from "react";
-import { Link, Navigate, useLocation } from "react-router";
+import { Navigate, useLocation } from "react-router";
+import { Loader2, ShieldAlert, LogOut, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BrandLockup } from "@/components/BrandImage";
+import { BrandLockup } from "./BrandImage";
+import { motion } from "framer-motion";
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated, isAdmin, user, signOut } = useAdmin();
@@ -11,17 +12,22 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-primary" />
-      </main>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground gap-4">
+        <div className="p-4 rounded-2xl bg-card/60 border border-white/10 shadow-2xl flex flex-col items-center gap-3">
+          <BrandLockup size="default" />
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+            <Loader2 className="size-4 animate-spin text-primary" />
+            <span>Verifying administrator access...</span>
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (!isAuthenticated) {
-    const returnTo = `${location.pathname}${location.search}`;
     return (
       <Navigate
-        to={`/auth?returnTo=${encodeURIComponent(returnTo)}`}
+        to={`/admin/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`}
         replace
       />
     );
@@ -29,42 +35,53 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
 
   if (!isAdmin) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background px-6">
-        <div className="text-center max-w-md">
-          <ShieldX className="mx-auto size-16 text-destructive/60" />
-          <h1 className="mt-6 font-display text-3xl font-bold tracking-tight">
-            Access Restricted
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Signed in as <span className="font-mono text-foreground">{user?.email || "Guest user"}</span>.
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            This dashboard is restricted to authorized UBIT administrative accounts (e.g. <span className="font-mono text-primary">ubittechnologiez@gmail.com</span> or <span className="font-mono text-primary">MD@ubittechnologiez.com</span>).
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/">
-              <Button variant="outline" className="rounded-full">
-                Back to Home
-              </Button>
-            </Link>
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md p-6 rounded-2xl bg-card border border-white/10 shadow-2xl space-y-6 text-center"
+        >
+          <div className="mx-auto grid size-16 place-items-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400">
+            <ShieldAlert className="size-8" />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">Administrator Access Required</h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Signed in as <span className="font-mono text-foreground font-medium">{user?.email ?? "Unknown"}</span>.
+              This portal is strictly reserved for authorized UBIT personnel (e.g. <span className="text-primary font-mono font-medium">ubittechnologiez@gmail.com</span>).
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 pt-2">
             <Button
               variant="default"
-              className="rounded-full"
-              onClick={async () => {
-                await signOut();
-                window.location.href = "/auth?returnTo=/dashboard";
+              className="w-full"
+              onClick={() => {
+                signOut().then(() => {
+                  window.location.href = "/admin/login";
+                });
               }}
             >
-              Sign In as Admin
+              <LogOut className="mr-2 size-4" />
+              Sign in with Admin Account
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full text-xs text-muted-foreground"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              <ArrowLeft className="mr-2 size-3.5" />
+              Back to Public Website
             </Button>
           </div>
-          <div className="mt-12">
-            <BrandLockup size="small" />
-          </div>
-        </div>
-      </main>
+        </motion.div>
+      </div>
     );
   }
 
-  return children;
+  return <>{children}</>;
 }
