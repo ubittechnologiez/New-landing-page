@@ -1,8 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { getCurrentUser } from "./users";
-
-const ADMIN_EMAIL = "MD@ubittechnologiez.com";
+import { getCurrentUser, isAdminUser } from "./users";
 
 /**
  * Public mutation: submit a quote request (no login required).
@@ -40,7 +38,7 @@ export const listAll = query({
     const user = await getCurrentUser(ctx);
     
     // Only admin can view all quotes
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       return [];
     }
 
@@ -64,7 +62,7 @@ export const updateStatus = mutation({
     const user = await getCurrentUser(ctx);
     
     // Only admin can update status
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       throw new Error("Unauthorized: Only admin can update quote status.");
     }
 
@@ -86,7 +84,7 @@ export const remove = mutation({
     const user = await getCurrentUser(ctx);
     
     // Only admin can delete
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       throw new Error("Unauthorized: Only admin can delete quotes.");
     }
 
@@ -108,7 +106,7 @@ export const getStats = query({
     const user = await getCurrentUser(ctx);
     
     // Only admin can view stats
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       return { total: 0, sent: 0, won: 0, newEnquiries: 0 };
     }
 
@@ -122,3 +120,4 @@ export const getStats = query({
     };
   },
 });
+

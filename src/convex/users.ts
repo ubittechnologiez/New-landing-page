@@ -31,3 +31,20 @@ export const getCurrentUser = async (ctx: QueryCtx) => {
   }
   return await ctx.db.get(userId);
 };
+
+export const ADMIN_EMAILS: readonly string[] = [
+  "md@ubittechnologiez.com",
+  "ubittechnologiez@gmail.com",
+  "admin@ubittechnologiez.com",
+] as const;
+
+export const isAdminUser = (user: { email?: string; role?: string } | null): boolean => {
+  if (!user || !user.email) return false;
+  const email = user.email.toLowerCase().trim();
+  return (
+    ADMIN_EMAILS.includes(email) ||
+    email.startsWith("admin@") ||
+    user.role === "admin"
+  );
+};
+

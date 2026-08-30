@@ -383,8 +383,8 @@ function RotatingWord({ words }: { words: string[] }) {
   const longest = words.reduce((a, b) => (a.length >= b.length ? a : b));
 
   return (
-    <span className="relative inline-grid overflow-hidden pb-[0.1em] -mb-[0.1em] align-baseline">
-      <span aria-hidden className="invisible whitespace-nowrap text-primary">
+    <span className="relative inline-grid text-left overflow-hidden pb-[0.1em] -mb-[0.1em] align-baseline">
+      <span aria-hidden className="invisible select-none whitespace-nowrap text-left text-primary">
         {longest}
       </span>
       <span className="absolute inset-0">
@@ -395,7 +395,7 @@ function RotatingWord({ words }: { words: string[] }) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "-115%", opacity: 0 }}
             transition={{ duration: 0.6, ease: EASE }}
-            className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-primary"
+            className="absolute inset-0 flex items-center justify-start text-left whitespace-nowrap text-primary"
           >
             {words[index]}
           </motion.span>
@@ -1574,7 +1574,7 @@ function Footer() {
           {/* brand */}
           <div className="md:col-span-1">
             <BrandLockup />
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-center">
               Enterprise IT infrastructure solutions provider based in Salem,
               Tamil Nadu. Delivering across South India.
             </p>
@@ -1643,10 +1643,17 @@ function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 py-6 text-xs text-muted-foreground md:flex-row">
-          <p>&copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved.</p>
-          <p className="flex items-center gap-1.5">
-            Built with <Dot className="size-1" /> for enterprise IT
+          <p>
+            &copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved. | A Group of Narmadha Trader
           </p>
+          <div className="flex items-center gap-6">
+            <Link to="/privacy" className="transition-colors hover:text-primary">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="transition-colors hover:text-primary">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

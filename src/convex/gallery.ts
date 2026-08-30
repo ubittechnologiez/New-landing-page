@@ -1,8 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { getCurrentUser } from "./users";
-
-const ADMIN_EMAIL = "MD@ubittechnologiez.com";
+import { getCurrentUser, isAdminUser } from "./users";
 
 /**
  * Get all gallery images ordered by position (ascending).
@@ -28,7 +26,7 @@ export const add = mutation({
   },
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       throw new Error("Unauthorized");
     }
 
@@ -53,7 +51,7 @@ export const remove = mutation({
   args: { id: v.id("gallery") },
   handler: async (ctx, { id }) => {
     const user = await getCurrentUser(ctx);
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       throw new Error("Unauthorized");
     }
     await ctx.db.delete(id);
@@ -70,7 +68,7 @@ export const reorder = mutation({
   },
   handler: async (ctx, { items }) => {
     const user = await getCurrentUser(ctx);
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       throw new Error("Unauthorized");
     }
 
@@ -90,7 +88,7 @@ export const move = mutation({
   },
   handler: async (ctx, { id, direction }) => {
     const user = await getCurrentUser(ctx);
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       throw new Error("Unauthorized");
     }
 
@@ -115,7 +113,7 @@ export const seed = mutation({
   args: {},
   handler: async (ctx) => {
     const user = await getCurrentUser(ctx);
-    if (user === null || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!isAdminUser(user)) {
       throw new Error("Unauthorized");
     }
 
@@ -143,3 +141,4 @@ export const seed = mutation({
     }
   },
 });
+

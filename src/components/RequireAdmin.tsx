@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { BrandLockup } from "@/components/BrandImage";
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
-  const { isLoading, isAuthenticated, isAdmin } = useAdmin();
+  const { isLoading, isAuthenticated, isAdmin, user, signOut } = useAdmin();
   const location = useLocation();
 
   if (isLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        <Loader2 className="size-6 animate-spin text-primary" />
       </main>
     );
   }
@@ -30,21 +30,33 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
   if (!isAdmin) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-6">
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <ShieldX className="mx-auto size-16 text-destructive/60" />
           <h1 className="mt-6 font-display text-3xl font-bold tracking-tight">
-            Access Denied
+            Access Restricted
           </h1>
-          <p className="mt-3 max-w-md text-muted-foreground">
-            You don't have permission to access the admin dashboard.
-            This area is restricted to authorized administrators only.
+          <p className="mt-3 text-sm text-muted-foreground">
+            Signed in as <span className="font-mono text-foreground">{user?.email || "Guest user"}</span>.
           </p>
-          <div className="mt-8 flex flex-col items-center gap-4">
+          <p className="mt-2 text-sm text-muted-foreground">
+            This dashboard is restricted to authorized UBIT administrative accounts (e.g. <span className="font-mono text-primary">ubittechnologiez@gmail.com</span> or <span className="font-mono text-primary">MD@ubittechnologiez.com</span>).
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link to="/">
               <Button variant="outline" className="rounded-full">
                 Back to Home
               </Button>
             </Link>
+            <Button
+              variant="default"
+              className="rounded-full"
+              onClick={async () => {
+                await signOut();
+                window.location.href = "/auth?returnTo=/dashboard";
+              }}
+            >
+              Sign In as Admin
+            </Button>
           </div>
           <div className="mt-12">
             <BrandLockup size="small" />
