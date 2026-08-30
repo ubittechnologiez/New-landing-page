@@ -599,7 +599,7 @@ export function QuoteManager() {
             </div>
           )}
 
-          <DialogFooter className="pt-2">
+          <DialogFooter className="pt-2 flex items-center justify-end gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -614,7 +614,7 @@ export function QuoteManager() {
                 className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 h-9"
               >
                 <Mail className="size-3.5 mr-1.5" />
-                Compose Email Reply
+                Reply to Client
               </a>
             )}
           </DialogFooter>

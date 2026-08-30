@@ -4,6 +4,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { submitQuoteToFirestore } from "@/lib/firestore-service";
+import { sendEnquiryEmailNotification } from "@/lib/email-service";
 import { ArrowRight, CheckCircle, Mail, MapPin, Phone } from "lucide-react";
 import { BrandLockup } from "@/components/BrandImage";
 import { Button } from "@/components/ui/button";
@@ -118,9 +119,24 @@ export default function Quote() {
         console.warn("Convex quote submit note:", cvxErr);
       }
 
+      // Dispatch email notification to MD@ubittechologiez.com
+      try {
+        await sendEnquiryEmailNotification({
+          clientName: clientName.trim(),
+          company: company.trim(),
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          category,
+          notes: requirements.trim() || undefined,
+          submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+        });
+      } catch (mailErr) {
+        console.warn("Enquiry notification note:", mailErr);
+      }
+
       setIsSubmitting(false);
       setIsSubmitted(true);
-      toast.success("Quote request submitted successfully!");
+      toast.success("Quote request submitted and notification sent to management!");
     } catch (error) {
       setIsSubmitting(false);
       toast.error(
@@ -377,10 +393,6 @@ export default function Quote() {
                         </>
                       )}
                     </Button>
-
-                    <p className="text-center text-xs text-muted-foreground">
-                      We'll respond within 24 hours with a customized quotation.
-                    </p>
                   </form>
                 </CardContent>
               </Card>
