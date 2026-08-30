@@ -13,6 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -338,32 +345,34 @@ export function QuoteManager() {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 px-3 text-xs rounded-md bg-background/80 border border-border/70 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="All">All Pipeline Stages</option>
-            <option value="New enquiry">New Enquiry</option>
-            <option value="Quotation sent">Quotation Sent</option>
-            <option value="Won">Won (Deal Closed)</option>
-            <option value="Lost">Lost</option>
-          </select>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="h-9 min-w-[160px] text-xs bg-background/80 border-border/70 text-foreground">
+              <SelectValue placeholder="All Pipeline Stages" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border-border text-foreground">
+              <SelectItem value="All" className="text-xs">All Pipeline Stages</SelectItem>
+              <SelectItem value="New enquiry" className="text-xs">New Enquiry</SelectItem>
+              <SelectItem value="Quotation sent" className="text-xs">Quotation Sent</SelectItem>
+              <SelectItem value="Won" className="text-xs">Won (Deal Closed)</SelectItem>
+              <SelectItem value="Lost" className="text-xs">Lost</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-9 px-3 text-xs rounded-md bg-background/80 border border-border/70 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="All">All Categories</option>
-            <option value="Server Solutions">Server Solutions</option>
-            <option value="Cybersecurity">Cybersecurity</option>
-            <option value="Networking">Networking</option>
-            <option value="Storage">Storage</option>
-            <option value="Workstations">Workstations</option>
-            <option value="Endpoints">Endpoints</option>
-          </select>
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="h-9 min-w-[150px] text-xs bg-background/80 border-border/70 text-foreground">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border-border text-foreground">
+              <SelectItem value="All" className="text-xs">All Categories</SelectItem>
+              <SelectItem value="Server Solutions" className="text-xs">Server Solutions</SelectItem>
+              <SelectItem value="Cybersecurity" className="text-xs">Cybersecurity</SelectItem>
+              <SelectItem value="Networking" className="text-xs">Networking</SelectItem>
+              <SelectItem value="Storage" className="text-xs">Storage</SelectItem>
+              <SelectItem value="Workstations" className="text-xs">Workstations</SelectItem>
+              <SelectItem value="Endpoints" className="text-xs">Endpoints</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -463,16 +472,20 @@ export function QuoteManager() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-end gap-1.5">
-                          <select
+                          <Select
                             value={quote.status}
-                            onChange={(e) => handleUpdateStatus(quote, e.target.value)}
-                            className="h-7 px-2 text-[11px] rounded bg-background border border-border text-foreground"
+                            onValueChange={(val) => handleUpdateStatus(quote, val)}
                           >
-                            <option value="New enquiry">New Enquiry</option>
-                            <option value="Quotation sent">Quotation Sent</option>
-                            <option value="Won">Won</option>
-                            <option value="Lost">Lost</option>
-                          </select>
+                            <SelectTrigger className="h-7 min-w-[120px] px-2 text-[11px] bg-background border-border text-foreground">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover border-border text-foreground">
+                              <SelectItem value="New enquiry" className="text-xs">New Enquiry</SelectItem>
+                              <SelectItem value="Quotation sent" className="text-xs">Quotation Sent</SelectItem>
+                              <SelectItem value="Won" className="text-xs">Won</SelectItem>
+                              <SelectItem value="Lost" className="text-xs">Lost</SelectItem>
+                            </SelectContent>
+                          </Select>
 
                           <Button
                             variant="ghost"
@@ -511,7 +524,7 @@ export function QuoteManager() {
           if (!open) setViewingQuote(null);
         }}
       >
-        <DialogContent className="max-w-md bg-card border-border sm:max-w-lg">
+        <DialogContent className="max-w-md bg-card border-border sm:max-w-lg max-h-[90vh] overflow-y-auto scrollbar-none">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
               <FileText className="size-5 text-primary" />

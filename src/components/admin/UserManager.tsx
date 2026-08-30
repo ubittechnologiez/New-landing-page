@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -367,29 +374,31 @@ export function UserManager() {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-9 px-3 text-xs rounded-md bg-background/80 border border-border/70 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="All">All Roles</option>
-            <option value="super_admin">Super Administrator</option>
-            <option value="admin">Infrastructure Admin</option>
-            <option value="sales_lead">Enterprise Sales Desk</option>
-            <option value="content_editor">Showcase Editor</option>
-          </select>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="h-9 min-w-[150px] text-xs bg-background/80 border-border/70 text-foreground">
+              <SelectValue placeholder="All Roles" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border-border text-foreground">
+              <SelectItem value="All" className="text-xs">All Roles</SelectItem>
+              <SelectItem value="super_admin" className="text-xs">Super Administrator</SelectItem>
+              <SelectItem value="admin" className="text-xs">Infrastructure Admin</SelectItem>
+              <SelectItem value="sales_lead" className="text-xs">Enterprise Sales Desk</SelectItem>
+              <SelectItem value="content_editor" className="text-xs">Showcase Editor</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 px-3 text-xs rounded-md bg-background/80 border border-border/70 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="All">All Status</option>
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-            <option value="pending">Pending</option>
-          </select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="h-9 min-w-[130px] text-xs bg-background/80 border-border/70 text-foreground">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border-border text-foreground">
+              <SelectItem value="All" className="text-xs">All Status</SelectItem>
+              <SelectItem value="active" className="text-xs">Active</SelectItem>
+              <SelectItem value="suspended" className="text-xs">Suspended</SelectItem>
+              <SelectItem value="pending" className="text-xs">Pending</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -565,7 +574,7 @@ export function UserManager() {
           }
         }}
       >
-        <DialogContent className="max-w-md bg-card border-border sm:max-w-lg">
+        <DialogContent className="max-w-md bg-card border-border sm:max-w-lg max-h-[90vh] overflow-y-auto scrollbar-none">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
               <ShieldCheck className="size-5 text-primary" />
@@ -628,29 +637,37 @@ export function UserManager() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="text-xs font-medium text-foreground">Assigned Role</label>
-                <select
+                <Select
                   value={formRole}
-                  onChange={(e) => setFormRole(e.target.value as FirestoreUser["role"])}
-                  className="w-full h-9 px-3 text-xs rounded-md bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  onValueChange={(val) => setFormRole(val as FirestoreUser["role"])}
                 >
-                  <option value="super_admin">Super Administrator</option>
-                  <option value="admin">Infrastructure Admin</option>
-                  <option value="sales_lead">Enterprise Sales Desk</option>
-                  <option value="content_editor">Showcase Editor</option>
-                </select>
+                  <SelectTrigger className="w-full h-9 text-xs bg-background border-border text-foreground">
+                    <SelectValue placeholder="Select Role" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border text-foreground">
+                    <SelectItem value="super_admin" className="text-xs">Super Administrator</SelectItem>
+                    <SelectItem value="admin" className="text-xs">Infrastructure Admin</SelectItem>
+                    <SelectItem value="sales_lead" className="text-xs">Enterprise Sales Desk</SelectItem>
+                    <SelectItem value="content_editor" className="text-xs">Showcase Editor</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-medium text-foreground">Account Status</label>
-                <select
+                <Select
                   value={formStatus}
-                  onChange={(e) => setFormStatus(e.target.value as FirestoreUser["status"])}
-                  className="w-full h-9 px-3 text-xs rounded-md bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  onValueChange={(val) => setFormStatus(val as FirestoreUser["status"])}
                 >
-                  <option value="active">Active (Full Access)</option>
-                  <option value="suspended">Suspended (Blocked)</option>
-                  <option value="pending">Pending Approval</option>
-                </select>
+                  <SelectTrigger className="w-full h-9 text-xs bg-background border-border text-foreground">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border text-foreground">
+                    <SelectItem value="active" className="text-xs">Active (Full Access)</SelectItem>
+                    <SelectItem value="suspended" className="text-xs">Suspended (Blocked)</SelectItem>
+                    <SelectItem value="pending" className="text-xs">Pending Approval</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

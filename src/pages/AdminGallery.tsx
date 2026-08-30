@@ -11,6 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -1278,7 +1285,7 @@ export default function AdminGalleryPage() {
 
       {/* ===================== ADD MODAL ===================== */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto bg-card border-border">
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto scrollbar-none bg-card border-border">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold flex items-center gap-2">
               <Plus className="size-5 text-primary" />
@@ -1396,20 +1403,21 @@ export default function AdminGalleryPage() {
 
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-foreground">Category *</label>
-                <select
-                  value={formCategory}
-                  onChange={(e) => setFormCategory(e.target.value)}
-                  className="w-full h-9 rounded-md border border-border/70 bg-background/80 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  {CATEGORIES.filter((c) => c !== "All").map((c) => (
-                    <option key={c} value={c} className="bg-card text-foreground">
-                      {c}
-                    </option>
-                  ))}
-                  <option value="Custom Project" className="bg-card text-foreground">
-                    Custom Project
-                  </option>
-                </select>
+                <Select value={formCategory} onValueChange={setFormCategory}>
+                  <SelectTrigger className="w-full h-9 text-xs bg-background/80 border-border/70 text-foreground">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border text-foreground">
+                    {CATEGORIES.filter((c) => c !== "All").map((c) => (
+                      <SelectItem key={c} value={c} className="text-xs">
+                        {c}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="Custom Project" className="text-xs">
+                      Custom Project
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -1521,7 +1529,7 @@ export default function AdminGalleryPage() {
 
       {/* ===================== EDIT MODAL ===================== */}
       <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto bg-card border-border">
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto scrollbar-none bg-card border-border">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold flex items-center gap-2">
               <Pencil className="size-5 text-blue-400" />
@@ -1589,20 +1597,21 @@ export default function AdminGalleryPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">Category</label>
-                  <select
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full h-9 rounded-md border border-border/70 bg-background/80 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    {CATEGORIES.filter((c) => c !== "All").map((c) => (
-                      <option key={c} value={c} className="bg-card text-foreground">
-                        {c}
-                      </option>
-                    ))}
-                    <option value="Custom Project" className="bg-card text-foreground">
-                      Custom Project
-                    </option>
-                  </select>
+                  <Select value={formCategory} onValueChange={setFormCategory}>
+                    <SelectTrigger className="w-full h-9 text-xs bg-background/80 border-border/70 text-foreground">
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border text-foreground">
+                      {CATEGORIES.filter((c) => c !== "All").map((c) => (
+                        <SelectItem key={c} value={c} className="text-xs">
+                          {c}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="Custom Project" className="text-xs">
+                        Custom Project
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
