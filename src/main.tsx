@@ -19,6 +19,7 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.tsx"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 import { RequireAdmin } from "./components/RequireAdmin.tsx";
+import { ScrollToTop } from "./components/ScrollToTop.tsx";
 
 // Simple loading fallback for route transitions
 function RouteLoading() {
@@ -200,6 +201,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
+            <ScrollToTop />
           </BrowserRouter>
           <Toaster />
         </AuthProvider>
