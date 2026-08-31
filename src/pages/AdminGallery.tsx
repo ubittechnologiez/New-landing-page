@@ -89,6 +89,9 @@ const CATEGORIES = [
   "Storage",
   "Workstations",
   "Endpoints",
+  "Web Development",
+  "Custom Software",
+  "Analytics & ERP",
   "Cloud & Data Center",
 ];
 

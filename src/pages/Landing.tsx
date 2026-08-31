@@ -1695,7 +1695,7 @@ function Footer() {
         <div className="grid gap-12 py-16 md:grid-cols-4 md:gap-8">
           {/* brand */}
           <div className="md:col-span-1">
-            <BrandLockup />
+            <BrandLockup className="pl-[30px]" />
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-center">
               Enterprise IT infrastructure solutions provider based in Salem,
               Tamil Nadu. Delivering across South India.
@@ -1765,7 +1765,7 @@ function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 py-6 text-xs text-muted-foreground md:flex-row">
-          <p>
+          <p className="text-sm text-center">
             &copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved. | A Group of Narmadha Trader
           </p>
           <div className="flex items-center gap-6">

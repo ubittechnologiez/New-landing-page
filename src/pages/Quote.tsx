@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -68,10 +68,16 @@ const CATEGORIES = [
   "NAS & Storage",
   "Workstations & Desktops",
   "Endpoints & Laptops",
+  "Web Development",
+  "Custom Software & Web Apps",
+  "E-Commerce Solutions",
   "Analytics & ERP",
+  "Cloud & DevOps",
+  "IT Consultancy & AMC",
 ];
 
 export default function Quote() {
+  const [searchParams] = useSearchParams();
   const submitQuote = useMutation(api.quotes.submitPublic);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -79,8 +85,33 @@ export default function Quote() {
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [category, setCategory] = useState<string>(() => {
+    const requested = searchParams.get("category") || searchParams.get("service") || "";
+    if (!requested) return CATEGORIES[0];
+    const match = CATEGORIES.find(
+      (c) =>
+        c.toLowerCase() === requested.toLowerCase() ||
+        requested.toLowerCase().includes(c.toLowerCase().split(" ")[0].toLowerCase()) ||
+        c.toLowerCase().includes(requested.toLowerCase())
+    );
+    return match || CATEGORIES[0];
+  });
   const [requirements, setRequirements] = useState("");
+
+  useEffect(() => {
+    const requested = searchParams.get("category") || searchParams.get("service") || "";
+    if (requested) {
+      const match = CATEGORIES.find(
+        (c) =>
+          c.toLowerCase() === requested.toLowerCase() ||
+          requested.toLowerCase().includes(c.toLowerCase().split(" ")[0].toLowerCase()) ||
+          c.toLowerCase().includes(requested.toLowerCase())
+      );
+      if (match) {
+        setCategory(match);
+      }
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -349,7 +380,7 @@ export default function Quote() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <Label>Product Category</Label>
+                      <Label>Product / Service Category</Label>
                       <Select value={category} onValueChange={setCategory}>
                         <SelectTrigger className="rounded-xl">
                           <SelectValue />

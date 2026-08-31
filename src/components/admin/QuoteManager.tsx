@@ -366,11 +366,17 @@ export function QuoteManager() {
             <SelectContent className="bg-popover border-border text-foreground">
               <SelectItem value="All" className="text-xs">All Categories</SelectItem>
               <SelectItem value="Server Solutions" className="text-xs">Server Solutions</SelectItem>
-              <SelectItem value="Cybersecurity" className="text-xs">Cybersecurity</SelectItem>
+              <SelectItem value="Firewall & Security" className="text-xs">Firewall & Security</SelectItem>
               <SelectItem value="Networking" className="text-xs">Networking</SelectItem>
-              <SelectItem value="Storage" className="text-xs">Storage</SelectItem>
-              <SelectItem value="Workstations" className="text-xs">Workstations</SelectItem>
-              <SelectItem value="Endpoints" className="text-xs">Endpoints</SelectItem>
+              <SelectItem value="NAS & Storage" className="text-xs">NAS & Storage</SelectItem>
+              <SelectItem value="Workstations & Desktops" className="text-xs">Workstations & Desktops</SelectItem>
+              <SelectItem value="Endpoints & Laptops" className="text-xs">Endpoints & Laptops</SelectItem>
+              <SelectItem value="Web Development" className="text-xs">Web Development</SelectItem>
+              <SelectItem value="Custom Software & Web Apps" className="text-xs">Custom Software & Web Apps</SelectItem>
+              <SelectItem value="E-Commerce Solutions" className="text-xs">E-Commerce Solutions</SelectItem>
+              <SelectItem value="Analytics & ERP" className="text-xs">Analytics & ERP</SelectItem>
+              <SelectItem value="Cloud & DevOps" className="text-xs">Cloud & DevOps</SelectItem>
+              <SelectItem value="IT Consultancy & AMC" className="text-xs">IT Consultancy & AMC</SelectItem>
             </SelectContent>
           </Select>
         </div>

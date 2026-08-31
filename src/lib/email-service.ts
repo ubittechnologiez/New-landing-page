@@ -1,8 +1,9 @@
+import emailjs from "@emailjs/browser";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "./firebase";
 
 export const MD_EMAIL = "MD@ubittechologiez.com";
-export const MD_EMAIL_ALT = "MD@ubittechnologiez.com";
+export const MD_EMAIL_ALT = "ubittechnologiez@gmail.com";
 
 export interface EnquiryEmailData {
   clientName: string;
@@ -14,11 +15,108 @@ export interface EnquiryEmailData {
   submittedAt?: string;
 }
 
+// Local storage key for dynamic admin configuration if needed
+const EMAILJS_CONFIG_KEY = "ubit_emailjs_config";
+
+export interface EmailJSConfig {
+  serviceId: string;
+  templateId: string;
+  publicKey: string;
+}
+
+export function getEmailJSConfig(): EmailJSConfig {
+  const envServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || "";
+  const envTemplateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "";
+  const envPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "";
+
+  if (envServiceId && envTemplateId && envPublicKey) {
+    return {
+      serviceId: envServiceId,
+      templateId: envTemplateId,
+      publicKey: envPublicKey,
+    };
+  }
+
+  try {
+    const stored = localStorage.getItem(EMAILJS_CONFIG_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        serviceId: parsed.serviceId || envServiceId,
+        templateId: parsed.templateId || envTemplateId,
+        publicKey: parsed.publicKey || envPublicKey,
+      };
+    }
+  } catch (err) {
+    console.warn("Failed to read emailjs config from localStorage", err);
+  }
+
+  return {
+    serviceId: envServiceId,
+    templateId: envTemplateId,
+    publicKey: envPublicKey,
+  };
+}
+
+export function saveEmailJSConfig(config: Partial<EmailJSConfig>) {
+  try {
+    const current = getEmailJSConfig();
+    const updated = { ...current, ...config };
+    localStorage.setItem(EMAILJS_CONFIG_KEY, JSON.stringify(updated));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Provisions and dispatches the enquiry email notification to Firestore 'mail_notifications' collection
- * (Triggers automated delivery to MD@ubittechologiez.com)
+ * Sends quotation / enquiry email via EmailJS browser SDK and logs the event in Firestore
  */
 export async function sendEnquiryEmailNotification(data: EnquiryEmailData) {
+  const timestamp = data.submittedAt || new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+  const config = getEmailJSConfig();
+
+  let emailjsResult: { success: boolean; error?: string } = { success: false };
+
+  if (config.serviceId && config.templateId && config.publicKey) {
+    try {
+      const templateParams = {
+        to_email: MD_EMAIL_ALT,
+        recipient: MD_EMAIL_ALT,
+        client_name: data.clientName,
+        from_name: data.clientName,
+        company: data.company,
+        email: data.email,
+        phone: data.phone || "Not provided",
+        category: data.category,
+        notes: data.notes || "No additional requirements specified.",
+        submitted_at: timestamp,
+        reply_to: data.email,
+      };
+
+      await emailjs.send(
+        config.serviceId,
+        config.templateId,
+        templateParams,
+        config.publicKey
+      );
+
+      emailjsResult = { success: true };
+    } catch (err: any) {
+      console.error("EmailJS dispatch error:", err);
+      emailjsResult = {
+        success: false,
+        error: err?.text || err?.message || "Failed to dispatch via EmailJS",
+      };
+    }
+  } else {
+    emailjsResult = {
+      success: false,
+      error: "EmailJS credentials not fully configured.",
+    };
+  }
+
+  // Backup log in Firestore mail_notifications collection
   try {
     const mailCollection = collection(db, "mail_notifications");
     await addDoc(mailCollection, {
@@ -30,50 +128,15 @@ Category: ${data.category}
 Email: ${data.email}
 Phone: ${data.phone || "N/A"}
 Notes: ${data.notes || "N/A"}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #ffffff;">
-            <h2 style="color: #0f172a; margin-top: 0;">New Quote Request / Business Enquiry</h2>
-            <p style="color: #64748b; font-size: 14px;">A new request has been submitted on UBIT Technologiez website.</p>
-            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-              <tr>
-                <td style="padding: 8px 0; color: #64748b; width: 140px;"><strong>Client Name:</strong></td>
-                <td style="padding: 8px 0; color: #0f172a;">${data.clientName}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #64748b;"><strong>Company:</strong></td>
-                <td style="padding: 8px 0; color: #0f172a;">${data.company}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #64748b;"><strong>Email:</strong></td>
-                <td style="padding: 8px 0; color: #0f172a;"><a href="mailto:${data.email}">${data.email}</a></td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #64748b;"><strong>Phone:</strong></td>
-                <td style="padding: 8px 0; color: #0f172a;">${data.phone || "Not provided"}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #64748b;"><strong>Category:</strong></td>
-                <td style="padding: 8px 0; color: #0f172a;"><span style="background: #f1f5f9; padding: 3px 8px; border-radius: 4px; font-weight: 600;">${data.category}</span></td>
-              </tr>
-            </table>
-            <div style="margin-top: 16px; padding: 14px; background-color: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
-              <strong style="color: #334155; font-size: 13px; text-transform: uppercase;">Requirements & Notes:</strong>
-              <p style="color: #1e293b; margin: 8px 0 0 0; white-space: pre-wrap; font-size: 14px;">${data.notes || "No special requirements entered."}</p>
-            </div>
-            <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">Sent automatically from UBIT Technologiez System to MD@ubittechologiez.com</p>
-          </div>
-        `,
       },
-      recipient: MD_EMAIL,
-      recipientAlt: MD_EMAIL_ALT,
       clientData: data,
-      status: "queued",
+      emailjsStatus: emailjsResult.success ? "sent" : "failed_or_unconfigured",
+      emailjsError: emailjsResult.error || null,
       createdAt: serverTimestamp(),
     });
-    return { success: true };
   } catch (error) {
     console.warn("Mail notification queue note:", error);
-    return { success: false, error };
   }
+
+  return emailjsResult;
 }
