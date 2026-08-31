@@ -39,6 +39,8 @@ import {
   Smartphone,
   Layers,
   Cloud,
+  ChevronDown,
+  PhoneCall,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
@@ -1055,7 +1057,7 @@ function Solutions() {
   return (
     <section
       id="solutions"
-      className="relative border-t border-white/5 py-24 md:py-36"
+      className="relative border-t border-white/5 py-14 md:py-36"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1068,16 +1070,28 @@ function Solutions() {
           }
         />
 
+        {/* Mobile Swipe Hint */}
+        <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground md:hidden">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-primary">6 Solutions</span>
+          <span className="flex items-center gap-1 font-mono text-[11px]">
+            Swipe to explore &rarr;
+          </span>
+        </div>
+
         <motion.div
           variants={staggerFast}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
         >
           {SOLUTIONS.map((solution) => (
-            <motion.div key={solution.title} variants={scaleUp} className="h-full">
-                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
+            <motion.div
+              key={solution.title}
+              variants={scaleUp}
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink h-full"
+            >
+                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
                   <div className="flex items-start justify-between">
                     <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                       <solution.icon className="size-6" />
@@ -1086,7 +1100,7 @@ function Solutions() {
                       0{SOLUTIONS.indexOf(solution) + 1}
                     </span>
                   </div>
-                  <h3 className="mt-6 font-display text-xl font-bold tracking-tight">
+                  <h3 className="mt-5 md:mt-6 font-display text-xl font-bold tracking-tight">
                     {solution.title}
                   </h3>
                   <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
@@ -1108,8 +1122,8 @@ function Solutions() {
         </motion.div>
 
         {/* Integrated OEM & Authorized Technology Brands */}
-        <div className="mt-20 pt-16 border-t border-white/6">
-          <div className="max-w-2xl mb-8 space-y-2">
+        <div className="mt-14 md:mt-20 pt-10 md:pt-16 border-t border-white/6">
+          <div className="max-w-2xl mb-6 md:mb-8 space-y-2">
             <span className="text-xs font-mono font-medium uppercase tracking-[0.2em] text-primary">
               Authorized OEM Partners
             </span>
@@ -1121,7 +1135,7 @@ function Solutions() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex overflow-x-auto pb-3 -mx-5 px-5 gap-2.5 md:flex-wrap md:mx-0 md:px-0 md:pb-0 scrollbar-none">
             {BRANDS.map((brand) => (
               <motion.span
                 key={brand}
@@ -1129,12 +1143,13 @@ function Solutions() {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, margin: "-40px" }}
+                className="shrink-0 md:shrink"
               >
                 <motion.span
                   variants={fadeUp}
                   whileHover={{ y: -3, scale: 1.04 }}
                   transition={{ type: "spring", stiffness: 300, damping: 18 }}
-                  className="inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-card/50 px-5 py-2.5 font-display text-sm font-semibold text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary"
+                  className="inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-card/50 px-4 py-2 md:px-5 md:py-2.5 font-display text-sm font-semibold text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary whitespace-nowrap"
                 >
                   <Dot />
                   {brand}
@@ -1152,7 +1167,7 @@ function WebDevelopment() {
   return (
     <section
       id="web-dev"
-      className="relative border-t border-white/5 bg-white/[0.015] py-24 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.015] py-14 md:py-36"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1170,21 +1185,33 @@ function WebDevelopment() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-60px" }}
-          className="-mt-8 mb-12 max-w-3xl text-base leading-relaxed text-muted-foreground md:-mt-10 md:mb-16"
+          className="-mt-8 mb-8 md:mb-16 max-w-3xl text-sm md:text-base leading-relaxed text-muted-foreground md:-mt-10"
         >
           Beyond hardware, UBIT builds high-performance web applications, enterprise portals, e-commerce platforms, and cloud-native digital systems tailored for businesses, educational institutions, and enterprises across South India.
         </motion.p>
+
+        {/* Mobile Swipe Hint */}
+        <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground md:hidden">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-primary">6 Digital Services</span>
+          <span className="flex items-center gap-1 font-mono text-[11px]">
+            Swipe to explore &rarr;
+          </span>
+        </div>
 
         <motion.div
           variants={staggerFast}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
         >
           {WEB_DEV.map((item, index) => (
-            <motion.div key={item.title} variants={scaleUp} className="h-full">
-              <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
+            <motion.div
+              key={item.title}
+              variants={scaleUp}
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink h-full"
+            >
+              <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
                 <div className="flex items-start justify-between">
                   <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                     <item.icon className="size-6" />
@@ -1193,7 +1220,7 @@ function WebDevelopment() {
                     0{index + 1}
                   </span>
                 </div>
-                <h3 className="mt-6 font-display text-xl font-bold tracking-tight">
+                <h3 className="mt-5 md:mt-6 font-display text-xl font-bold tracking-tight">
                   {item.title}
                 </h3>
                 <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
@@ -1220,7 +1247,7 @@ function WebDevelopment() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-primary/20 bg-primary/5 p-8 backdrop-blur-sm sm:flex-row"
+          className="mt-8 md:mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-primary/20 bg-primary/5 p-6 md:p-8 backdrop-blur-sm sm:flex-row"
         >
           <div className="space-y-1 text-center sm:text-left">
             <h4 className="font-display text-lg font-bold text-foreground">
@@ -1246,7 +1273,7 @@ function Analytics() {
   return (
     <section
       id="analytics"
-      className="relative border-t border-white/5 bg-white/[0.02] py-24 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:py-36"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1259,7 +1286,15 @@ function Analytics() {
           }
         />
 
-        <div className="grid gap-x-12 gap-y-0 md:grid-cols-2">
+        {/* Mobile Swipe Hint */}
+        <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground md:hidden">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-primary">4 Advisory Services</span>
+          <span className="flex items-center gap-1 font-mono text-[11px]">
+            Swipe to explore &rarr;
+          </span>
+        </div>
+
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-0 md:mx-0 md:px-0 md:pb-0">
           {ANALYTICS.map((item, i) => (
             <motion.div
               key={item.title}
@@ -1267,18 +1302,18 @@ function Analytics() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-40px" }}
-              className="group"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center rounded-2xl border border-white/8 bg-card/50 p-6 md:w-auto md:max-w-none md:shrink md:rounded-none md:border-0 md:bg-transparent md:p-0 group"
             >
               <motion.div
                 variants={fadeUp}
-                className="flex items-start gap-5 border-b border-white/6 py-8 transition-colors duration-300 hover:bg-white/[0.03] md:px-4"
+                className="flex items-start gap-4 md:gap-5 md:border-b md:border-white/6 md:py-8 transition-colors duration-300 md:hover:bg-white/[0.03] md:px-4"
               >
                 <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:-translate-y-1 group-hover:bg-primary group-hover:text-primary-foreground">
                   <item.icon className="size-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-4">
-                    <h3 className="font-display text-xl font-semibold tracking-tight md:text-2xl">
+                    <h3 className="font-display text-lg md:text-xl lg:text-2xl font-semibold tracking-tight">
                       {item.title}
                     </h3>
                     <span className="font-mono text-xs text-muted-foreground/60">
@@ -1312,7 +1347,7 @@ function WhyUs() {
   return (
     <section
       id="why"
-      className="relative border-t border-white/5 py-24 md:py-36"
+      className="relative border-t border-white/5 py-14 md:py-36"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1324,17 +1359,29 @@ function WhyUs() {
           }
         />
 
+        {/* Mobile Swipe Hint */}
+        <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground md:hidden">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-primary">Core Strengths</span>
+          <span className="flex items-center gap-1 font-mono text-[11px]">
+            Swipe to explore &rarr;
+          </span>
+        </div>
+
         <motion.div
           variants={stagger}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
         >
           {WHY.map((item) => (
-            <motion.div key={item.title} variants={scaleUp} className="h-full">
+            <motion.div
+              key={item.title}
+              variants={scaleUp}
+              className="w-[80vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink h-full"
+            >
                 <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
-                  <div className="flex items-start gap-5">
+                  <div className="flex items-start gap-4 md:gap-5">
                     <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                       <item.icon className="size-5" />
                     </div>
@@ -1360,10 +1407,10 @@ function About() {
   return (
     <section
       id="about"
-      className="relative border-t border-white/5 bg-white/[0.02] py-24 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:py-36"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <div className="grid gap-16 lg:grid-cols-2 lg:gap-20">
+        <div className="grid gap-10 md:gap-16 lg:grid-cols-2 lg:gap-20">
           <div>
             <SectionHeading
               eyebrow="About us"
@@ -1379,11 +1426,11 @@ function About() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-60px" }}
-              className="-mt-4 flex flex-col gap-8"
+              className="-mt-4 flex flex-col gap-6 md:gap-8"
             >
               <motion.p
                 variants={fadeUp}
-                className="max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg"
+                className="max-w-lg text-sm leading-relaxed text-muted-foreground md:text-lg"
               >
                 UBIT Technologiez is a leading IT infrastructure solutions
                 provider based in Salem, Tamil Nadu. We specialize in
@@ -1394,7 +1441,7 @@ function About() {
               </motion.p>
               <motion.p
                 variants={fadeUp}
-                className="max-w-lg text-base leading-relaxed text-foreground md:text-lg"
+                className="max-w-lg text-sm leading-relaxed text-foreground md:text-lg"
               >
                 Our mission is to empower businesses with reliable, scalable,
                 and secure IT infrastructure that drives growth and
@@ -1402,12 +1449,12 @@ function About() {
               </motion.p>
               <motion.div
                 variants={fadeUp}
-                className="flex flex-wrap gap-2 border-t border-white/6 pt-6"
+                className="flex flex-wrap gap-2 border-t border-white/6 pt-5 md:pt-6"
               >
                 {ABOUT_TAGS.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-white/6 bg-white/[0.03] px-3.5 py-1.5 text-xs text-muted-foreground"
+                    className="rounded-full border border-white/6 bg-white/[0.03] px-3 md:px-3.5 py-1 md:py-1.5 text-xs text-muted-foreground"
                   >
                     {tag}
                   </span>
@@ -1416,7 +1463,7 @@ function About() {
             </motion.div>
           </div>
 
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5 md:gap-6">
             <motion.div
               variants={stagger}
               initial="hidden"
@@ -1425,7 +1472,7 @@ function About() {
             >
               <motion.div
                 variants={fadeUp}
-                className="relative overflow-hidden rounded-2xl border border-white/8 bg-card/50 p-8 backdrop-blur-sm"
+                className="relative overflow-hidden rounded-2xl border border-white/8 bg-card/50 p-6 md:p-8 backdrop-blur-sm"
               >
                 <div className="absolute -right-16 -top-16 size-48 rounded-full bg-primary/8 blur-3xl" />
                 <motion.span
@@ -1435,10 +1482,10 @@ function About() {
                 >
                   Serving South India
                 </motion.span>
-                <motion.p className="relative mt-4 font-display text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+                <motion.p className="relative mt-3 md:mt-4 font-display text-2xl md:text-4xl font-bold leading-tight tracking-tight">
                   Salem, Tamil Nadu
                 </motion.p>
-                <motion.p className="relative mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                <motion.p className="relative mt-2 md:mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
                   Headquartered in Salem and delivering across South India —
                   from SMBs to large enterprises, we build infrastructure that
                   scales with your business.
@@ -1451,7 +1498,7 @@ function About() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-40px" }}
-              className="rounded-2xl border border-white/8 bg-card/50 p-8 backdrop-blur-sm"
+              className="rounded-2xl border border-white/8 bg-card/50 p-6 md:p-8 backdrop-blur-sm"
             >
               <motion.p
                 variants={fadeUp}
@@ -1461,7 +1508,7 @@ function About() {
               </motion.p>
               <motion.ul
                 variants={fadeUp}
-                className="mt-4 grid grid-cols-1 gap-3 text-sm text-foreground sm:grid-cols-2"
+                className="mt-4 grid grid-cols-1 gap-2.5 text-sm text-foreground sm:grid-cols-2"
               >
                 {[
                   "Genuine products with warranty",
@@ -1511,7 +1558,7 @@ function Contact() {
   return (
     <section
       id="contact"
-      className="relative border-t border-white/5 py-24 md:py-36"
+      className="relative border-t border-white/5 py-14 md:py-36"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1528,14 +1575,22 @@ function Contact() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-60px" }}
-          className="-mt-8 mb-12 max-w-2xl text-base leading-relaxed text-muted-foreground md:-mt-10 md:mb-16"
+          className="-mt-8 mb-8 md:mb-16 max-w-2xl text-sm md:text-base leading-relaxed text-muted-foreground md:-mt-10"
         >
           Ready to upgrade your technology infrastructure? Reach out for a free
           consultation and a customized quotation tailored to your business —
           we'll get back to you within 24 hours.
         </motion.p>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        {/* Mobile Swipe Hint */}
+        <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground md:hidden">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-primary">Contact Channels</span>
+          <span className="flex items-center gap-1 font-mono text-[11px]">
+            Swipe to contact &rarr;
+          </span>
+        </div>
+
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0">
           {CONTACT_CARDS.map((card) => (
             <motion.a
               key={card.title}
@@ -1546,10 +1601,10 @@ function Contact() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-40px" }}
-              className="group block"
+              className="w-[82vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink group block"
             >
               <motion.span variants={fadeUp} className="block h-full">
-                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
+                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
                   <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                     <card.icon className="size-6" />
                   </span>
@@ -1585,7 +1640,7 @@ function Cta() {
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden border-t border-white/5 py-28 md:py-40"
+      className="relative overflow-hidden border-t border-white/5 py-20 md:py-40"
     >
       <motion.span
         aria-hidden
@@ -1610,7 +1665,7 @@ function Cta() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-          className="mt-6 font-display text-[clamp(2.6rem,8vw,6rem)] font-bold leading-[1.10] tracking-tight"
+          className="mt-6 font-display text-[clamp(2.4rem,7vw,6rem)] font-bold leading-[1.10] tracking-tight"
         >
           Ready to upgrade your
           <span className="block text-primary">infrastructure</span>
@@ -1631,7 +1686,7 @@ function Cta() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          className="mt-8 md:mt-10 flex flex-wrap items-center justify-center gap-4"
         >
           <Magnetic>
             <Button asChild size="lg" className="h-12 rounded-full px-8">
@@ -1659,6 +1714,7 @@ function Cta() {
 
 function Footer() {
   const ref = useRef<HTMLDivElement>(null);
+  const [openSection, setOpenSection] = useState<string | null>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -1671,10 +1727,14 @@ function Footer() {
     "UBIT TECHNOLOGIEZ",
   ];
 
+  const toggleSection = (section: string) => {
+    setOpenSection((prev) => (prev === section ? null : section));
+  };
+
   return (
     <footer ref={ref} className="relative overflow-hidden border-t border-white/5">
       {/* giant marquee wordmark */}
-      <div className="relative overflow-hidden py-10 md:py-14">
+      <div className="relative overflow-hidden py-8 md:py-14">
         <motion.div
           aria-hidden
           style={{ x: marqueeX }}
@@ -1692,10 +1752,11 @@ function Footer() {
       </div>
 
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <div className="grid gap-12 py-16 md:grid-cols-4 md:gap-8">
+        {/* Desktop Footer View (Unchanged) */}
+        <div className="hidden md:grid gap-12 py-16 md:grid-cols-4 md:gap-8">
           {/* brand */}
           <div className="md:col-span-1">
-            <BrandLockup className="pl-[30px]" />
+            <BrandLockup className="ml-[35px]" />
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-center">
               Enterprise IT infrastructure solutions provider based in Salem,
               Tamil Nadu. Delivering across South India.
@@ -1761,6 +1822,127 @@ function Footer() {
               <li>9:00 AM – 6:00 PM IST</li>
               <li className="mt-2 text-primary/80">12/7 Technical Support</li>
             </ul>
+          </div>
+        </div>
+
+        {/* Mobile Accordion Footer View */}
+        <div className="flex flex-col gap-4 py-8 md:hidden">
+          <div className="flex flex-col items-center text-center pb-4 border-b border-white/6">
+            <BrandLockup className="ml-[35px]" />
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground max-w-xs">
+              Enterprise IT infrastructure solutions provider based in Salem, Tamil Nadu. Delivering across South India.
+            </p>
+          </div>
+
+          {/* Navigation Accordion */}
+          <div className="border-b border-white/6 pb-3">
+            <button
+              onClick={() => toggleSection("nav")}
+              className="flex w-full items-center justify-between py-2 text-left font-display text-sm font-semibold uppercase tracking-wider text-foreground"
+            >
+              <span>Navigation</span>
+              <ChevronDown
+                className={`size-4 text-muted-foreground transition-transform duration-200 ${
+                  openSection === "nav" ? "rotate-180 text-primary" : ""
+                }`}
+              />
+            </button>
+            <AnimatePresence>
+              {openSection === "nav" && (
+                <motion.ul
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 flex flex-col gap-2 overflow-hidden text-sm text-muted-foreground"
+                >
+                  {NAV_LINKS.map((link) => (
+                    <li key={link.href}>
+                      {link.href.startsWith("/") ? (
+                        <Link
+                          to={link.href}
+                          className="block py-1 text-sm text-muted-foreground hover:text-primary"
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          className="block py-1 text-sm text-muted-foreground hover:text-primary"
+                        >
+                          {link.label}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Contact Accordion */}
+          <div className="border-b border-white/6 pb-3">
+            <button
+              onClick={() => toggleSection("contact")}
+              className="flex w-full items-center justify-between py-2 text-left font-display text-sm font-semibold uppercase tracking-wider text-foreground"
+            >
+              <span>Contact</span>
+              <ChevronDown
+                className={`size-4 text-muted-foreground transition-transform duration-200 ${
+                  openSection === "contact" ? "rotate-180 text-primary" : ""
+                }`}
+              />
+            </button>
+            <AnimatePresence>
+              {openSection === "contact" && (
+                <motion.ul
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 flex flex-col gap-2.5 overflow-hidden text-sm text-muted-foreground"
+                >
+                  <li className="flex items-start gap-2 py-0.5">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
+                    620, Ashok Nagar, Salem 636015
+                  </li>
+                  <li className="flex items-center gap-2 py-0.5">
+                    <Phone className="size-4 shrink-0 text-primary" />
+                    +91 93630 32560
+                  </li>
+                  <li className="flex items-center gap-2 py-0.5">
+                    <Mail className="size-4 shrink-0 text-primary" />
+                    MD@ubittechnologiez.com
+                  </li>
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Hours Accordion */}
+          <div className="border-b border-white/6 pb-3">
+            <button
+              onClick={() => toggleSection("hours")}
+              className="flex w-full items-center justify-between py-2 text-left font-display text-sm font-semibold uppercase tracking-wider text-foreground"
+            >
+              <span>Business Hours</span>
+              <ChevronDown
+                className={`size-4 text-muted-foreground transition-transform duration-200 ${
+                  openSection === "hours" ? "rotate-180 text-primary" : ""
+                }`}
+              />
+            </button>
+            <AnimatePresence>
+              {openSection === "hours" && (
+                <motion.ul
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 flex flex-col gap-1.5 overflow-hidden text-sm text-muted-foreground"
+                >
+                  <li>Monday – Saturday: 9:00 AM – 6:00 PM IST</li>
+                  <li className="text-primary font-medium">12/7 Technical Support</li>
+                </motion.ul>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
