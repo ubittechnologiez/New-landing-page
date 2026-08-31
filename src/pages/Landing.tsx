@@ -1828,7 +1828,7 @@ function Footer() {
         {/* Mobile Accordion Footer View */}
         <div className="flex flex-col gap-4 py-8 md:hidden">
           <div className="flex flex-col items-center text-center pb-4 border-b border-white/6">
-            <BrandLockup className="ml-[35px]" />
+            <BrandLockup />
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground max-w-xs">
               Enterprise IT infrastructure solutions provider based in Salem, Tamil Nadu. Delivering across South India.
             </p>
@@ -1947,9 +1947,14 @@ function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 py-6 text-xs text-muted-foreground md:flex-row">
-          <p className="text-sm text-center">
-            &copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved. | A Group of Narmadha Trader
-          </p>
+          <div className="space-y-1 text-center md:text-left">
+            <p className="text-xs">
+              &copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved.
+            </p>
+            <p className="text-xs text-muted-foreground/80">
+              A Group of Narmadha Trader
+            </p>
+          </div>
           <div className="flex items-center gap-6">
             <Link to="/privacy" className="transition-colors hover:text-primary">
               Privacy Policy
