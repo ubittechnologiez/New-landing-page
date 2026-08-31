@@ -501,7 +501,7 @@ function GhostTicker({ words }: { words: string[] }) {
     <section
       ref={ref}
       aria-hidden
-      className="relative overflow-hidden border-y border-white/5 py-14 md:py-18"
+      className="relative overflow-hidden border-y border-white/5 h-[197px] pt-[56px]"
     >
       <motion.div
         style={{ x }}
@@ -539,15 +539,17 @@ function RevealLine({
   text,
   delay = 0,
   className,
+  innerClassName,
 }: {
   text: string;
   delay?: number;
   className?: string;
+  innerClassName?: string;
 }) {
   return (
     <span className={cn("block overflow-hidden", className)}>
       <motion.span
-        className="block"
+        className={cn("block", innerClassName)}
         initial={{ y: "112%" }}
         animate={{ y: 0 }}
         transition={{ duration: 0.85, ease: EASE, delay }}
@@ -562,10 +564,12 @@ function SectionHeading({
   eyebrow,
   title,
   align = "left",
+  className,
 }: {
   eyebrow: string;
   title: React.ReactNode;
   align?: "left" | "center";
+  className?: string;
 }) {
   return (
     <motion.div
@@ -575,7 +579,8 @@ function SectionHeading({
       viewport={{ once: true, margin: "-60px" }}
       className={cn(
         "mb-12 flex flex-col gap-4 md:mb-16",
-        align === "center" && "items-center text-center"
+        align === "center" && "items-center text-center",
+        className
       )}
     >
       <motion.span
@@ -920,7 +925,7 @@ function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden"
+      className="relative flex min-h-[92vh] md:min-h-screen flex-col justify-center overflow-hidden"
     >
       <div ref={ref} className="absolute inset-0">
         <motion.div
@@ -957,17 +962,17 @@ function Hero() {
 
       <motion.div
         style={{ y: contentY, opacity: contentOpacity }}
-        className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-32 md:px-8"
+        className="relative mx-auto w-full max-w-7xl px-5 pt-28 pb-16 md:pt-36 md:px-8 lg:pt-40 lg:pb-24"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-          className="mb-8 flex items-center gap-3"
+          className="mb-6 flex items-center gap-3 md:mb-8"
         >
           <Badge
             variant="outline"
-            className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
+            className="-mt-[70px] gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
           >
             <span className="relative flex size-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
@@ -977,8 +982,8 @@ function Hero() {
           </Badge>
         </motion.div>
 
-        <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
-          <RevealLine text="Powering your" delay={0.15} />
+        <h1 className="font-display text-[clamp(2.4rem,7vw,5.5rem)] font-bold leading-[1.08] tracking-tight">
+          <RevealLine text="Powering your" delay={0.15} innerClassName="-mt-[14px]" />
           <RevealLine text="Business with" delay={0.27} />
           <RevealLine text="Enterprise" delay={0.39} className="text-primary" />
           <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
@@ -997,7 +1002,7 @@ function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
-          className="mt-10 flex max-w-xl flex-col gap-8"
+          className="mt-8 flex max-w-2xl flex-col gap-6 md:mt-10 md:gap-8"
         >
           <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
             From high-performance servers and firewalls to complete networking
@@ -1031,18 +1036,18 @@ function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9 }}
-          className="mt-20 grid grid-cols-2 gap-4 sm:grid-cols-4"
+          className="mt-[35px] grid grid-cols-2 gap-4 sm:grid-cols-4"
         >
           {STATS.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-2xl border border-white/8 bg-card/50 px-6 py-6 backdrop-blur-sm"
+              className="rounded-2xl border border-white/8 bg-card/50 px-5 py-5 sm:px-6 sm:py-6 backdrop-blur-sm shadow-sm transition-all duration-300 hover:border-primary/30"
             >
               <dt className="sr-only">{stat.label}</dt>
-              <dd className="font-display text-3xl font-bold text-primary md:text-4xl">
+              <dd className="font-display text-3xl font-bold text-primary sm:text-4xl md:text-4xl lg:text-5xl">
                 <CountUp value={stat.value} suffix={stat.suffix} />
               </dd>
-              <dd className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <dd className="mt-1.5 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                 {stat.label}
               </dd>
             </div>
@@ -1057,10 +1062,11 @@ function Solutions() {
   return (
     <section
       id="solutions"
-      className="relative border-t border-white/5 py-14 md:py-36"
+      className="relative border-t border-white/5 py-16 md:py-28 lg:py-32"
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 w-full">
         <SectionHeading
+          className="-mt-[60px] mb-16"
           eyebrow="What we offer"
           title={
             <>
@@ -1125,8 +1131,8 @@ function Solutions() {
 
         {/* Integrated OEM & Authorized Technology Brands */}
         <div className="mt-14 md:mt-20 pt-10 md:pt-16 border-t border-white/6">
-          <div className="max-w-2xl mb-6 md:mb-8 space-y-2">
-            <span className="text-xs font-mono font-medium uppercase tracking-[0.2em] text-primary">
+          <div className="max-w-2xl mb-6 md:mb-8 flex flex-col gap-3 md:gap-4">
+            <span className="block font-mono text-xs font-semibold uppercase tracking-[0.3em] text-primary">
               Authorized OEM Partners
             </span>
             <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
@@ -1169,10 +1175,11 @@ function WebDevelopment() {
   return (
     <section
       id="web-dev"
-      className="relative border-t border-white/5 bg-white/[0.015] py-14 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.015] py-16 md:py-28 lg:py-32"
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 w-full">
         <SectionHeading
+          className="-mt-[60px]"
           eyebrow="Software & Digital Solutions"
           title={
             <>
@@ -1187,7 +1194,7 @@ function WebDevelopment() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-60px" }}
-          className="-mt-8 mb-8 md:mb-16 max-w-3xl text-sm md:text-base leading-relaxed text-muted-foreground md:-mt-10"
+          className="-mt-8 mb-8 md:mb-14 max-w-3xl text-sm md:text-base leading-relaxed text-muted-foreground md:-mt-10"
         >
           Beyond hardware, UBIT builds high-performance web applications, enterprise portals, e-commerce platforms, and cloud-native digital systems tailored for businesses, educational institutions, and enterprises across South India.
         </motion.p>
@@ -1251,7 +1258,7 @@ function WebDevelopment() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="mt-8 md:mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-primary/20 bg-primary/5 p-6 md:p-8 backdrop-blur-sm sm:flex-row"
+          className="mt-8 md:mt-12 flex flex-col items-center justify-between gap-6 rounded-2xl border border-primary/20 bg-primary/5 p-6 md:p-8 backdrop-blur-sm sm:flex-row"
         >
           <div className="space-y-1 text-center sm:text-left">
             <h4 className="font-display text-lg font-bold text-foreground">
@@ -1277,10 +1284,11 @@ function Analytics() {
   return (
     <section
       id="analytics"
-      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.02] py-16 md:py-28 lg:py-32"
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 w-full">
         <SectionHeading
+          className="-mt-[60px]"
           eyebrow="What we also offer"
           title={
             <>
@@ -1353,10 +1361,11 @@ function WhyUs() {
   return (
     <section
       id="why"
-      className="relative border-t border-white/5 py-14 md:py-36"
+      className="relative border-t border-white/5 py-16 md:py-28 lg:py-32"
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 w-full">
         <SectionHeading
+          className="-mt-[60px]"
           eyebrow="Why choose us"
           title={
             <>
@@ -1413,11 +1422,11 @@ function About() {
   return (
     <section
       id="about"
-      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.02] py-16 md:py-28 lg:py-32"
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 w-full">
         <div className="grid gap-10 md:gap-16 lg:grid-cols-2 lg:gap-20">
-          <div>
+          <div className="-mt-[60px]">
             <SectionHeading
               eyebrow="About us"
               title={
@@ -1460,7 +1469,7 @@ function About() {
                 {ABOUT_TAGS.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-white/6 bg-white/[0.03] px-3 md:px-3.5 py-1 md:py-1.5 text-xs text-muted-foreground"
+                    className="rounded-full border border-white/6 bg-white/[0.03] px-3.5 py-1.5 text-xs text-muted-foreground"
                   >
                     {tag}
                   </span>
@@ -1564,10 +1573,11 @@ function Contact() {
   return (
     <section
       id="contact"
-      className="relative border-t border-white/5 py-14 md:py-36"
+      className="relative border-t border-white/5 py-16 md:py-28 lg:py-32"
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 w-full">
         <SectionHeading
+          className="-mt-[60px]"
           eyebrow="Get in touch"
           title={
             <>
@@ -1646,6 +1656,7 @@ function Cta() {
   return (
     <section
       ref={ref}
+      id="cta"
       className="relative overflow-hidden border-t border-white/5 py-20 md:py-40"
     >
       <motion.span
@@ -1656,7 +1667,7 @@ function Cta() {
         UBIT
       </motion.span>
       <div className="absolute left-1/2 top-1/2 h-[26rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[140px]" />
-      <div className="relative mx-auto flex max-w-4xl flex-col items-center px-5 text-center">
+      <div className="relative mx-auto flex max-w-4xl flex-col items-center px-5 text-center -mt-[70px]">
         <motion.span
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
