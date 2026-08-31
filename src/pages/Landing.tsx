@@ -1755,16 +1755,16 @@ function Footer() {
         {/* Desktop Footer View (Unchanged) */}
         <div className="hidden md:grid gap-12 py-16 md:grid-cols-4 md:gap-8">
           {/* brand */}
-          <div className="md:col-span-1">
-            <BrandLockup className="ml-[35px]" />
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-center">
+          <div className="md:col-span-1 flex flex-col items-center text-center">
+            <BrandLockup />
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-center max-w-xs">
               Enterprise IT infrastructure solutions provider based in Salem,
               Tamil Nadu. Delivering across South India.
             </p>
           </div>
 
           {/* nav */}
-          <div>
+          <div className="ml-[55px]">
             <h4 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-foreground">
               Navigation
             </h4>
@@ -1820,7 +1820,7 @@ function Footer() {
             <ul className="mt-4 flex flex-col gap-2.5 text-sm text-muted-foreground">
               <li>Monday – Saturday</li>
               <li>9:00 AM – 6:00 PM IST</li>
-              <li className="mt-2 text-primary/80">12/7 Technical Support</li>
+              <li className="text-primary/80">12/7 Technical Support</li>
             </ul>
           </div>
         </div>
