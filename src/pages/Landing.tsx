@@ -117,21 +117,21 @@ const BRANDS = [
   "Sophos",
   "Fortinet",
   "Cisco",
-  "Dell",
-  "HP",
-  "Lenovo",
-  "Microsoft",
   "Synology",
   "Ubiquiti",
-  "Intel",
+  "Microsoft",
+  "intel",
   "AMD",
+  "MSI",
+  "Lenovo",
+  "HP",
+  "Dell",
   "Asus",
   "Acer",
-  "MSI",
-  "D-Link",
-  "CommScope",
   "UGREEN",
   "Cooler Master",
+  "D-Link",
+  "Commscope",
 ];
 
 const ROTATING_WORDS = [
@@ -483,7 +483,7 @@ function SpotlightCard({
             "radial-gradient(200px circle at var(--spot-x, 50%) var(--spot-y, 50%), oklch(0.72 0.14 75 / 0.12), transparent 70%)",
         }}
       />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 flex h-full flex-col">{children}</div>
     </div>
   );
 }
@@ -1083,30 +1083,32 @@ function Solutions() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
         >
           {SOLUTIONS.map((solution) => (
             <motion.div
               key={solution.title}
               variants={scaleUp}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink h-full"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col"
             >
-                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
-                  <div className="flex items-start justify-between">
-                    <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
-                      <solution.icon className="size-6" />
+                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-start justify-between">
+                      <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                        <solution.icon className="size-6" />
+                      </div>
+                      <span className="font-mono text-xs text-muted-foreground/60">
+                        0{SOLUTIONS.indexOf(solution) + 1}
+                      </span>
                     </div>
-                    <span className="font-mono text-xs text-muted-foreground/60">
-                      0{SOLUTIONS.indexOf(solution) + 1}
-                    </span>
+                    <h3 className="mt-5 md:mt-6 font-display text-xl font-bold tracking-tight">
+                      {solution.title}
+                    </h3>
+                    <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                      {solution.copy}
+                    </p>
                   </div>
-                  <h3 className="mt-5 md:mt-6 font-display text-xl font-bold tracking-tight">
-                    {solution.title}
-                  </h3>
-                  <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-                    {solution.copy}
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
+                  <div className="mt-5 flex flex-wrap gap-2 pt-2">
                     {solution.chips.map((chip) => (
                       <span
                         key={chip}
@@ -1135,7 +1137,7 @@ function Solutions() {
             </p>
           </div>
 
-          <div className="flex overflow-x-auto pb-3 -mx-5 px-5 gap-2.5 md:flex-wrap md:mx-0 md:px-0 md:pb-0 scrollbar-none">
+          <div className="flex overflow-x-auto py-3 px-5 -mx-5 gap-2.5 md:gap-3 md:flex-wrap md:mx-0 md:px-2 md:py-3 md:overflow-visible scrollbar-none">
             {BRANDS.map((brand) => (
               <motion.span
                 key={brand}
@@ -1143,13 +1145,13 @@ function Solutions() {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, margin: "-40px" }}
-                className="shrink-0 md:shrink"
+                className="shrink-0 md:shrink relative z-0 hover:z-20 transition-[z-index]"
               >
                 <motion.span
                   variants={fadeUp}
                   whileHover={{ y: -3, scale: 1.04 }}
                   transition={{ type: "spring", stiffness: 300, damping: 18 }}
-                  className="inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-card/50 px-4 py-2 md:px-5 md:py-2.5 font-display text-sm font-semibold text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary whitespace-nowrap"
+                  className="inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-card/50 px-4 py-2 md:px-5 md:py-2.5 font-display text-sm font-semibold text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-primary/50 hover:text-primary whitespace-nowrap shadow-sm hover:shadow-md hover:shadow-primary/10"
                 >
                   <Dot />
                   {brand}
@@ -1203,30 +1205,32 @@ function WebDevelopment() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
         >
           {WEB_DEV.map((item, index) => (
             <motion.div
               key={item.title}
               variants={scaleUp}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink h-full"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col"
             >
-              <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
-                <div className="flex items-start justify-between">
-                  <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
-                    <item.icon className="size-6" />
+              <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between">
+                    <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                      <item.icon className="size-6" />
+                    </div>
+                    <span className="font-mono text-xs text-muted-foreground/60">
+                      0{index + 1}
+                    </span>
                   </div>
-                  <span className="font-mono text-xs text-muted-foreground/60">
-                    0{index + 1}
-                  </span>
+                  <h3 className="mt-5 md:mt-6 font-display text-xl font-bold tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                    {item.copy}
+                  </p>
                 </div>
-                <h3 className="mt-5 md:mt-6 font-display text-xl font-bold tracking-tight">
-                  {item.title}
-                </h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-                  {item.copy}
-                </p>
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="mt-5 flex flex-wrap gap-2 pt-2">
                   {item.chips.map((chip) => (
                     <span
                       key={chip}
@@ -1294,7 +1298,7 @@ function Analytics() {
           </span>
         </div>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-0 md:mx-0 md:px-0 md:pb-0">
+        <div className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-0 md:mx-0 md:px-0 md:pb-0">
           {ANALYTICS.map((item, i) => (
             <motion.div
               key={item.title}
@@ -1302,28 +1306,30 @@ function Analytics() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-40px" }}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-center rounded-2xl border border-white/8 bg-card/50 p-6 md:w-auto md:max-w-none md:shrink md:rounded-none md:border-0 md:bg-transparent md:p-0 group"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center rounded-2xl border border-white/8 bg-card/50 p-6 md:w-auto md:max-w-none md:shrink md:rounded-none md:border-0 md:bg-transparent md:p-0 group flex flex-col justify-between"
             >
               <motion.div
                 variants={fadeUp}
-                className="flex items-start gap-4 md:gap-5 md:border-b md:border-white/6 md:py-8 transition-colors duration-300 md:hover:bg-white/[0.03] md:px-4"
+                className="flex items-start gap-4 md:gap-5 md:border-b md:border-white/6 md:py-8 transition-colors duration-300 md:hover:bg-white/[0.03] md:px-4 flex-1 flex flex-col md:flex-row justify-between w-full"
               >
                 <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:-translate-y-1 group-hover:bg-primary group-hover:text-primary-foreground">
                   <item.icon className="size-5" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="font-display text-lg md:text-xl lg:text-2xl font-semibold tracking-tight">
-                      {item.title}
-                    </h3>
-                    <span className="font-mono text-xs text-muted-foreground/60">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
+                <div className="flex-1 flex flex-col justify-between w-full">
+                  <div>
+                    <div className="flex items-center justify-between gap-4">
+                      <h3 className="font-display text-lg md:text-xl lg:text-2xl font-semibold tracking-tight">
+                        {item.title}
+                      </h3>
+                      <span className="font-mono text-xs text-muted-foreground/60">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                      {item.copy}
+                    </p>
                   </div>
-                  <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-                    {item.copy}
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap gap-2 pt-1">
                     {item.chips.map((chip) => (
                       <span
                         key={chip}
@@ -1372,20 +1378,20 @@ function WhyUs() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0"
         >
           {WHY.map((item) => (
             <motion.div
               key={item.title}
               variants={scaleUp}
-              className="w-[80vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink h-full"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col"
             >
-                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
-                  <div className="flex items-start gap-4 md:gap-5">
+                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30 flex flex-col justify-start">
+                  <div className="flex items-start gap-4 md:gap-5 flex-1">
                     <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                       <item.icon className="size-5" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-display text-lg font-bold tracking-tight">
                         {item.title}
                       </h3>
@@ -1590,7 +1596,7 @@ function Contact() {
           </span>
         </div>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0">
+        <div className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0">
           {CONTACT_CARDS.map((card) => (
             <motion.a
               key={card.title}
@@ -1601,10 +1607,10 @@ function Contact() {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: "-40px" }}
-              className="w-[82vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink group block"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink group block flex flex-col"
             >
-              <motion.span variants={fadeUp} className="block h-full">
-                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30">
+              <motion.span variants={fadeUp} className="block h-full flex-1 flex flex-col">
+                <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30 flex flex-col justify-start">
                   <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                     <card.icon className="size-6" />
                   </span>
@@ -1675,11 +1681,11 @@ function Cta() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.2 }}
-          className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg"
+          className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
         >
-          Tell us what your business needs — servers, security, networking or
-          analytics — and we'll come back with a tailored quote within 24
-          hours.
+          Tell us what your business needs — servers, security, networking or analytics,
+          <br className="hidden sm:inline" />
+          {" "}and we'll come back with a tailored quote within 24 hours.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -1764,7 +1770,7 @@ function Footer() {
           </div>
 
           {/* nav */}
-          <div className="ml-[55px]">
+          <div className="ml-[70px]">
             <h4 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-foreground">
               Navigation
             </h4>
@@ -1820,7 +1826,7 @@ function Footer() {
             <ul className="mt-4 flex flex-col gap-2.5 text-sm text-muted-foreground">
               <li>Monday – Saturday</li>
               <li>9:00 AM – 6:00 PM IST</li>
-              <li className="text-primary/80">12/7 Technical Support</li>
+              <li>12/7 Technical Support</li>
             </ul>
           </div>
         </div>
@@ -1939,32 +1945,57 @@ function Footer() {
                   className="mt-2 flex flex-col gap-1.5 overflow-hidden text-sm text-muted-foreground"
                 >
                   <li>Monday – Saturday: 9:00 AM – 6:00 PM IST</li>
-                  <li className="text-primary font-medium">12/7 Technical Support</li>
+                  <li className="text-white font-medium">12/7 Technical Support</li>
                 </motion.ul>
               )}
             </AnimatePresence>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 py-6 text-xs text-muted-foreground md:flex-row">
-          <div className="space-y-1 text-center md:text-left">
-            <p className="text-xs">
+        {/* Bottom Subfooter */}
+        <div className="border-t border-white/5 py-6 text-xs text-muted-foreground">
+          {/* Mobile Layout (< md) */}
+          <div className="flex flex-col items-center justify-between gap-4 text-center md:hidden">
+            <div className="space-y-1">
+              <p className="text-xs">
+                &copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved.
+              </p>
+              <p className="text-xs text-muted-foreground/80">
+                A Group of Narmadha Trader
+              </p>
+            </div>
+            <div className="flex items-center gap-6">
+              <Link to="/privacy" className="transition-colors hover:text-primary">
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="transition-colors hover:text-primary">
+                Terms of Service
+              </Link>
+              <Link to="/admin/login" className="transition-colors hover:text-primary opacity-60 hover:opacity-100">
+                Portal
+              </Link>
+            </div>
+          </div>
+
+          {/* Desktop Layout (md+) */}
+          <div className="hidden md:grid md:grid-cols-3 md:items-center">
+            <p className="text-xs text-left">
               &copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved.
             </p>
-            <p className="text-xs text-muted-foreground/80">
+            <p className="text-xs text-center text-muted-foreground/80">
               A Group of Narmadha Trader
             </p>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link to="/privacy" className="transition-colors hover:text-primary">
-              Privacy Policy
-            </Link>
-            <Link to="/terms" className="transition-colors hover:text-primary">
-              Terms of Service
-            </Link>
-            <Link to="/admin/login" className="transition-colors hover:text-primary opacity-60 hover:opacity-100">
-              Portal
-            </Link>
+            <div className="flex items-center justify-end gap-6">
+              <Link to="/privacy" className="transition-colors hover:text-primary">
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="transition-colors hover:text-primary">
+                Terms of Service
+              </Link>
+              <Link to="/admin/login" className="transition-colors hover:text-primary opacity-60 hover:opacity-100">
+                Portal
+              </Link>
+            </div>
           </div>
         </div>
       </div>
