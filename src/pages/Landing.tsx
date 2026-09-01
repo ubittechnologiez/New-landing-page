@@ -539,15 +539,17 @@ function RevealLine({
   text,
   delay = 0,
   className,
+  innerClassName,
 }: {
   text: string;
   delay?: number;
   className?: string;
+  innerClassName?: string;
 }) {
   return (
     <span className={cn("block overflow-hidden", className)}>
       <motion.span
-        className="block"
+        className={cn("block", innerClassName)}
         initial={{ y: "112%" }}
         animate={{ y: 0 }}
         transition={{ duration: 0.85, ease: EASE, delay }}
@@ -562,10 +564,12 @@ function SectionHeading({
   eyebrow,
   title,
   align = "left",
+  className,
 }: {
   eyebrow: string;
   title: React.ReactNode;
   align?: "left" | "center";
+  className?: string;
 }) {
   return (
     <motion.div
@@ -575,7 +579,8 @@ function SectionHeading({
       viewport={{ once: true, margin: "-60px" }}
       className={cn(
         "mb-12 flex flex-col gap-4 md:mb-16",
-        align === "center" && "items-center text-center"
+        align === "center" && "items-center text-center",
+        className
       )}
     >
       <motion.span
@@ -967,7 +972,7 @@ function Hero() {
         >
           <Badge
             variant="outline"
-            className="gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
+            className="md:-mt-[60px] gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
           >
             <span className="relative flex size-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
@@ -978,7 +983,7 @@ function Hero() {
         </motion.div>
 
         <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
-          <RevealLine text="Powering your" delay={0.15} />
+          <RevealLine text="Powering your" delay={0.15} innerClassName="md:-mt-[16px]" />
           <RevealLine text="Business with" delay={0.27} />
           <RevealLine text="Enterprise" delay={0.39} className="text-primary" />
           <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
@@ -1068,6 +1073,7 @@ function Solutions() {
               <span className="text-primary"> infrastructure solutions</span>
             </>
           }
+          className="md:mb-16 md:-mt-16"
         />
 
         {/* Mobile Swipe Hint */}
