@@ -17,9 +17,10 @@ import {
   Database,
   Layers,
   Sparkles,
+  Building2,
 } from "lucide-react";
 
-export type AdminTab = "overview" | "gallery" | "users" | "quotes" | "settings";
+export type AdminTab = "overview" | "gallery" | "clients" | "users" | "quotes" | "settings";
 
 interface AdminSidebarProps {
   activeTab?: AdminTab;
@@ -29,6 +30,7 @@ interface AdminSidebarProps {
     galleryCount: number;
     quotesCount: number;
     usersCount: number;
+    clientsCount?: number;
   };
   onCloseMobile?: () => void;
 }
@@ -58,6 +60,14 @@ export function AdminSidebar({
       badge: counts.galleryCount > 0 ? `${counts.galleryCount}` : null,
       badgeColor: "bg-primary/20 text-primary border-primary/30",
       desc: "Infrastructure visual assets",
+    },
+    {
+      id: "clients" as AdminTab,
+      label: "Our Clients Logos",
+      icon: Building2,
+      badge: (counts.clientsCount || 0) > 0 ? `${counts.clientsCount}` : null,
+      badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+      desc: "Running banner & logo order",
     },
     {
       id: "users" as AdminTab,

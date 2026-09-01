@@ -41,6 +41,7 @@ import {
   subscribeToUsers,
   subscribeToQuotes,
   subscribeToGallery,
+  subscribeToClients,
   FirestoreGalleryItem,
   INITIAL_SHOWCASE_DATA,
 } from "@/lib/firestore-service";
@@ -49,6 +50,7 @@ import { UserManager } from "@/components/admin/UserManager";
 import { QuoteManager } from "@/components/admin/QuoteManager";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { SystemSettings } from "@/components/admin/SystemSettings";
+import { ClientManager } from "@/components/admin/ClientManager";
 import {
   ArrowDown,
   ArrowUp,
@@ -120,9 +122,10 @@ export default function AdminGalleryPage() {
   // Active Tab state synced with URL
   const determineInitialTab = (): AdminTab => {
     const tabParam = searchParams.get("tab") as AdminTab;
-    if (tabParam && ["overview", "gallery", "users", "quotes", "settings"].includes(tabParam)) {
+    if (tabParam && ["overview", "gallery", "clients", "users", "quotes", "settings"].includes(tabParam)) {
       return tabParam;
     }
+    if (location.pathname.includes("/admin/clients")) return "clients";
     if (location.pathname.includes("/admin/users")) return "users";
     if (location.pathname.includes("/admin/quotes")) return "quotes";
     if (location.pathname.includes("/admin/overview")) return "overview";
@@ -189,7 +192,8 @@ export default function AdminGalleryPage() {
     galleryCount: number;
     quotesCount: number;
     usersCount: number;
-  }>({ galleryCount: 0, quotesCount: 0, usersCount: 3 });
+    clientsCount: number;
+  }>({ galleryCount: 0, quotesCount: 0, usersCount: 3, clientsCount: 12 });
   const [isSeedingFirestore, setIsSeedingFirestore] = useState(false);
 
   const refreshFirestoreStats = async () => {
@@ -241,11 +245,18 @@ export default function AdminGalleryPage() {
       }
     });
 
+    const unsubClients = subscribeToClients((clients) => {
+      if (mounted) {
+        setFirestoreCounts((prev) => ({ ...prev, clientsCount: clients.length || prev.clientsCount }));
+      }
+    });
+
     return () => {
       mounted = false;
       unsubGallery();
       unsubUsers();
       unsubQuotes();
+      unsubClients();
     };
   }, []);
 
@@ -781,6 +792,7 @@ export default function AdminGalleryPage() {
                 galleryCount: totalGalleryCount,
                 quotesCount: totalQuotesCount,
                 usersCount: totalUsersCount,
+                clientsCount: firestoreCounts.clientsCount,
               }}
             />
           </div>
@@ -811,6 +823,7 @@ export default function AdminGalleryPage() {
                   galleryCount: totalGalleryCount,
                   quotesCount: totalQuotesCount,
                   usersCount: totalUsersCount,
+                  clientsCount: firestoreCounts.clientsCount,
                 }}
               />
             </div>
@@ -827,10 +840,14 @@ export default function AdminGalleryPage() {
                 galleryCount: totalGalleryCount,
                 quotesCount: totalQuotesCount,
                 usersCount: totalUsersCount,
+                clientsCount: firestoreCounts.clientsCount,
               }}
               onOpenAddImage={openAddModal}
             />
           )}
+
+          {/* TAB: OUR CLIENTS LOGOS */}
+          {activeTab === "clients" && <ClientManager />}
 
           {/* TAB 2: USER MANAGEMENT */}
           {activeTab === "users" && <UserManager />}

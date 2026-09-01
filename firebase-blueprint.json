@@ -48,6 +48,21 @@
         "status": { "type": "string", "required": false },
         "createdAt": { "type": "timestamp", "required": false }
       }
+    },
+    "clients": {
+      "rules": {
+        "read": "true",
+        "write": "request.auth != null && request.auth.token.email in ['ubittechnologiez@gmail.com', 'md@ubittechnologiez.com', 'admin@ubittechnologiez.com']"
+      },
+      "fields": {
+        "name": { "type": "string", "required": true },
+        "logoUrl": { "type": "string", "required": true },
+        "position": { "type": "number", "required": true },
+        "website": { "type": "string", "required": false },
+        "isActive": { "type": "boolean", "required": false },
+        "createdAt": { "type": "timestamp", "required": false },
+        "updatedAt": { "type": "timestamp", "required": false }
+      }
     }
   }
 }

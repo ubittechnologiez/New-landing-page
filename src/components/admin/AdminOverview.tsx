@@ -17,6 +17,7 @@ import {
   HardDrive,
   Cpu,
   Layers,
+  Building2,
 } from "lucide-react";
 
 interface AdminOverviewProps {
@@ -25,6 +26,7 @@ interface AdminOverviewProps {
     galleryCount: number;
     quotesCount: number;
     usersCount: number;
+    clientsCount?: number;
   };
   onOpenAddImage: () => void;
 }
@@ -47,7 +49,7 @@ export function AdminOverview({
             UBIT Administrator Workspace
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Manage live project showcase assets, enterprise commercial quotations, team administrator permissions, and cloud database persistence.
+            Manage live project showcase assets, corporate client marquee logos & display order, enterprise quotations, and administrator permissions.
           </p>
 
           <div className="flex flex-wrap gap-2.5 pt-2">
@@ -62,11 +64,20 @@ export function AdminOverview({
             <Button
               variant="outline"
               size="sm"
+              onClick={() => onNavigateTab("clients")}
+              className="text-xs h-9"
+            >
+              <Building2 className="size-3.5 mr-1.5 text-amber-400" />
+              Manage Client Logos
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => onNavigateTab("users")}
               className="text-xs h-9"
             >
               <Users className="size-3.5 mr-1.5" />
-              Manage Team Accounts
+              Team Accounts
             </Button>
             <Button
               variant="outline"
@@ -75,7 +86,7 @@ export function AdminOverview({
               className="text-xs h-9"
             >
               <FileText className="size-3.5 mr-1.5" />
-              View Client Quotes
+              Client Quotes
             </Button>
           </div>
         </div>
@@ -85,7 +96,7 @@ export function AdminOverview({
       </div>
 
       {/* Primary KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Gallery Card */}
         <div
           onClick={() => onNavigateTab("gallery")}
@@ -112,6 +123,35 @@ export function AdminOverview({
           </div>
           <p className="text-[11px] text-muted-foreground mt-2">
             Server racks, cybersecurity firewalls, and enterprise hardware.
+          </p>
+        </div>
+
+        {/* Client Logos Card */}
+        <div
+          onClick={() => onNavigateTab("clients")}
+          className="group cursor-pointer rounded-xl border border-border/70 bg-card/60 p-5 shadow-sm hover:border-amber-500/50 hover:bg-card/90 transition-all backdrop-blur-sm"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Client Logos
+            </span>
+            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
+              <Building2 className="size-5" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline justify-between">
+            <div>
+              <span className="text-3xl font-extrabold text-foreground tracking-tight">
+                {counts.clientsCount || 12}
+              </span>
+              <span className="text-xs text-muted-foreground ml-2">running live</span>
+            </div>
+            <span className="text-xs text-amber-400 font-medium flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+              Marquee <ArrowUpRight className="size-3" />
+            </span>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-2">
+            Instant banner logo upload & 1st, 2nd, 3rd position reordering.
           </p>
         </div>
 
@@ -165,7 +205,7 @@ export function AdminOverview({
               <span className="text-xs text-muted-foreground ml-2">leads logged</span>
             </div>
             <span className="text-xs text-emerald-400 font-medium flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-              View Pipeline <ArrowUpRight className="size-3" />
+              Pipeline <ArrowUpRight className="size-3" />
             </span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-2">

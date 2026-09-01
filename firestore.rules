@@ -12,6 +12,11 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // Allow read & write for client logos
+    match /clients/{clientId} {
+      allow read, write: if true;
+    }
+
     // Allow read & write for users
     match /users/{userId} {
       allow read, write: if true;
