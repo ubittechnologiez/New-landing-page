@@ -1767,8 +1767,8 @@ function Footer() {
         <div className="hidden md:grid gap-12 py-16 md:grid-cols-4 md:gap-8 lg:gap-12 md:max-w-7xl mx-auto items-start">
           {/* brand */}
           <div className="md:col-span-1 flex flex-col items-start text-left">
-            <BrandLockup />
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-left max-w-xs">
+            <BrandLockup className="md:pl-2 md:pr-1 md:mr-0 md:-mb-[11px]" />
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-center max-w-xs">
               Enterprise IT infrastructure solutions provider based in Salem,
               Tamil Nadu. Delivering across South India.
             </p>
