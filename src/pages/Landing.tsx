@@ -1179,7 +1179,7 @@ function WebDevelopment() {
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
-          eyebrow="Software & Digital Solutions"
+          eyebrow="Digital Solutions"
           title={
             <>
               Custom web, portal &{" "}
@@ -1288,7 +1288,7 @@ function Analytics() {
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
-          eyebrow="What we also offer"
+          eyebrow="Software Solutions"
           title={
             <>
               Financial analytics
@@ -1306,52 +1306,47 @@ function Analytics() {
           </span>
         </div>
 
-        <div className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-0 md:mx-0 md:px-0 md:pb-0">
-          {ANALYTICS.map((item, i) => (
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-40px" }}
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 md:gap-5 md:mx-0 md:px-0 md:pb-0"
+        >
+          {ANALYTICS.map((item) => (
             <motion.div
               key={item.title}
-              variants={stagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-40px" }}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-center rounded-2xl border border-white/8 bg-card/50 p-6 md:w-auto md:max-w-none md:shrink md:rounded-none md:border-0 md:bg-transparent md:p-0 group flex flex-col justify-between"
+              variants={scaleUp}
+              className="w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col"
             >
-              <motion.div
-                variants={fadeUp}
-                className="flex items-start gap-4 md:gap-5 md:border-b md:border-white/6 md:py-8 transition-colors duration-300 md:hover:bg-white/[0.03] md:px-4 flex-1 flex flex-col md:flex-row justify-between w-full"
-              >
-                <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:-translate-y-1 group-hover:bg-primary group-hover:text-primary-foreground">
-                  <item.icon className="size-5" />
-                </div>
-                <div className="flex-1 flex flex-col justify-between w-full">
-                  <div>
-                    <div className="flex items-center justify-between gap-4">
-                      <h3 className="font-display text-lg md:text-xl lg:text-2xl font-semibold tracking-tight">
-                        {item.title}
-                      </h3>
-                      <span className="font-mono text-xs text-muted-foreground/60">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                    <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+              <SpotlightCard className="h-full rounded-2xl border border-white/8 bg-card/50 p-6 md:p-7 backdrop-blur-sm transition-colors duration-300 hover:border-primary/30 flex flex-col justify-start">
+                <div className="flex items-start gap-4 md:gap-5 flex-1">
+                  <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/[0.04] border border-white/6 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                    <item.icon className="size-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-display text-lg font-bold tracking-tight text-white">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {item.copy}
                     </p>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2 pt-1">
-                    {item.chips.map((chip) => (
-                      <span
-                        key={chip}
-                        className="rounded-full border border-white/6 bg-white/[0.03] px-3 py-1 text-xs text-muted-foreground"
-                      >
-                        {chip}
-                      </span>
-                    ))}
+                    <div className="mt-4 flex flex-wrap gap-2 pt-1">
+                      {item.chips.map((chip) => (
+                        <span
+                          key={chip}
+                          className="rounded-full border border-white/6 bg-white/[0.03] px-3 py-1 text-xs text-muted-foreground"
+                        >
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </motion.div>
+              </SpotlightCard>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
