@@ -962,7 +962,7 @@ function Hero() {
 
       <motion.div
         style={{ y: contentY, opacity: contentOpacity }}
-        className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-32 md:px-8"
+        className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-32 md:pb-[120px] md:mt-0 md:px-8"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1036,7 +1036,7 @@ function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9 }}
-          className="mt-20 grid grid-cols-2 gap-4 sm:grid-cols-4"
+          className="mt-20 md:mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4"
         >
           {STATS.map((stat) => (
             <div
@@ -1062,7 +1062,7 @@ function Solutions() {
   return (
     <section
       id="solutions"
-      className="relative border-t border-white/5 py-14 md:py-36"
+      className="relative border-t border-white/5 py-14 md:pt-36 md:pb-[72px]"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1175,7 +1175,7 @@ function WebDevelopment() {
   return (
     <section
       id="web-dev"
-      className="relative border-t border-white/5 bg-white/[0.015] py-14 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.015] py-14 md:pt-36 md:pb-24"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1186,6 +1186,7 @@ function WebDevelopment() {
               <span className="text-primary">application development</span>
             </>
           }
+          className="md:-mt-[60px]"
         />
 
         <motion.p
@@ -1283,7 +1284,7 @@ function Analytics() {
   return (
     <section
       id="analytics"
-      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:pt-36 md:pb-[98px]"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1294,6 +1295,7 @@ function Analytics() {
               <span className="text-primary"> & ERP services</span>
             </>
           }
+          className="md:-mt-[60px]"
         />
 
         {/* Mobile Swipe Hint */}
@@ -1359,7 +1361,7 @@ function WhyUs() {
   return (
     <section
       id="why"
-      className="relative border-t border-white/5 py-14 md:py-36"
+      className="relative border-t border-white/5 py-14 md:pt-36 md:pb-24"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
@@ -1369,6 +1371,7 @@ function WhyUs() {
               The <span className="text-primary">UBIT advantage</span>
             </>
           }
+          className="md:-mt-[60px]"
         />
 
         {/* Mobile Swipe Hint */}
@@ -1419,10 +1422,10 @@ function About() {
   return (
     <section
       id="about"
-      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:py-36"
+      className="relative border-t border-white/5 bg-white/[0.02] py-14 md:pt-36 md:pb-[73px]"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <div className="grid gap-10 md:gap-16 lg:grid-cols-2 lg:gap-20">
+        <div className="grid gap-10 md:gap-16 lg:grid-cols-2 lg:gap-20 md:-mt-[60px]">
           <div>
             <SectionHeading
               eyebrow="About us"
@@ -1570,9 +1573,9 @@ function Contact() {
   return (
     <section
       id="contact"
-      className="relative border-t border-white/5 py-14 md:py-36"
+      className="relative border-t border-white/5 py-14 md:pt-36 md:pb-[98px]"
     >
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 md:-mt-[60px]">
         <SectionHeading
           eyebrow="Get in touch"
           title={
@@ -1662,7 +1665,7 @@ function Cta() {
         UBIT
       </motion.span>
       <div className="absolute left-1/2 top-1/2 h-[26rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[140px]" />
-      <div className="relative mx-auto flex max-w-4xl flex-col items-center px-5 text-center">
+      <div className="relative mx-auto flex max-w-4xl flex-col items-center px-5 text-center md:-mt-[60px]">
         <motion.span
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1825,7 +1828,7 @@ function Footer() {
           </div>
 
           {/* hours */}
-          <div>
+          <div className="md:pl-[23px]">
             <h4 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-foreground">
               Business Hours
             </h4>
