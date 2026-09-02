@@ -792,7 +792,7 @@ function Nav() {
           : "bg-transparent"
       )}
     >
-      <nav className="mx-auto flex h-16 max-w-7xl md:max-w-[1440px] items-center justify-between px-5 md:h-20 md:px-8">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
         <a href="#top" className="flex items-center gap-3">
           <BrandLockup />
         </a>
@@ -926,7 +926,7 @@ function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden"
+      className="relative flex min-h-screen md:min-h-0 md:h-auto flex-col justify-center md:justify-start overflow-hidden"
     >
       <div ref={ref} className="absolute inset-0">
         <motion.div
@@ -963,7 +963,7 @@ function Hero() {
 
       <motion.div
         style={{ y: contentY, opacity: contentOpacity }}
-        className="relative mx-auto w-full max-w-7xl md:max-w-[1440px] px-5 pt-20 pb-16 md:pt-32 md:pb-[120px] md:mt-0 md:px-8"
+        className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-28 md:pb-16 md:mt-0 md:px-8"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -973,7 +973,7 @@ function Hero() {
         >
           <Badge
             variant="outline"
-            className="md:-mt-[60px] gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
+            className="md:-mt-[28px] gap-2 rounded-full border-white/10 bg-card/50 px-3 py-1 backdrop-blur-sm"
           >
             <span className="relative flex size-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
@@ -1037,7 +1037,7 @@ function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9 }}
-          className="mt-20 md:mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 md:max-w-7xl mx-auto"
+          className="mt-20 md:mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 w-full"
         >
           {STATS.map((stat) => (
             <div
@@ -1065,7 +1065,7 @@ function Solutions() {
       id="solutions"
       className="relative border-t border-white/5 py-14 md:pt-36 md:pb-[72px]"
     >
-      <div className="mx-auto max-w-7xl md:max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
           eyebrow="What we offer"
           title={
@@ -1090,7 +1090,7 @@ function Solutions() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 md:max-w-7xl mx-auto"
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 w-full"
         >
           {SOLUTIONS.map((solution) => (
             <motion.div
@@ -1131,7 +1131,7 @@ function Solutions() {
         </motion.div>
 
         {/* Integrated OEM & Authorized Technology Brands */}
-        <div className="mt-14 md:mt-20 pt-10 md:pt-16 border-t border-white/6 md:max-w-7xl mx-auto">
+        <div className="mt-14 md:mt-20 pt-10 md:pt-16 border-t border-white/6 w-full">
           <div className="max-w-2xl mb-6 md:mb-8 flex flex-col gap-3 md:gap-3.5">
             <span className="text-xs font-mono font-semibold uppercase tracking-[0.25em] text-primary block">
               Authorized OEM Partners
@@ -1178,7 +1178,7 @@ function WebDevelopment() {
       id="web-dev"
       className="relative border-t border-white/5 bg-white/[0.015] py-14 md:pt-36 md:pb-24"
     >
-      <div className="mx-auto max-w-7xl md:max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
           eyebrow="Digital Solutions"
           title={
@@ -1213,7 +1213,7 @@ function WebDevelopment() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 md:max-w-7xl mx-auto"
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 w-full"
         >
           {WEB_DEV.map((item, index) => (
             <motion.div
@@ -1259,7 +1259,7 @@ function WebDevelopment() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="mt-8 md:mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-primary/20 bg-primary/5 p-6 md:p-8 backdrop-blur-sm sm:flex-row md:max-w-7xl mx-auto"
+          className="mt-8 md:mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-primary/20 bg-primary/5 p-6 md:p-8 backdrop-blur-sm sm:flex-row w-full"
         >
           <div className="space-y-1 text-center sm:text-left">
             <h4 className="font-display text-lg font-bold text-foreground">
@@ -1287,7 +1287,7 @@ function Analytics() {
       id="analytics"
       className="relative border-t border-white/5 bg-white/[0.02] py-14 md:pt-36 md:pb-[98px]"
     >
-      <div className="mx-auto max-w-7xl md:max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
           eyebrow="Software Solutions"
           title={
@@ -1312,7 +1312,7 @@ function Analytics() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 md:gap-5 md:mx-0 md:px-0 md:pb-0 md:max-w-7xl mx-auto"
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 md:gap-5 md:mx-0 md:px-0 md:pb-0 w-full"
         >
           {ANALYTICS.map((item) => (
             <motion.div
@@ -1359,7 +1359,7 @@ function WhyUs() {
       id="why"
       className="relative border-t border-white/5 py-14 md:pt-36 md:pb-24"
     >
-      <div className="mx-auto max-w-7xl md:max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
           eyebrow="Why choose us"
           title={
@@ -1383,7 +1383,7 @@ function WhyUs() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-40px" }}
-          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 md:max-w-7xl mx-auto"
+          className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 w-full"
         >
           {WHY.map((item) => (
             <motion.div
@@ -1420,8 +1420,8 @@ function About() {
       id="about"
       className="relative border-t border-white/5 bg-white/[0.02] py-14 md:pt-36 md:pb-[73px]"
     >
-      <div className="mx-auto max-w-7xl md:max-w-[1440px] px-5 md:px-8">
-        <div className="grid gap-10 md:gap-16 lg:grid-cols-2 lg:gap-20 md:-mt-[60px] md:max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <div className="grid gap-10 md:gap-16 lg:grid-cols-2 lg:gap-20 md:-mt-[60px] w-full">
           <div>
             <SectionHeading
               eyebrow="About us"
@@ -1571,7 +1571,7 @@ function Contact() {
       id="contact"
       className="relative border-t border-white/5 py-14 md:pt-36 md:pb-[98px]"
     >
-      <div className="mx-auto max-w-7xl md:max-w-[1440px] px-5 md:px-8 md:-mt-[60px]">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 md:-mt-[60px]">
         <SectionHeading
           eyebrow="Get in touch"
           title={
@@ -1601,7 +1601,7 @@ function Contact() {
           </span>
         </div>
 
-        <div className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 md:max-w-7xl mx-auto">
+        <div className="flex items-stretch overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 scrollbar-none md:grid md:grid-cols-3 md:gap-5 md:mx-0 md:px-0 md:pb-0 w-full">
           {CONTACT_CARDS.map((card) => (
             <motion.a
               key={card.title}
@@ -1762,20 +1762,20 @@ function Footer() {
         </motion.div>
       </div>
 
-      <div className="mx-auto max-w-7xl md:max-w-[1440px] px-5 md:px-8">
-        {/* Desktop Footer View (Unchanged) */}
-        <div className="hidden md:grid gap-12 py-16 md:grid-cols-4 md:gap-8 lg:gap-12 md:max-w-7xl mx-auto items-start">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        {/* Desktop Footer View */}
+        <div className="hidden md:grid gap-12 py-16 md:grid-cols-4 md:gap-8 lg:gap-12 w-full md:ml-[33px] items-start">
           {/* brand */}
           <div className="md:col-span-1 flex flex-col items-start text-left">
             <BrandLockup className="md:pl-2 md:pr-1 md:mr-0 md:-mb-[11px]" />
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-center max-w-xs">
+            <p className="mt-4 md:mt-[12px] md:ml-[13px] text-sm leading-relaxed text-muted-foreground text-left md:text-center max-w-xs">
               Enterprise IT infrastructure solutions provider based in Salem,
               Tamil Nadu. Delivering across South India.
             </p>
           </div>
 
           {/* nav */}
-          <div className="flex flex-col items-start md:pl-6 lg:pl-10">
+          <div className="flex flex-col items-start md:pl-6 lg:pl-10 md:ml-[21px]">
             <h4 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-foreground">
               Navigation
             </h4>
@@ -1803,7 +1803,7 @@ function Footer() {
           </div>
 
           {/* contact */}
-          <div className="flex flex-col items-start md:pl-2 lg:pl-4">
+          <div className="flex flex-col items-start md:pl-2 lg:pl-4 md:mr-0 md:-ml-[40px]">
             <h4 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-foreground">
               Contact
             </h4>
@@ -1983,7 +1983,7 @@ function Footer() {
           </div>
 
           {/* Desktop Layout (md+) */}
-          <div className="hidden md:grid md:grid-cols-3 md:items-center md:max-w-7xl mx-auto">
+          <div className="hidden md:grid md:grid-cols-3 md:items-center w-full">
             <p className="text-xs text-left">
               &copy; {new Date().getFullYear()} UBIT Technologiez. All rights reserved.
             </p>
