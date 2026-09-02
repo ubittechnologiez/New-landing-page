@@ -57,49 +57,49 @@ import { cn } from "@/lib/utils";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-// Enhanced stagger variants with different speeds
+// Snappy stagger variants for instant, responsive page rendering
 const stagger: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.11, delayChildren: 0.05 } },
+  show: { transition: { staggerChildren: 0.04, delayChildren: 0.01 } },
 };
 
 const staggerFast: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.06, delayChildren: 0.02 } },
+  show: { transition: { staggerChildren: 0.025, delayChildren: 0.005 } },
 };
 
 const staggerSlow: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.18, delayChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.06, delayChildren: 0.02 } },
 };
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE } },
 };
 
 // Character reveal animation variants
 const charReveal: Variants = {
-  hidden: { opacity: 0, y: 20, rotateX: -40 },
-  show: { opacity: 1, y: 0, rotateX: 0, transition: { duration: 0.5, ease: EASE } },
+  hidden: { opacity: 0, y: 12, rotateX: -20 },
+  show: { opacity: 1, y: 0, rotateX: 0, transition: { duration: 0.25, ease: EASE } },
 };
 
 // Scale up reveal for cards
 const scaleUp: Variants = {
-  hidden: { opacity: 0, scale: 0.92, y: 20 },
-  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+  hidden: { opacity: 0, scale: 0.96, y: 12 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3, ease: EASE } },
 };
 
 // Slide in from left
 const slideInLeft: Variants = {
-  hidden: { opacity: 0, x: -40 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.7, ease: EASE } },
+  hidden: { opacity: 0, x: -20 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.32, ease: EASE } },
 };
 
 // Slide in from right
 const slideInRight: Variants = {
-  hidden: { opacity: 0, x: 40 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.7, ease: EASE } },
+  hidden: { opacity: 0, x: 20 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.32, ease: EASE } },
 };
 
 /* ---------------------------------- data ---------------------------------- */
@@ -405,7 +405,7 @@ function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
   useEffect(() => {
     if (!inView) return;
     const controls = animate(motionValue, value, {
-      duration: 1.8,
+      duration: 0.75,
       ease: EASE,
       onUpdate: (latest) => setDisplay(Math.round(latest).toString()),
     });
@@ -553,7 +553,7 @@ function RevealLine({
         className={cn("block", innerClassName)}
         initial={{ y: "112%" }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.85, ease: EASE, delay }}
+        transition={{ duration: 0.38, ease: EASE, delay }}
       >
         {text}
       </motion.span>
@@ -650,7 +650,7 @@ function CharReveal({
   delay?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const inView = useInView(ref, { once: true, margin: "-40px" });
   const chars = text.split("");
 
   return (
@@ -658,11 +658,11 @@ function CharReveal({
       {chars.map((char, i) => (
         <motion.span
           key={`${char}-${i}`}
-          initial={{ opacity: 0, y: 15, rotateX: -50 }}
-          animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 15, rotateX: -50 }}
+          initial={{ opacity: 0, y: 12, rotateX: -30 }}
+          animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 12, rotateX: -30 }}
           transition={{
-            duration: 0.4,
-            delay: delay + i * 0.03,
+            duration: 0.25,
+            delay: delay + i * 0.012,
             ease: EASE,
           }}
           className="inline-block"
@@ -966,9 +966,9 @@ function Hero() {
         className="relative mx-auto w-full max-w-7xl px-5 pt-20 pb-16 md:pt-28 md:pb-16 md:mt-0 md:px-8"
       >
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: 0.35, ease: EASE, delay: 0 }}
           className="mb-8 flex items-center gap-3"
         >
           <Badge
@@ -984,15 +984,15 @@ function Hero() {
         </motion.div>
 
         <h1 className="font-display text-[clamp(2.2rem,8.5vw,6rem)] font-bold leading-[1.10] tracking-tight">
-          <RevealLine text="Powering your" delay={0.15} innerClassName="md:-mt-[16px]" />
-          <RevealLine text="Business with" delay={0.27} />
-          <RevealLine text="Enterprise" delay={0.39} className="text-primary" />
+          <RevealLine text="Powering your" delay={0.03} innerClassName="md:-mt-[16px]" />
+          <RevealLine text="Business with" delay={0.07} />
+          <RevealLine text="Enterprise" delay={0.11} className="text-primary" />
           <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
             <motion.span
               className="block"
               initial={{ y: "112%" }}
               animate={{ y: 0 }}
-              transition={{ duration: 0.85, ease: EASE, delay: 0.51 }}
+              transition={{ duration: 0.38, ease: EASE, delay: 0.15 }}
             >
               <RotatingWord words={ROTATING_WORDS} />
             </motion.span>
@@ -1000,9 +1000,9 @@ function Hero() {
         </h1>
 
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.55 }}
+          transition={{ duration: 0.35, ease: EASE, delay: 0.18 }}
           className="mt-10 flex max-w-xl flex-col gap-8"
         >
           <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -1034,9 +1034,9 @@ function Hero() {
 
 
         <motion.dl
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
+          transition={{ duration: 0.35, delay: 0.22 }}
           className="mt-20 md:mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 w-full"
         >
           {STATS.map((stat) => (
@@ -1663,29 +1663,29 @@ function Cta() {
       <div className="absolute left-1/2 top-1/2 h-[26rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[140px]" />
       <div className="relative mx-auto flex max-w-4xl flex-col items-center px-5 text-center md:-mt-[60px]">
         <motion.span
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: EASE }}
+          transition={{ duration: 0.3, ease: EASE }}
           className="font-mono text-xs uppercase tracking-[0.3em] text-primary/90"
         >
           Free consultation · Customized quotation
         </motion.span>
         <motion.h2
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: 0.35, ease: EASE, delay: 0.05 }}
           className="mt-6 font-display text-[clamp(2.4rem,7vw,6rem)] font-bold leading-[1.10] tracking-tight"
         >
           Ready to upgrade your
           <span className="block text-primary">infrastructure</span>
         </motion.h2>
         <motion.p
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.2 }}
+          transition={{ duration: 0.35, ease: EASE, delay: 0.1 }}
           className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
         >
           Tell us what your business needs — servers, security, networking or analytics,
@@ -1693,10 +1693,10 @@ function Cta() {
           {" "}and we'll come back with a tailored quote within 24 hours.
         </motion.p>
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
+          transition={{ duration: 0.35, ease: EASE, delay: 0.15 }}
           className="mt-8 md:mt-10 flex flex-wrap items-center justify-center gap-4"
         >
           <Magnetic>

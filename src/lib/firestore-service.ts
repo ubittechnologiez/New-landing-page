@@ -861,6 +861,8 @@ export async function reorderClientLogosInFirestore(
 
 // ---------------- Global Banner Settings Services ---------------- //
 
+export const BANNER_SETTINGS_STORAGE_KEY = "ubit_clients_banner_settings";
+
 export const DEFAULT_BANNER_SETTINGS: FirestoreBannerSettings = {
   logoHeight: 48,
   globalScale: 100,
@@ -868,40 +870,106 @@ export const DEFAULT_BANNER_SETTINGS: FirestoreBannerSettings = {
   gap: 32,
 };
 
+export function getCachedBannerSettings(): FirestoreBannerSettings {
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem(BANNER_SETTINGS_STORAGE_KEY) : null;
+    if (raw) {
+      return {
+        ...DEFAULT_BANNER_SETTINGS,
+        ...JSON.parse(raw),
+      };
+    }
+  } catch (err) {
+    console.debug("Cached banner settings parse fallback:", err);
+  }
+  return DEFAULT_BANNER_SETTINGS;
+}
+
 export function subscribeToBannerSettings(
   onUpdate: (settings: FirestoreBannerSettings) => void,
   onError?: (err: Error) => void,
 ) {
+  // 1. Immediately emit cached settings if present
+  const initial = getCachedBannerSettings();
+  onUpdate(initial);
+
+  // 2. Listen to custom window event for zero-latency local updates
+  const handleLocalUpdate = (e: any) => {
+    if (e.detail) {
+      onUpdate({
+        ...DEFAULT_BANNER_SETTINGS,
+        ...e.detail,
+      });
+    }
+  };
+  if (typeof window !== "undefined") {
+    window.addEventListener("ubit_banner_settings_updated", handleLocalUpdate);
+  }
+
+  // 3. Listen to Firestore real-time snapshot
   const settingsDoc = doc(db, "settings", "clients_banner");
 
-  return onSnapshot(
+  const unsubscribe = onSnapshot(
     settingsDoc,
     (snapshot) => {
       if (snapshot.exists()) {
-        onUpdate({
+        const data = snapshot.data() as FirestoreBannerSettings;
+        const merged: FirestoreBannerSettings = {
           ...DEFAULT_BANNER_SETTINGS,
-          ...(snapshot.data() as FirestoreBannerSettings),
-        });
+          ...data,
+        };
+        try {
+          localStorage.setItem(BANNER_SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+        } catch (err) {
+          console.debug("Failed to cache banner settings:", err);
+        }
+        onUpdate(merged);
       } else {
         onUpdate(DEFAULT_BANNER_SETTINGS);
       }
     },
     (err) => {
       console.warn("Banner settings subscription note:", err.message);
-      onUpdate(DEFAULT_BANNER_SETTINGS);
+      onUpdate(getCachedBannerSettings());
       if (onError) onError(err);
     },
   );
+
+  return () => {
+    if (typeof window !== "undefined") {
+      window.removeEventListener("ubit_banner_settings_updated", handleLocalUpdate);
+    }
+    unsubscribe();
+  };
 }
 
 export async function updateBannerSettingsInFirestore(
   settings: Partial<FirestoreBannerSettings>,
 ) {
+  const current = getCachedBannerSettings();
+  const merged: FirestoreBannerSettings = {
+    ...current,
+    ...settings,
+  };
+
+  // 1. Instantly update localStorage and broadcast locally
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(BANNER_SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+      window.dispatchEvent(
+        new CustomEvent("ubit_banner_settings_updated", { detail: merged })
+      );
+    } catch (err) {
+      console.debug("Failed to broadcast local banner update:", err);
+    }
+  }
+
+  // 2. Persist to Firestore
   const settingsDoc = doc(db, "settings", "clients_banner");
   await setDoc(
     settingsDoc,
     {
-      ...settings,
+      ...merged,
       updatedAt: serverTimestamp(),
     },
     { merge: true },

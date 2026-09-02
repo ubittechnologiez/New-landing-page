@@ -10,6 +10,7 @@ import {
   FirestoreClientLogo,
   FirestoreBannerSettings,
   DEFAULT_BANNER_SETTINGS,
+  getCachedBannerSettings,
   INITIAL_CLIENTS_DATA,
 } from "@/lib/firestore-service";
 import { processImageFile } from "@/lib/image-utils";
@@ -63,10 +64,10 @@ export function ClientManager() {
   const [selectedClient, setSelectedClient] = useState<FirestoreClientLogo | null>(null);
 
   // Banner preview sizing & speed controls
-  const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(DEFAULT_BANNER_SETTINGS);
-  const [previewLogoHeight, setPreviewLogoHeight] = useState<number>(48);
-  const [previewGap, setPreviewGap] = useState<number>(32);
-  const [previewSpeed, setPreviewSpeed] = useState<"slow" | "normal" | "fast">("normal");
+  const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(() => getCachedBannerSettings());
+  const [previewLogoHeight, setPreviewLogoHeight] = useState<number>(() => getCachedBannerSettings().logoHeight || 48);
+  const [previewGap, setPreviewGap] = useState<number>(() => getCachedBannerSettings().gap || 32);
+  const [previewSpeed, setPreviewSpeed] = useState<"slow" | "normal" | "fast">(() => getCachedBannerSettings().speed || "normal");
   const [showResizingControls, setShowResizingControls] = useState(true);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -362,11 +363,20 @@ export function ClientManager() {
     }
   };
 
-  const handleResetBannerSettings = () => {
+  const handleResetBannerSettings = async () => {
     setPreviewLogoHeight(48);
     setPreviewGap(32);
     setPreviewSpeed("normal");
-    toast.info("Reset preview sizing to standard 48px height");
+    try {
+      await updateBannerSettingsInFirestore({
+        logoHeight: 48,
+        gap: 32,
+        speed: "normal",
+      });
+      toast.success("Reset and saved default sizing to live banner");
+    } catch {
+      toast.info("Reset preview sizing to standard 48px height");
+    }
   };
 
   const filteredClients = clients.filter((c) =>
@@ -534,9 +544,9 @@ export function ClientManager() {
 
                 <input
                   type="range"
-                  min="16"
-                  max="64"
-                  step="4"
+                  min="32"
+                  max="120"
+                  step="2"
                   value={previewGap}
                   onChange={(e) => setPreviewGap(Number(e.target.value))}
                   className="w-full accent-primary h-1.5 bg-muted rounded-lg cursor-pointer"
@@ -544,10 +554,10 @@ export function ClientManager() {
 
                 <div className="flex items-center justify-between gap-1 pt-0.5">
                   {[
-                    { label: "Tight", val: 16 },
-                    { label: "Balanced", val: 32 },
-                    { label: "Relaxed", val: 48 },
-                    { label: "Spacious", val: 64 },
+                    { label: "Compact", val: 48 },
+                    { label: "Standard", val: 64 },
+                    { label: "Wide", val: 84 },
+                    { label: "XL Wide", val: 104 },
                   ].map((preset) => (
                     <button
                       key={preset.label}
@@ -610,7 +620,7 @@ export function ClientManager() {
               return (
                 <div
                   key={`preview-${client.id || client.name}-${idx}`}
-                  style={{ marginLeft: `${previewGap}px`, marginRight: `${previewGap}px` }}
+                  style={{ marginLeft: `${Math.round(previewGap / 2)}px`, marginRight: `${Math.round(previewGap / 2)}px` }}
                   className="flex items-center justify-center shrink-0 group relative transition-all"
                   title={`${client.name} (Scale: ${Math.round(clientScale * 100)}%)`}
                 >

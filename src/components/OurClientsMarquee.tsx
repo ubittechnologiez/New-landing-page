@@ -5,12 +5,18 @@ import {
   FirestoreClientLogo,
   FirestoreBannerSettings,
   DEFAULT_BANNER_SETTINGS,
+  getCachedBannerSettings,
   INITIAL_CLIENTS_DATA,
 } from "@/lib/firestore-service";
 
 export function OurClientsMarquee() {
-  const [clients, setClients] = useState<FirestoreClientLogo[]>([]);
-  const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(DEFAULT_BANNER_SETTINGS);
+  const [clients, setClients] = useState<FirestoreClientLogo[]>(() =>
+    INITIAL_CLIENTS_DATA.map((c, i) => ({
+      id: `fallback-${i}`,
+      ...c,
+    }))
+  );
+  const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(() => getCachedBannerSettings());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,21 +79,27 @@ export function OurClientsMarquee() {
   const getSpeedDuration = () => {
     switch (bannerSettings.speed) {
       case "slow":
-        return "50s";
+        return "45s";
       case "fast":
-        return "18s";
+        return "16s";
       default:
-        return "30s";
+        return "28s";
     }
   };
+
+  const baseHeight = bannerSettings.logoHeight || 48;
+  const logoGap = bannerSettings.gap || 32;
 
   return (
     <section
       id="clients"
-      className="relative overflow-hidden border-y border-white/5 bg-background/60 h-[150px] md:h-[203px] py-2 md:py-8 select-none flex flex-col justify-center"
+      className="relative overflow-hidden border-y border-white/5 bg-background/60 py-5 sm:py-6 md:py-8 select-none flex flex-col justify-center transition-all duration-300"
+      style={{
+        minHeight: `${Math.max(130, baseHeight + 75)}px`,
+      }}
     >
       {/* Title only: "OUR CLIENTS" */}
-      <div className="mx-auto max-w-7xl px-5 md:px-8 -mt-8 sm:-mt-10 md:-mt-4 mb-2 md:mb-5 pt-0 text-center">
+      <div className="mx-auto max-w-7xl px-5 md:px-8 mb-3 md:mb-5 pt-0 text-center">
         <span className="inline-block text-xs md:text-sm font-mono font-semibold uppercase tracking-[0.28em] text-primary">
           Our Clients
         </span>
@@ -107,7 +119,7 @@ export function OurClientsMarquee() {
 
         {/* Marquee Track with Raw Large Logos */}
         <div
-          className="flex w-max items-center ubit-marquee py-3 h-[77px] md:h-auto"
+          className="flex w-max items-center ubit-marquee py-2"
           style={{ animationDuration: getSpeedDuration() }}
         >
           {duplicatedList.map((client, idx) => {
@@ -115,7 +127,11 @@ export function OurClientsMarquee() {
             return (
               <div
                 key={`${client.id || client.name}-${idx}`}
-                className="mx-6 sm:mx-8 md:mx-12 lg:mx-14 flex items-center justify-center shrink-0 group transition-all duration-300"
+                style={{
+                  marginLeft: `${Math.round(logoGap / 2)}px`,
+                  marginRight: `${Math.round(logoGap / 2)}px`,
+                }}
+                className="flex items-center justify-center shrink-0 group transition-all duration-300"
               >
                 <img
                   src={client.logoUrl}
@@ -123,10 +139,11 @@ export function OurClientsMarquee() {
                   loading="lazy"
                   draggable={false}
                   style={{
+                    height: `${baseHeight}px`,
                     transform: `scale(${logoScale})`,
                     transformOrigin: "center center",
                   }}
-                  className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto max-w-[180px] sm:max-w-[220px] md:max-w-[260px] object-contain transition-all duration-300 opacity-85 group-hover:opacity-100 group-hover:scale-110 group-hover:brightness-110 filter drop-shadow-sm"
+                  className="w-auto max-w-[200px] sm:max-w-[240px] md:max-w-[280px] object-contain transition-all duration-300 opacity-85 group-hover:opacity-100 group-hover:scale-110 group-hover:brightness-110 filter drop-shadow-sm"
                   onError={(e) => {
                     // Fallback to stylized bold text logo if image fails
                     const target = e.target as HTMLImageElement;

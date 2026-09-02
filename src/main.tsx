@@ -8,9 +8,9 @@ import React, { StrictMode, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
+import Landing from "./pages/Landing.tsx";
 
-// Lazy load route components for better code splitting
-const Landing = lazy(() => import("./pages/Landing.tsx"));
+// Lazy load secondary route components for better code splitting
 const QuotePage = lazy(() => import("./pages/Quote.tsx"));
 const GalleryPage = lazy(() => import("./pages/Gallery.tsx"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin.tsx"));
