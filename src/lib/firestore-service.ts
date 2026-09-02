@@ -47,7 +47,16 @@ export interface FirestoreClientLogo {
   website?: string;
   isActive?: boolean;
   industry?: string;
+  scale?: number; // Visual scale multiplier, e.g., 0.6 to 1.8 (default 1.0 = 100%)
   createdAt?: any;
+  updatedAt?: any;
+}
+
+export interface FirestoreBannerSettings {
+  logoHeight?: number; // Base height in px (e.g., 36, 48, 60, 72)
+  globalScale?: number; // Global scale percentage (e.g. 100)
+  speed?: "slow" | "normal" | "fast";
+  gap?: number; // px gap between items (e.g., 24, 32, 48, 64)
   updatedAt?: any;
 }
 
@@ -794,6 +803,7 @@ export async function addClientLogoToFirestore(client: {
   website?: string;
   isActive?: boolean;
   industry?: string;
+  scale?: number;
 }) {
   const clientsRef = collection(db, "clients");
   
@@ -810,6 +820,7 @@ export async function addClientLogoToFirestore(client: {
 
   const docRef = await addDoc(clientsRef, {
     ...client,
+    scale: client.scale ?? 1,
     position: targetPosition,
     isActive: client.isActive ?? true,
     createdAt: serverTimestamp(),
@@ -846,4 +857,53 @@ export async function reorderClientLogosInFirestore(
       });
     }
   }
+}
+
+// ---------------- Global Banner Settings Services ---------------- //
+
+export const DEFAULT_BANNER_SETTINGS: FirestoreBannerSettings = {
+  logoHeight: 48,
+  globalScale: 100,
+  speed: "normal",
+  gap: 32,
+};
+
+export function subscribeToBannerSettings(
+  onUpdate: (settings: FirestoreBannerSettings) => void,
+  onError?: (err: Error) => void,
+) {
+  const settingsDoc = doc(db, "settings", "clients_banner");
+
+  return onSnapshot(
+    settingsDoc,
+    (snapshot) => {
+      if (snapshot.exists()) {
+        onUpdate({
+          ...DEFAULT_BANNER_SETTINGS,
+          ...(snapshot.data() as FirestoreBannerSettings),
+        });
+      } else {
+        onUpdate(DEFAULT_BANNER_SETTINGS);
+      }
+    },
+    (err) => {
+      console.warn("Banner settings subscription note:", err.message);
+      onUpdate(DEFAULT_BANNER_SETTINGS);
+      if (onError) onError(err);
+    },
+  );
+}
+
+export async function updateBannerSettingsInFirestore(
+  settings: Partial<FirestoreBannerSettings>,
+) {
+  const settingsDoc = doc(db, "settings", "clients_banner");
+  await setDoc(
+    settingsDoc,
+    {
+      ...settings,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
 }

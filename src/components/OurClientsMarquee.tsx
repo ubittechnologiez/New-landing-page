@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import {
   subscribeToClients,
+  subscribeToBannerSettings,
   FirestoreClientLogo,
+  FirestoreBannerSettings,
+  DEFAULT_BANNER_SETTINGS,
   INITIAL_CLIENTS_DATA,
 } from "@/lib/firestore-service";
 
 export function OurClientsMarquee() {
   const [clients, setClients] = useState<FirestoreClientLogo[]>([]);
+  const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(DEFAULT_BANNER_SETTINGS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = subscribeToClients(
+    const unsubClients = subscribeToClients(
       (items) => {
         const activeItems = items
           .filter((item) => item.isActive !== false)
@@ -40,7 +44,14 @@ export function OurClientsMarquee() {
       }
     );
 
-    return () => unsubscribe();
+    const unsubSettings = subscribeToBannerSettings((settings) => {
+      setBannerSettings(settings);
+    });
+
+    return () => {
+      unsubClients();
+      unsubSettings();
+    };
   }, []);
 
   const displayList: FirestoreClientLogo[] =
@@ -58,6 +69,17 @@ export function OurClientsMarquee() {
     ...displayList,
     ...displayList,
   ];
+
+  const getSpeedDuration = () => {
+    switch (bannerSettings.speed) {
+      case "slow":
+        return "50s";
+      case "fast":
+        return "18s";
+      default:
+        return "30s";
+    }
+  };
 
   return (
     <section
@@ -84,34 +106,44 @@ export function OurClientsMarquee() {
         />
 
         {/* Marquee Track with Raw Large Logos */}
-        <div className="flex w-max items-center ubit-marquee py-3 h-[77px] md:h-auto">
-          {duplicatedList.map((client, idx) => (
-            <div
-              key={`${client.id || client.name}-${idx}`}
-              className="mx-6 sm:mx-8 md:mx-12 lg:mx-14 flex items-center justify-center shrink-0 group transition-all duration-300"
-            >
-              <img
-                src={client.logoUrl}
-                alt={client.name}
-                loading="lazy"
-                draggable={false}
-                className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto max-w-[180px] sm:max-w-[220px] md:max-w-[260px] object-contain transition-all duration-300 opacity-85 group-hover:opacity-100 group-hover:scale-110 group-hover:brightness-110 filter drop-shadow-sm"
-                onError={(e) => {
-                  // Fallback to stylized bold text logo if image fails
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  const parent = target.parentElement;
-                  if (parent && !parent.querySelector(".fallback-text")) {
-                    const badge = document.createElement("span");
-                    badge.className =
-                      "fallback-text font-display font-extrabold text-sm sm:text-base md:text-lg text-foreground tracking-wider uppercase";
-                    badge.textContent = client.name;
-                    parent.appendChild(badge);
-                  }
-                }}
-              />
-            </div>
-          ))}
+        <div
+          className="flex w-max items-center ubit-marquee py-3 h-[77px] md:h-auto"
+          style={{ animationDuration: getSpeedDuration() }}
+        >
+          {duplicatedList.map((client, idx) => {
+            const logoScale = client.scale ?? 1;
+            return (
+              <div
+                key={`${client.id || client.name}-${idx}`}
+                className="mx-6 sm:mx-8 md:mx-12 lg:mx-14 flex items-center justify-center shrink-0 group transition-all duration-300"
+              >
+                <img
+                  src={client.logoUrl}
+                  alt={client.name}
+                  loading="lazy"
+                  draggable={false}
+                  style={{
+                    transform: `scale(${logoScale})`,
+                    transformOrigin: "center center",
+                  }}
+                  className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto max-w-[180px] sm:max-w-[220px] md:max-w-[260px] object-contain transition-all duration-300 opacity-85 group-hover:opacity-100 group-hover:scale-110 group-hover:brightness-110 filter drop-shadow-sm"
+                  onError={(e) => {
+                    // Fallback to stylized bold text logo if image fails
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector(".fallback-text")) {
+                      const badge = document.createElement("span");
+                      badge.className =
+                        "fallback-text font-display font-extrabold text-sm sm:text-base md:text-lg text-foreground tracking-wider uppercase";
+                      badge.textContent = client.name;
+                      parent.appendChild(badge);
+                    }
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
