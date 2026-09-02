@@ -11,7 +11,7 @@ import {
   FirestoreBannerSettings,
   DEFAULT_BANNER_SETTINGS,
   getCachedBannerSettings,
-  INITIAL_CLIENTS_DATA,
+  getCachedClients,
 } from "@/lib/firestore-service";
 import { processImageFile } from "@/lib/image-utils";
 import { Button } from "@/components/ui/button";
@@ -55,8 +55,8 @@ import {
 } from "lucide-react";
 
 export function ClientManager() {
-  const [clients, setClients] = useState<FirestoreClientLogo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [clients, setClients] = useState<FirestoreClientLogo[]>(() => getCachedClients());
+  const [loading, setLoading] = useState(() => getCachedClients().length === 0);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

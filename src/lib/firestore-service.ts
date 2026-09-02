@@ -493,307 +493,80 @@ export function subscribeToGallery(
 
 // ---------------- Client Logos Services ---------------- //
 
-function makeRawBrandLogo(brand: string): string {
-  let innerContent = "";
-  let width = 200;
-  const height = 60;
+export const CLIENTS_STORAGE_KEY = "ubit_clients_cache_data";
 
-  switch (brand) {
-    case "tcs":
-      width = 170;
-      innerContent = `
-        <g transform="translate(10, 10)">
-          <!-- Tata Swirl Ring -->
-          <circle cx="20" cy="20" r="18" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="80 15"/>
-          <path d="M12 24 C14 14, 26 14, 28 24" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="20" cy="17" r="3.5" fill="#38bdf8"/>
-          <!-- TCS Wordmark -->
-          <text x="50" y="27" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="24" letter-spacing="1.5">TCS</text>
-        </g>
-      `;
-      break;
-
-    case "infosys":
-      width = 190;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <text x="5" y="26" fill="#007cc3" font-family="'Segoe UI', Roboto, Helvetica, sans-serif" font-weight="700" font-size="28" letter-spacing="-0.5">Infosys</text>
-          <circle cx="118" cy="10" r="3.5" fill="#38bdf8"/>
-        </g>
-      `;
-      break;
-
-    case "apollo":
-      width = 200;
-      innerContent = `
-        <g transform="translate(10, 10)">
-          <!-- Apollo Sun & Medical Flame -->
-          <path d="M18 6 L24 16 L34 16 L26 23 L29 33 L20 27 L11 33 L14 23 L6 16 L16 16 Z" fill="#ef4444"/>
-          <circle cx="20" cy="20" r="6" fill="#fbbf24"/>
-          <!-- Wordmark -->
-          <text x="44" y="26" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="22" letter-spacing="0.5">Apollo</text>
-        </g>
-      `;
-      break;
-
-    case "titan":
-      width = 180;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <path d="M8 6 H30 M19 6 V32" stroke="#eab308" stroke-width="3.5" stroke-linecap="square"/>
-          <circle cx="19" cy="19" r="15" fill="none" stroke="#ca8a04" stroke-width="1.5" stroke-opacity="0.6"/>
-          <text x="44" y="26" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="22" letter-spacing="3">TITAN</text>
-        </g>
-      `;
-      break;
-
-    case "sundaram":
-      width = 210;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <polygon points="18,6 28,12 28,26 18,32 8,26 8,12" fill="none" stroke="#3b82f6" stroke-width="3"/>
-          <circle cx="18" cy="19" r="4" fill="#60a5fa"/>
-          <text x="38" y="25" fill="#f8fafc" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="18" letter-spacing="1">SUNDARAM</text>
-        </g>
-      `;
-      break;
-
-    case "lt":
-      width = 170;
-      innerContent = `
-        <g transform="translate(10, 10)">
-          <circle cx="20" cy="20" r="18" fill="#eab308"/>
-          <text x="10" y="27" fill="#0f172a" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="20">L&amp;T</text>
-          <text x="48" y="26" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="21" letter-spacing="1">L&amp;T</text>
-        </g>
-      `;
-      break;
-
-    case "ramco":
-      width = 180;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <path d="M6 28 L14 10 L22 28 L18 28 L14 18 L10 28 Z" fill="#ef4444"/>
-          <circle cx="14" cy="7" r="3" fill="#f87171"/>
-          <text x="30" y="26" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="22" letter-spacing="1">ramco</text>
-        </g>
-      `;
-      break;
-
-    case "tvs":
-      width = 180;
-      innerContent = `
-        <g transform="translate(10, 10)">
-          <polygon points="6,24 16,8 24,14 18,30" fill="#38bdf8"/>
-          <polygon points="18,30 26,16 34,22 28,34" fill="#ef4444"/>
-          <text x="42" y="26" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="24" font-style="italic" letter-spacing="2">TVS</text>
-        </g>
-      `;
-      break;
-
-    case "ashok":
-      width = 230;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <circle cx="16" cy="18" r="14" fill="none" stroke="#10b981" stroke-width="2.5"/>
-          <path d="M8 18 H24 M16 10 V26 M10 12 L22 24 M10 24 L22 12" stroke="#10b981" stroke-width="1.5"/>
-          <text x="38" y="25" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="17" letter-spacing="1">ASHOK LEYLAND</text>
-        </g>
-      `;
-      break;
-
-    case "zoho":
-      width = 180;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <!-- 4 Zoho Colorful Blocks -->
-          <rect x="4" y="6" width="11" height="11" rx="2" fill="#ef4444"/>
-          <rect x="17" y="6" width="11" height="11" rx="2" fill="#22c55e"/>
-          <rect x="4" y="19" width="11" height="11" rx="2" fill="#3b82f6"/>
-          <rect x="17" y="19" width="11" height="11" rx="2" fill="#eab308"/>
-          <text x="36" y="26" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="24" letter-spacing="2">ZOHO</text>
-        </g>
-      `;
-      break;
-
-    case "hcl":
-      width = 180;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <path d="M8 8 V28 M8 18 H20 M20 8 V28" stroke="#818cf8" stroke-width="4" stroke-linecap="round"/>
-          <text x="32" y="26" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="24" letter-spacing="1">HCL<tspan fill="#818cf8">Tech</tspan></text>
-        </g>
-      `;
-      break;
-
-    case "wipro":
-      width = 190;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <!-- Multi-color concentric sunburst -->
-          <circle cx="16" cy="18" r="4" fill="#eab308"/>
-          <circle cx="16" cy="8" r="2.5" fill="#ef4444"/>
-          <circle cx="24" cy="12" r="2.5" fill="#ec4899"/>
-          <circle cx="26" cy="20" r="2.5" fill="#8b5cf6"/>
-          <circle cx="22" cy="26" r="2.5" fill="#3b82f6"/>
-          <circle cx="14" cy="28" r="2.5" fill="#06b6d4"/>
-          <circle cx="7" cy="23" r="2.5" fill="#10b981"/>
-          <circle cx="7" cy="14" r="2.5" fill="#84cc16"/>
-          <text x="38" y="25" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="22" letter-spacing="0.5">wipro</text>
-        </g>
-      `;
-      break;
-
-    default:
-      width = 180;
-      innerContent = `
-        <g transform="translate(10, 12)">
-          <circle cx="16" cy="18" r="12" fill="#38bdf8"/>
-          <text x="36" y="25" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="20">${brand.toUpperCase()}</text>
-        </g>
-      `;
+export function getCachedClients(): FirestoreClientLogo[] {
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem(CLIENTS_STORAGE_KEY) : null;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.debug("Cached clients parse error:", err);
   }
-
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-    ${innerContent}
-  </svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  return [];
 }
 
-export const INITIAL_CLIENTS_DATA: Omit<FirestoreClientLogo, "id">[] = [
-  {
-    name: "Tata Consultancy Services",
-    logoUrl: makeRawBrandLogo("tcs"),
-    position: 1,
-    industry: "Enterprise IT & Consulting",
-    isActive: true,
-    website: "https://www.tcs.com",
-  },
-  {
-    name: "Infosys",
-    logoUrl: makeRawBrandLogo("infosys"),
-    position: 2,
-    industry: "Global Cloud & Systems",
-    isActive: true,
-    website: "https://www.infosys.com",
-  },
-  {
-    name: "Apollo Hospitals",
-    logoUrl: makeRawBrandLogo("apollo"),
-    position: 3,
-    industry: "Healthcare & Life Sciences",
-    isActive: true,
-    website: "https://www.apollohospitals.com",
-  },
-  {
-    name: "Titan Company",
-    logoUrl: makeRawBrandLogo("titan"),
-    position: 4,
-    industry: "Consumer & Precision Eng",
-    isActive: true,
-    website: "https://www.titancompany.in",
-  },
-  {
-    name: "Sundaram Fasteners",
-    logoUrl: makeRawBrandLogo("sundaram"),
-    position: 5,
-    industry: "Automotive Precision Mfg",
-    isActive: true,
-    website: "https://www.sundaramfasteners.com",
-  },
-  {
-    name: "Larsen & Toubro",
-    logoUrl: makeRawBrandLogo("lt"),
-    position: 6,
-    industry: "Infrastructure & Heavy Tech",
-    isActive: true,
-    website: "https://www.ltts.com",
-  },
-  {
-    name: "Ramco Systems",
-    logoUrl: makeRawBrandLogo("ramco"),
-    position: 7,
-    industry: "ERP & Aviation Systems",
-    isActive: true,
-    website: "https://www.ramco.com",
-  },
-  {
-    name: "TVS Motor Company",
-    logoUrl: makeRawBrandLogo("tvs"),
-    position: 8,
-    industry: "Automotive & Manufacturing",
-    isActive: true,
-    website: "https://www.tvsmotor.com",
-  },
-  {
-    name: "Ashok Leyland",
-    logoUrl: makeRawBrandLogo("ashok"),
-    position: 9,
-    industry: "Commercial Vehicles & Logistics",
-    isActive: true,
-    website: "https://www.ashokleyland.com",
-  },
-  {
-    name: "Zoho Corporation",
-    logoUrl: makeRawBrandLogo("zoho"),
-    position: 10,
-    industry: "Enterprise Cloud Software",
-    isActive: true,
-    website: "https://www.zoho.com",
-  },
-  {
-    name: "HCLTech",
-    logoUrl: makeRawBrandLogo("hcl"),
-    position: 11,
-    industry: "Digital & Engineering",
-    isActive: true,
-    website: "https://www.hcltech.com",
-  },
-  {
-    name: "Wipro",
-    logoUrl: makeRawBrandLogo("wipro"),
-    position: 12,
-    industry: "IT & Global Innovation",
-    isActive: true,
-    website: "https://www.wipro.com",
-  },
-];
+export const INITIAL_CLIENTS_DATA: Omit<FirestoreClientLogo, "id">[] = [];
 
 export function subscribeToClients(
   onUpdate: (clients: FirestoreClientLogo[]) => void,
   onError?: (err: Error) => void,
 ) {
+  // 1. Immediately emit cached real clients
+  const cached = getCachedClients();
+  if (cached.length > 0) {
+    onUpdate(cached);
+  }
+
+  // 2. Listen to local event for zero-latency cross-component updates
+  const handleLocalUpdate = (e: any) => {
+    if (Array.isArray(e.detail)) {
+      onUpdate(e.detail);
+    }
+  };
+  if (typeof window !== "undefined") {
+    window.addEventListener("ubit_clients_updated", handleLocalUpdate);
+  }
+
+  // 3. Listen to Firestore collection
   const clientsRef = collection(db, "clients");
   const q = query(clientsRef, orderBy("position", "asc"));
 
-  return onSnapshot(
+  const unsubscribe = onSnapshot(
     q,
     (snapshot) => {
-      if (snapshot.empty) {
-        // Provide seeded initial clients
-        const fallback: FirestoreClientLogo[] = INITIAL_CLIENTS_DATA.map((c, i) => ({
-          id: `initial-client-${i + 1}`,
-          ...c,
-        }));
-        onUpdate(fallback);
-        return;
-      }
       const items: FirestoreClientLogo[] = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<FirestoreClientLogo, "id">),
       }));
+
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.setItem(CLIENTS_STORAGE_KEY, JSON.stringify(items));
+        }
+      } catch (err) {
+        console.debug("Failed to cache clients list:", err);
+      }
+
       onUpdate(items);
     },
     (err) => {
       console.warn("Clients Firestore subscription note:", err.message);
-      const fallback: FirestoreClientLogo[] = INITIAL_CLIENTS_DATA.map((c, i) => ({
-        id: `initial-client-${i + 1}`,
-        ...c,
-      }));
-      onUpdate(fallback);
+      onUpdate(getCachedClients());
       if (onError) onError(err);
     },
   );
+
+  return () => {
+    if (typeof window !== "undefined") {
+      window.removeEventListener("ubit_clients_updated", handleLocalUpdate);
+    }
+    unsubscribe();
+  };
 }
 
 export async function addClientLogoToFirestore(client: {
@@ -826,6 +599,7 @@ export async function addClientLogoToFirestore(client: {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+
   return docRef.id;
 }
 

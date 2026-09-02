@@ -6,18 +6,16 @@ import {
   FirestoreBannerSettings,
   DEFAULT_BANNER_SETTINGS,
   getCachedBannerSettings,
-  INITIAL_CLIENTS_DATA,
+  getCachedClients,
 } from "@/lib/firestore-service";
 
 export function OurClientsMarquee() {
-  const [clients, setClients] = useState<FirestoreClientLogo[]>(() =>
-    INITIAL_CLIENTS_DATA.map((c, i) => ({
-      id: `fallback-${i}`,
-      ...c,
-    }))
-  );
+  const [clients, setClients] = useState<FirestoreClientLogo[]>(() => {
+    const cached = getCachedClients();
+    return cached.filter((item) => item.isActive !== false).sort((a, b) => (a.position || 0) - (b.position || 0));
+  });
   const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(() => getCachedBannerSettings());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => getCachedClients().length === 0);
 
   useEffect(() => {
     const unsubClients = subscribeToClients(
@@ -26,26 +24,11 @@ export function OurClientsMarquee() {
           .filter((item) => item.isActive !== false)
           .sort((a, b) => (a.position || 0) - (b.position || 0));
 
-        if (activeItems.length > 0) {
-          setClients(activeItems);
-        } else {
-          setClients(
-            INITIAL_CLIENTS_DATA.map((c, i) => ({
-              id: `fallback-${i}`,
-              ...c,
-            }))
-          );
-        }
+        setClients(activeItems);
         setLoading(false);
       },
       (err) => {
         console.warn("Clients marquee loading note:", err);
-        setClients(
-          INITIAL_CLIENTS_DATA.map((c, i) => ({
-            id: `fallback-${i}`,
-            ...c,
-          }))
-        );
         setLoading(false);
       }
     );
@@ -60,21 +43,14 @@ export function OurClientsMarquee() {
     };
   }, []);
 
-  const displayList: FirestoreClientLogo[] =
-    clients.length > 0
-      ? clients
-      : INITIAL_CLIENTS_DATA.map((c, i) => ({
-          id: `fallback-${i}`,
-          ...c,
-        }));
+  if (clients.length === 0) {
+    // If no clients are registered or while initially fetching without cache, do NOT show any sample logos
+    return null;
+  }
 
   // Duplicate logos multiple times to ensure seamless, gapless infinite scrolling across all screen widths
-  const duplicatedList = [
-    ...displayList,
-    ...displayList,
-    ...displayList,
-    ...displayList,
-  ];
+  const repeatCount = Math.max(4, Math.ceil(16 / clients.length));
+  const duplicatedList = Array(repeatCount).fill(clients).flat();
 
   const getSpeedDuration = () => {
     switch (bannerSettings.speed) {
