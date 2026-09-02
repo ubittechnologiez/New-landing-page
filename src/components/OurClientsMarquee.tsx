@@ -84,7 +84,7 @@ export function OurClientsMarquee() {
         />
 
         {/* Marquee Track with Raw Large Logos */}
-        <div className="flex w-max items-center ubit-marquee py-3">
+        <div className="flex w-max items-center ubit-marquee py-3 h-[77px] md:h-auto">
           {duplicatedList.map((client, idx) => (
             <div
               key={`${client.id || client.name}-${idx}`}
