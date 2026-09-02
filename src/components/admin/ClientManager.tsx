@@ -12,6 +12,7 @@ import {
   DEFAULT_BANNER_SETTINGS,
   getCachedBannerSettings,
   getCachedClients,
+  getResolvedBannerConfig,
 } from "@/lib/firestore-service";
 import { processImageFile } from "@/lib/image-utils";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,8 @@ import {
   Save,
   Check,
   MoveHorizontal,
+  Monitor,
+  Smartphone,
 } from "lucide-react";
 
 export function ClientManager() {
@@ -65,9 +68,19 @@ export function ClientManager() {
 
   // Banner preview sizing & speed controls
   const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(() => getCachedBannerSettings());
-  const [previewLogoHeight, setPreviewLogoHeight] = useState<number>(() => getCachedBannerSettings().logoHeight || 48);
-  const [previewGap, setPreviewGap] = useState<number>(() => getCachedBannerSettings().gap || 32);
-  const [previewSpeed, setPreviewSpeed] = useState<"slow" | "normal" | "fast">(() => getCachedBannerSettings().speed || "normal");
+  const [selectedDevice, setSelectedDevice] = useState<"desktop" | "mobile">("desktop");
+  const [previewLogoHeight, setPreviewLogoHeight] = useState<number>(() => {
+    const cached = getCachedBannerSettings();
+    return getResolvedBannerConfig(cached, false).logoHeight;
+  });
+  const [previewGap, setPreviewGap] = useState<number>(() => {
+    const cached = getCachedBannerSettings();
+    return getResolvedBannerConfig(cached, false).gap;
+  });
+  const [previewSpeed, setPreviewSpeed] = useState<"slow" | "normal" | "fast">(() => {
+    const cached = getCachedBannerSettings();
+    return getResolvedBannerConfig(cached, false).speed;
+  });
   const [showResizingControls, setShowResizingControls] = useState(true);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -84,6 +97,14 @@ export function ClientManager() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleDeviceChange = (device: "desktop" | "mobile") => {
+    setSelectedDevice(device);
+    const resolved = getResolvedBannerConfig(bannerSettings, device === "mobile");
+    setPreviewLogoHeight(resolved.logoHeight);
+    setPreviewGap(resolved.gap);
+    setPreviewSpeed(resolved.speed);
+  };
+
   useEffect(() => {
     const unsubClients = subscribeToClients((items) => {
       const sorted = [...items].sort((a, b) => (a.position || 0) - (b.position || 0));
@@ -93,16 +114,17 @@ export function ClientManager() {
 
     const unsubSettings = subscribeToBannerSettings((settings) => {
       setBannerSettings(settings);
-      if (settings.logoHeight) setPreviewLogoHeight(settings.logoHeight);
-      if (settings.gap) setPreviewGap(settings.gap);
-      if (settings.speed) setPreviewSpeed(settings.speed);
+      const resolved = getResolvedBannerConfig(settings, selectedDevice === "mobile");
+      setPreviewLogoHeight(resolved.logoHeight);
+      setPreviewGap(resolved.gap);
+      setPreviewSpeed(resolved.speed);
     });
 
     return () => {
       unsubClients();
       unsubSettings();
     };
-  }, []);
+  }, [selectedDevice]);
 
   const openAddModal = () => {
     setFormName("");
@@ -349,12 +371,23 @@ export function ClientManager() {
   const handleSaveBannerSettings = async () => {
     try {
       setIsSavingSettings(true);
-      await updateBannerSettingsInFirestore({
-        logoHeight: previewLogoHeight,
-        gap: previewGap,
-        speed: previewSpeed,
-      });
-      toast.success("Banner sizing settings saved live!");
+      const isMob = selectedDevice === "mobile";
+      const updatePayload: Partial<FirestoreBannerSettings> = {
+        [selectedDevice]: {
+          logoHeight: previewLogoHeight,
+          gap: previewGap,
+          speed: previewSpeed,
+        },
+      };
+      if (!isMob) {
+        updatePayload.logoHeight = previewLogoHeight;
+        updatePayload.gap = previewGap;
+        updatePayload.speed = previewSpeed;
+      }
+      await updateBannerSettingsInFirestore(updatePayload);
+      toast.success(
+        `Saved ${selectedDevice === "desktop" ? "Desktop" : "Mobile"} marquee sizing & speed settings live!`
+      );
     } catch (err: any) {
       console.error("Error saving banner settings:", err);
       toast.error("Failed to save banner settings");
@@ -364,18 +397,28 @@ export function ClientManager() {
   };
 
   const handleResetBannerSettings = async () => {
-    setPreviewLogoHeight(48);
-    setPreviewGap(32);
-    setPreviewSpeed("normal");
+    const isMob = selectedDevice === "mobile";
+    const defaultVals = isMob
+      ? { logoHeight: 36, gap: 48, speed: "normal" as const }
+      : { logoHeight: 48, gap: 104, speed: "normal" as const };
+
+    setPreviewLogoHeight(defaultVals.logoHeight);
+    setPreviewGap(defaultVals.gap);
+    setPreviewSpeed(defaultVals.speed);
+
     try {
-      await updateBannerSettingsInFirestore({
-        logoHeight: 48,
-        gap: 32,
-        speed: "normal",
-      });
-      toast.success("Reset and saved default sizing to live banner");
+      const updatePayload: Partial<FirestoreBannerSettings> = {
+        [selectedDevice]: defaultVals,
+      };
+      if (!isMob) {
+        updatePayload.logoHeight = defaultVals.logoHeight;
+        updatePayload.gap = defaultVals.gap;
+        updatePayload.speed = defaultVals.speed;
+      }
+      await updateBannerSettingsInFirestore(updatePayload);
+      toast.success(`Reset ${selectedDevice === "desktop" ? "Desktop" : "Mobile"} sizing to defaults`);
     } catch {
-      toast.info("Reset preview sizing to standard 48px height");
+      toast.info(`Reset preview to default ${defaultVals.logoHeight}px height`);
     }
   };
 
@@ -453,13 +496,45 @@ export function ClientManager() {
 
         {/* Provision for Logo Resizing Toolbar */}
         {showResizingControls && (
-          <div className="p-3 sm:p-4 rounded-xl bg-background/80 border border-primary/20 space-y-3.5">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
-                <Sliders className="size-4 text-primary" />
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider font-mono">
-                  Marquee Banner Sizing & Speed Provision
-                </span>
+          <div className="p-3.5 sm:p-5 rounded-xl bg-background/90 border border-primary/30 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between gap-3 flex-wrap border-b border-border/50 pb-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-md border border-primary/20">
+                  <Sliders className="size-4" />
+                  <span className="text-xs font-bold uppercase tracking-wider font-mono">
+                    Marquee Banner Sizing & Speed Provision
+                  </span>
+                </div>
+
+                {/* Device Switch Button (Desktop / Mobile) */}
+                <div className="flex items-center gap-2 ml-0 sm:ml-2">
+                  <div className="flex items-center gap-1 bg-muted/80 p-1 rounded-lg border border-border/80 shadow-xs">
+                    <button
+                      type="button"
+                      onClick={() => handleDeviceChange("desktop")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                        selectedDevice === "desktop"
+                          ? "bg-primary text-primary-foreground shadow-xs font-bold"
+                          : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      }`}
+                    >
+                      <Monitor className="size-3.5" />
+                      Desktop
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeviceChange("mobile")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                        selectedDevice === "mobile"
+                          ? "bg-primary text-primary-foreground shadow-xs font-bold"
+                          : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      }`}
+                    >
+                      <Smartphone className="size-3.5" />
+                      Mobile
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
@@ -467,31 +542,47 @@ export function ClientManager() {
                   variant="outline"
                   size="sm"
                   onClick={handleResetBannerSettings}
-                  className="h-7 text-[11px] px-2.5 gap-1 border-border/70 hover:bg-muted"
+                  className="h-8 text-xs px-2.5 gap-1 border-border/70 hover:bg-muted"
+                  title={`Reset ${selectedDevice} sizing to default`}
                 >
                   <RotateCcw className="size-3" />
-                  Reset
+                  Reset {selectedDevice === "desktop" ? "Desktop" : "Mobile"}
                 </Button>
                 <Button
                   variant="default"
                   size="sm"
                   disabled={isSavingSettings}
                   onClick={handleSaveBannerSettings}
-                  className="h-7 text-[11px] px-3 gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="h-8 text-xs px-3.5 gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-xs"
                 >
-                  <Save className="size-3" />
-                  {isSavingSettings ? "Saving..." : "Save Default Sizing"}
+                  <Save className="size-3.5" />
+                  {isSavingSettings ? "Saving..." : `Save ${selectedDevice === "desktop" ? "Desktop" : "Mobile"} Settings`}
                 </Button>
               </div>
             </div>
 
+            {/* Target mode indicator notice */}
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-lg border border-border/40">
+              <span className="flex items-center gap-1.5">
+                {selectedDevice === "desktop" ? (
+                  <Monitor className="size-3.5 text-primary" />
+                ) : (
+                  <Smartphone className="size-3.5 text-primary" />
+                )}
+                Currently editing parameters for <strong className="text-foreground uppercase">{selectedDevice}</strong> screens ({selectedDevice === "desktop" ? "≥ 768px screens & desktops" : "< 768px smartphones & tablets"}).
+              </span>
+              <Badge variant="outline" className="text-[10px] font-mono capitalize border-primary/30 text-primary">
+                {selectedDevice} Active
+              </Badge>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
               {/* Logo Height Sizing Control */}
-              <div className="space-y-1.5 p-2.5 rounded-lg bg-card/60 border border-border/50">
+              <div className="space-y-1.5 p-3 rounded-lg bg-card/60 border border-border/50">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground font-medium flex items-center gap-1">
                     <Maximize2 className="size-3 text-primary" />
-                    Base Logo Height:
+                    {selectedDevice === "desktop" ? "Desktop" : "Mobile"} Logo Height:
                   </span>
                   <Badge variant="outline" className="font-mono text-primary font-bold text-[11px] px-1.5 py-0">
                     {previewLogoHeight}px
@@ -500,8 +591,8 @@ export function ClientManager() {
                 
                 <input
                   type="range"
-                  min="28"
-                  max="88"
+                  min={selectedDevice === "desktop" ? 28 : 20}
+                  max={selectedDevice === "desktop" ? 88 : 64}
                   step="2"
                   value={previewLogoHeight}
                   onChange={(e) => setPreviewLogoHeight(Number(e.target.value))}
@@ -509,12 +600,20 @@ export function ClientManager() {
                 />
 
                 <div className="flex items-center justify-between gap-1 pt-0.5">
-                  {[
-                    { label: "Compact", val: 36 },
-                    { label: "Standard", val: 48 },
-                    { label: "Large", val: 60 },
-                    { label: "XL", val: 76 },
-                  ].map((preset) => (
+                  {(selectedDevice === "desktop"
+                    ? [
+                        { label: "Compact", val: 36 },
+                        { label: "Standard", val: 48 },
+                        { label: "Large", val: 60 },
+                        { label: "XL", val: 76 },
+                      ]
+                    : [
+                        { label: "Small", val: 28 },
+                        { label: "Standard", val: 36 },
+                        { label: "Large", val: 44 },
+                        { label: "XL", val: 52 },
+                      ]
+                  ).map((preset) => (
                     <button
                       key={preset.label}
                       onClick={() => setPreviewLogoHeight(preset.val)}
@@ -524,18 +623,18 @@ export function ClientManager() {
                           : "bg-muted/50 hover:bg-muted text-muted-foreground"
                       }`}
                     >
-                      {preset.label} ({preset.val}p)
+                      {preset.label} ({preset.val}px)
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Spacing / Gap Control */}
-              <div className="space-y-1.5 p-2.5 rounded-lg bg-card/60 border border-border/50">
+              <div className="space-y-1.5 p-3 rounded-lg bg-card/60 border border-border/50">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground font-medium flex items-center gap-1">
                     <MoveHorizontal className="size-3 text-primary" />
-                    Logo Spacing (Gap):
+                    {selectedDevice === "desktop" ? "Desktop" : "Mobile"} Spacing (Gap):
                   </span>
                   <Badge variant="outline" className="font-mono text-primary font-bold text-[11px] px-1.5 py-0">
                     {previewGap}px
@@ -544,8 +643,8 @@ export function ClientManager() {
 
                 <input
                   type="range"
-                  min="48"
-                  max="180"
+                  min={selectedDevice === "desktop" ? 48 : 16}
+                  max={selectedDevice === "desktop" ? 180 : 120}
                   step="2"
                   value={previewGap}
                   onChange={(e) => setPreviewGap(Number(e.target.value))}
@@ -553,12 +652,20 @@ export function ClientManager() {
                 />
 
                 <div className="flex items-center justify-between gap-1 pt-0.5">
-                  {[
-                    { label: "Compact", val: 84 },
-                    { label: "Standard", val: 104 },
-                    { label: "Wide", val: 124 },
-                    { label: "XL Wide", val: 144 },
-                  ].map((preset) => (
+                  {(selectedDevice === "desktop"
+                    ? [
+                        { label: "Compact", val: 84 },
+                        { label: "Standard", val: 104 },
+                        { label: "Wide", val: 124 },
+                        { label: "XL Wide", val: 144 },
+                      ]
+                    : [
+                        { label: "Compact", val: 32 },
+                        { label: "Standard", val: 48 },
+                        { label: "Wide", val: 64 },
+                        { label: "XL Wide", val: 80 },
+                      ]
+                  ).map((preset) => (
                     <button
                       key={preset.label}
                       onClick={() => setPreviewGap(preset.val)}
@@ -575,11 +682,11 @@ export function ClientManager() {
               </div>
 
               {/* Running Speed Control */}
-              <div className="space-y-1.5 p-2.5 rounded-lg bg-card/60 border border-border/50 sm:col-span-2 lg:col-span-1">
+              <div className="space-y-1.5 p-3 rounded-lg bg-card/60 border border-border/50 sm:col-span-2 lg:col-span-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground font-medium flex items-center gap-1">
                     <Gauge className="size-3 text-primary" />
-                    Marquee Speed:
+                    {selectedDevice === "desktop" ? "Desktop" : "Mobile"} Speed:
                   </span>
                   <Badge variant="outline" className="font-mono text-primary font-bold text-[11px] uppercase px-1.5 py-0">
                     {previewSpeed}
@@ -607,46 +714,56 @@ export function ClientManager() {
         )}
 
         {/* Live Running Banner Track (Right to Left) */}
-        <div className="relative w-full overflow-hidden rounded-xl border border-white/5 bg-background/95 py-5 shadow-inner">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-24 bg-gradient-to-r from-background to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-24 bg-gradient-to-l from-background to-transparent" />
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs px-1 text-muted-foreground font-mono">
+            <span className="flex items-center gap-1.5">
+              {selectedDevice === "desktop" ? <Monitor className="size-3 text-primary" /> : <Smartphone className="size-3 text-primary" />}
+              Previewing: <strong className="text-foreground capitalize">{selectedDevice} Layout</strong> (Height: {previewLogoHeight}px | Gap: {previewGap}px | Speed: {previewSpeed})
+            </span>
+            <span>{activeClients.length} logos in loop</span>
+          </div>
 
-          <div
-            className="flex w-max items-center ubit-marquee"
-            style={{ animationDuration: getSpeedDuration() }}
-          >
-            {[...activeClients, ...activeClients, ...activeClients].map((client, idx) => {
-              const clientScale = client.scale ?? 1;
-              return (
-                <div
-                  key={`preview-${client.id || client.name}-${idx}`}
-                  style={{ marginLeft: `${Math.round(previewGap / 2)}px`, marginRight: `${Math.round(previewGap / 2)}px` }}
-                  className="flex items-center justify-center shrink-0 group relative transition-all"
-                  title={`${client.name} (Scale: ${Math.round(clientScale * 100)}%)`}
-                >
-                  <img
-                    src={client.logoUrl}
-                    alt={client.name}
-                    style={{
-                      height: `${previewLogoHeight}px`,
-                      transform: `scale(${clientScale})`,
-                      transformOrigin: "center center",
-                    }}
-                    className="w-auto max-w-[260px] object-contain transition-transform duration-200"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                    }}
-                  />
-                  {/* Subtle scale indicator badge on hover */}
-                  {clientScale !== 1 && (
-                    <span className="opacity-0 group-hover:opacity-100 absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] font-mono px-1 py-0.2 rounded bg-primary text-primary-foreground shadow transition-opacity pointer-events-none">
-                      {Math.round(clientScale * 100)}%
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+          <div className="relative w-full overflow-hidden rounded-xl border border-white/5 bg-background/95 py-5 shadow-inner">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-24 bg-gradient-to-r from-background to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-24 bg-gradient-to-l from-background to-transparent" />
+
+            <div
+              className="flex w-max items-center ubit-marquee"
+              style={{ animationDuration: getSpeedDuration() }}
+            >
+              {[...activeClients, ...activeClients, ...activeClients].map((client, idx) => {
+                const clientScale = client.scale ?? 1;
+                return (
+                  <div
+                    key={`preview-${client.id || client.name}-${idx}`}
+                    style={{ marginLeft: `${Math.round(previewGap / 2)}px`, marginRight: `${Math.round(previewGap / 2)}px` }}
+                    className="flex items-center justify-center shrink-0 group relative transition-all"
+                    title={`${client.name} (Scale: ${Math.round(clientScale * 100)}%)`}
+                  >
+                    <img
+                      src={client.logoUrl}
+                      alt={client.name}
+                      style={{
+                        height: `${previewLogoHeight}px`,
+                        transform: `scale(${clientScale})`,
+                        transformOrigin: "center center",
+                      }}
+                      className="w-auto max-w-[260px] object-contain transition-transform duration-200"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "none";
+                      }}
+                    />
+                    {/* Subtle scale indicator badge on hover */}
+                    {clientScale !== 1 && (
+                      <span className="opacity-0 group-hover:opacity-100 absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] font-mono px-1 py-0.2 rounded bg-primary text-primary-foreground shadow transition-opacity pointer-events-none">
+                        {Math.round(clientScale * 100)}%
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

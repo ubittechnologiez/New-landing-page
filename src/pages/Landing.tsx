@@ -786,15 +786,15 @@ function Nav() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-40 transition-all duration-300",
+        "fixed inset-x-0 top-0 z-40 h-[68px] transition-all duration-300",
         scrolled
           ? "border-b border-white/8 bg-background/90 backdrop-blur-xl"
           : "bg-transparent"
       )}
     >
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
+      <nav className="mx-auto flex h-full max-w-7xl items-center justify-between px-5 md:px-8">
         <a href="#top" className="flex items-center gap-3">
-          <BrandLockup />
+          <BrandLockup className="h-[46px]" />
         </a>
 
         <div className="hidden items-center gap-8 lg:flex">
@@ -1975,9 +1975,6 @@ function Footer() {
               </Link>
               <Link to="/terms" className="transition-colors hover:text-primary">
                 Terms of Service
-              </Link>
-              <Link to="/admin/login" className="transition-colors hover:text-primary opacity-60 hover:opacity-100">
-                Portal
               </Link>
             </div>
           </div>

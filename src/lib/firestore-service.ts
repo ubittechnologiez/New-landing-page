@@ -52,11 +52,19 @@ export interface FirestoreClientLogo {
   updatedAt?: any;
 }
 
+export interface DeviceBannerConfig {
+  logoHeight?: number; // Base height in px (e.g. 48 for desktop, 36 for mobile)
+  gap?: number; // px gap between items (e.g. 104 for desktop, 48 for mobile)
+  speed?: "slow" | "normal" | "fast";
+}
+
 export interface FirestoreBannerSettings {
   logoHeight?: number; // Base height in px (e.g., 36, 48, 60, 72)
   globalScale?: number; // Global scale percentage (e.g. 100)
   speed?: "slow" | "normal" | "fast";
   gap?: number; // px gap between items (e.g., 24, 32, 48, 64)
+  desktop?: DeviceBannerConfig;
+  mobile?: DeviceBannerConfig;
   updatedAt?: any;
 }
 
@@ -641,16 +649,54 @@ export const DEFAULT_BANNER_SETTINGS: FirestoreBannerSettings = {
   logoHeight: 48,
   globalScale: 100,
   speed: "normal",
-  gap: 32,
+  gap: 104,
+  desktop: {
+    logoHeight: 48,
+    gap: 104,
+    speed: "normal",
+  },
+  mobile: {
+    logoHeight: 36,
+    gap: 48,
+    speed: "normal",
+  },
 };
+
+export function getResolvedBannerConfig(
+  settings?: FirestoreBannerSettings,
+  isMobile: boolean = false
+): { logoHeight: number; gap: number; speed: "slow" | "normal" | "fast" } {
+  const current = settings || getCachedBannerSettings();
+  if (isMobile) {
+    return {
+      logoHeight: current.mobile?.logoHeight ?? Math.round((current.logoHeight || 48) * 0.75),
+      gap: current.mobile?.gap ?? Math.max(24, Math.round((current.gap || 104) * 0.45)),
+      speed: current.mobile?.speed ?? current.speed ?? "normal",
+    };
+  }
+  return {
+    logoHeight: current.desktop?.logoHeight ?? current.logoHeight ?? 48,
+    gap: current.desktop?.gap ?? current.gap ?? 104,
+    speed: current.desktop?.speed ?? current.speed ?? "normal",
+  };
+}
 
 export function getCachedBannerSettings(): FirestoreBannerSettings {
   try {
     const raw = typeof window !== "undefined" ? localStorage.getItem(BANNER_SETTINGS_STORAGE_KEY) : null;
     if (raw) {
+      const parsed = JSON.parse(raw);
       return {
         ...DEFAULT_BANNER_SETTINGS,
-        ...JSON.parse(raw),
+        ...parsed,
+        desktop: {
+          ...DEFAULT_BANNER_SETTINGS.desktop,
+          ...(parsed.desktop || {}),
+        },
+        mobile: {
+          ...DEFAULT_BANNER_SETTINGS.mobile,
+          ...(parsed.mobile || {}),
+        },
       };
     }
   } catch (err) {
@@ -724,6 +770,14 @@ export async function updateBannerSettingsInFirestore(
   const merged: FirestoreBannerSettings = {
     ...current,
     ...settings,
+    desktop: {
+      ...(current.desktop || DEFAULT_BANNER_SETTINGS.desktop || {}),
+      ...(settings.desktop || {}),
+    },
+    mobile: {
+      ...(current.mobile || DEFAULT_BANNER_SETTINGS.mobile || {}),
+      ...(settings.mobile || {}),
+    },
   };
 
   // 1. Instantly update localStorage and broadcast locally

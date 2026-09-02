@@ -5,10 +5,17 @@ import { Loader2, ShieldAlert, LogOut, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandLockup } from "./BrandImage";
 import { motion } from "framer-motion";
+import { useIsDesktop } from "@/hooks/use-is-desktop";
+import { DesktopOnlyNotice } from "@/components/admin/DesktopOnlyNotice";
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated, isAdmin, user, signOut } = useAdmin();
   const location = useLocation();
+  const isDesktop = useIsDesktop(1024);
+
+  if (!isDesktop) {
+    return <DesktopOnlyNotice />;
+  }
 
   if (isLoading) {
     return (

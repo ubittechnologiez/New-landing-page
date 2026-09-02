@@ -434,7 +434,7 @@ export default function GalleryPage() {
           <p>© {new Date().getFullYear()} UBIT Technologiez. All rights reserved.</p>
           <Link
             to="/admin/login"
-            className="text-[11px] text-muted-foreground/70 hover:text-primary transition-colors flex items-center gap-1"
+            className="hidden md:flex text-[11px] text-muted-foreground/70 hover:text-primary transition-colors items-center gap-1"
           >
             <Lock className="size-3" />
             <span>Portal</span>

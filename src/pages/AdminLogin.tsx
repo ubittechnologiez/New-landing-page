@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ArrowLeft,
   Copy,
   Eye,
   EyeOff,
@@ -25,6 +24,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useIsDesktop } from "@/hooks/use-is-desktop";
+import { DesktopOnlyNotice } from "@/components/admin/DesktopOnlyNotice";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -52,6 +53,7 @@ function GoogleIcon({ className = "size-5" }: { className?: string }) {
 }
 
 export default function AdminLoginPage() {
+  const isDesktop = useIsDesktop(1024);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("returnTo") || "/admin";
@@ -194,6 +196,10 @@ export default function AdminLoginPage() {
     }
   };
 
+  if (!isDesktop) {
+    return <DesktopOnlyNotice />;
+  }
+
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-primary/20">
       {/* Interactive cursor glow */}
@@ -215,19 +221,16 @@ export default function AdminLoginPage() {
       <div className="pointer-events-none absolute -left-32 bottom-0 size-[28rem] rounded-full bg-[#4a7ab5]/10 blur-[130px]" />
       <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(to_right,oklch(1_0_0/0.02)_1px,transparent_1px),linear-gradient(to_bottom,oklch(1_0_0/0.02)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)]" />
 
-      {/* Header Bar */}
-      <header className="relative z-10 px-6 py-5 flex items-center justify-between border-b border-white/8 bg-background/50 backdrop-blur-md">
-        <Link to="/" className="flex items-center gap-2 group">
-          <BrandLockup size="small" />
-        </Link>
+      {/* Floating Brand Logo */}
+      <div className="absolute top-6 left-6 z-20">
         <Link
           to="/"
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center group transition-opacity hover:opacity-80"
+          title="Return to Homepage"
         >
-          <ArrowLeft className="size-3.5" />
-          <span>Back to Website</span>
+          <BrandLockup className="h-[46px]" />
         </Link>
-      </header>
+      </div>
 
       {/* Center Auth Card */}
       <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">

@@ -7,6 +7,7 @@ import {
   DEFAULT_BANNER_SETTINGS,
   getCachedBannerSettings,
   getCachedClients,
+  getResolvedBannerConfig,
 } from "@/lib/firestore-service";
 
 export function OurClientsMarquee() {
@@ -16,8 +17,20 @@ export function OurClientsMarquee() {
   });
   const [bannerSettings, setBannerSettings] = useState<FirestoreBannerSettings>(() => getCachedBannerSettings());
   const [loading, setLoading] = useState(() => getCachedClients().length === 0);
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
     const unsubClients = subscribeToClients(
       (items) => {
         const activeItems = items
@@ -38,6 +51,7 @@ export function OurClientsMarquee() {
     });
 
     return () => {
+      window.removeEventListener("resize", checkMobile);
       unsubClients();
       unsubSettings();
     };
@@ -48,12 +62,17 @@ export function OurClientsMarquee() {
     return null;
   }
 
+  // Resolved dynamic config based on current device screen
+  const resolvedConfig = getResolvedBannerConfig(bannerSettings, isMobile);
+  const baseHeight = resolvedConfig.logoHeight;
+  const logoGap = resolvedConfig.gap;
+
   // Duplicate logos multiple times to ensure seamless, gapless infinite scrolling across all screen widths
   const repeatCount = Math.max(4, Math.ceil(16 / clients.length));
   const duplicatedList = Array(repeatCount).fill(clients).flat();
 
   const getSpeedDuration = () => {
-    switch (bannerSettings.speed) {
+    switch (resolvedConfig.speed) {
       case "slow":
         return "45s";
       case "fast":
@@ -62,9 +81,6 @@ export function OurClientsMarquee() {
         return "28s";
     }
   };
-
-  const baseHeight = bannerSettings.logoHeight || 48;
-  const logoGap = bannerSettings.gap || 32;
 
   return (
     <section
