@@ -544,8 +544,8 @@ export function ClientManager() {
 
                 <input
                   type="range"
-                  min="32"
-                  max="120"
+                  min="48"
+                  max="180"
                   step="2"
                   value={previewGap}
                   onChange={(e) => setPreviewGap(Number(e.target.value))}
@@ -554,10 +554,10 @@ export function ClientManager() {
 
                 <div className="flex items-center justify-between gap-1 pt-0.5">
                   {[
-                    { label: "Compact", val: 48 },
-                    { label: "Standard", val: 64 },
-                    { label: "Wide", val: 84 },
-                    { label: "XL Wide", val: 104 },
+                    { label: "Compact", val: 84 },
+                    { label: "Standard", val: 104 },
+                    { label: "Wide", val: 124 },
+                    { label: "XL Wide", val: 144 },
                   ].map((preset) => (
                     <button
                       key={preset.label}
